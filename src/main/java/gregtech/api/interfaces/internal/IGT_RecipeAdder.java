@@ -586,6 +586,15 @@ public interface IGT_RecipeAdder {
      */
     boolean addForgeHammerRecipe(ItemStack aInput1, ItemStack aOutput1, int aDuration, int aEUt);
 
+    // Allows fluids as well as multiple items.
+    boolean addForgeHammerRecipe(
+            ItemStack[] ItemInputArray,
+            FluidStack[] FluidInputArray,
+            ItemStack[] ItemOutputArray,
+            FluidStack[] FluidOutputArray,
+            int aDuration,
+            int aEUt);
+
     /**
      * Adds a Wiremill Recipe
      *
@@ -1174,7 +1183,25 @@ public interface IGT_RecipeAdder {
      * Adds a Recipe for the Sifter. (up to 9 Outputs)
      */
     boolean addSifterRecipe(ItemStack aItemToSift, ItemStack[] aSiftedItems, int[] aChances, int aDuration, int aEUt);
-
+    /**
+     * Adds a Generalised Laser Engraver Recipe.
+     *
+     * @param ItemInputArray    Array of input items.
+     * @param FluidInputArray   Array of output items.
+     * @param OutputItemArray   Array of input fluids.
+     * @param FluidOutputArray  Array of output items.
+     * @param aDuration         Must be > 0. Duration in ticks.
+     * @param aEUt              Should be > 0. EU/t.
+     * @param aCleanroom        Boolean for usage of cleanroom in recipe.
+     */
+    boolean addSifterRecipe(
+            ItemStack[] ItemInputArray,
+            FluidStack[] FluidInputArray,
+            ItemStack[] OutputItemArray,
+            FluidStack[] FluidOutputArray,
+            int aDuration,
+            int aEUt,
+            boolean aCleanroom);
     /**
      * Adds a Recipe for the Arc Furnace. (up to 4 Outputs)
      */
