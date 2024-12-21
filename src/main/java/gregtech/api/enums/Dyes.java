@@ -1,32 +1,38 @@
 package gregtech.api.enums;
 
-import gregtech.api.interfaces.IColorModulationContainer;
-import gregtech.api.objects.GT_ArrayList;
-import gregtech.api.util.GT_Utility;
 import java.util.ArrayList;
+
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 
+import org.jetbrains.annotations.Contract;
+
+import gregtech.api.interfaces.IColorModulationContainer;
+import gregtech.api.objects.GTArrayList;
+import gregtech.api.util.GTUtility;
+
 public enum Dyes implements IColorModulationContainer {
+
     /**
      * The valid Colors, see VALUES Array below
      */
-    dyeBlack(0, 32, 32, 32, "Black"),
-    dyeRed(1, 255, 0, 0, "Red"),
-    dyeGreen(2, 0, 255, 0, "Green"),
-    dyeBrown(3, 96, 64, 0, "Brown"),
-    dyeBlue(4, 0, 32, 255, "Blue"),
-    dyePurple(5, 128, 0, 128, "Purple"),
-    dyeCyan(6, 0, 255, 255, "Cyan"),
-    dyeLightGray(7, 192, 192, 192, "Light Gray"),
-    dyeGray(8, 128, 128, 128, "Gray"),
-    dyePink(9, 255, 192, 192, "Pink"),
-    dyeLime(10, 128, 255, 128, "Lime"),
-    dyeYellow(11, 255, 255, 0, "Yellow"),
-    dyeLightBlue(12, 96, 128, 255, "Light Blue"),
-    dyeMagenta(13, 255, 0, 255, "Magenta"),
-    dyeOrange(14, 255, 128, 0, "Orange"),
-    dyeWhite(15, 255, 255, 255, "White"),
+    dyeBlack(0, 32, 32, 32, "Black", EnumChatFormatting.BLACK),
+    dyeRed(1, 255, 0, 0, "Red", EnumChatFormatting.RED),
+    dyeGreen(2, 0, 255, 0, "Green", EnumChatFormatting.DARK_GREEN),
+    dyeBrown(3, 96, 64, 0, "Brown", EnumChatFormatting.GOLD),
+    dyeBlue(4, 0, 32, 255, "Blue", EnumChatFormatting.DARK_BLUE),
+    dyePurple(5, 128, 0, 128, "Purple", EnumChatFormatting.DARK_PURPLE),
+    dyeCyan(6, 0, 255, 255, "Cyan", EnumChatFormatting.DARK_AQUA),
+    dyeLightGray(7, 192, 192, 192, "Light Gray", EnumChatFormatting.GRAY),
+    dyeGray(8, 128, 128, 128, "Gray", EnumChatFormatting.DARK_GRAY),
+    dyePink(9, 255, 192, 192, "Pink", EnumChatFormatting.LIGHT_PURPLE),
+    dyeLime(10, 128, 255, 128, "Lime", EnumChatFormatting.GREEN),
+    dyeYellow(11, 255, 255, 0, "Yellow", EnumChatFormatting.YELLOW),
+    dyeLightBlue(12, 96, 128, 255, "Light Blue", EnumChatFormatting.AQUA),
+    dyeMagenta(13, 255, 0, 255, "Magenta", EnumChatFormatting.LIGHT_PURPLE),
+    dyeOrange(14, 255, 128, 0, "Orange", EnumChatFormatting.GOLD),
+    dyeWhite(15, 255, 255, 255, "White", EnumChatFormatting.WHITE),
     /**
      * The NULL Color
      */
@@ -38,36 +44,26 @@ public enum Dyes implements IColorModulationContainer {
     CONSTRUCTION_FOAM(-1, 64, 64, 64, "Construction Foam"),
     MACHINE_METAL(-1, 210, 220, 255, "Machine Metal");
 
-    public static final Dyes[] VALUES = {
-        dyeBlack,
-        dyeRed,
-        dyeGreen,
-        dyeBrown,
-        dyeBlue,
-        dyePurple,
-        dyeCyan,
-        dyeLightGray,
-        dyeGray,
-        dyePink,
-        dyeLime,
-        dyeYellow,
-        dyeLightBlue,
-        dyeMagenta,
-        dyeOrange,
-        dyeWhite
-    };
+    public static final Dyes[] VALUES = { dyeBlack, dyeRed, dyeGreen, dyeBrown, dyeBlue, dyePurple, dyeCyan,
+        dyeLightGray, dyeGray, dyePink, dyeLime, dyeYellow, dyeLightBlue, dyeMagenta, dyeOrange, dyeWhite };
 
     public final byte mIndex;
     public final String mName;
     public final short[] mRGBa;
     public final short[] mOriginalRGBa;
-    private final ArrayList<Fluid> mFluidDyes = new GT_ArrayList<Fluid>(false, 1);
+    public final EnumChatFormatting formatting;
+    private final ArrayList<Fluid> mFluidDyes = new GTArrayList<>(false, 1);
 
     Dyes(int aIndex, int aR, int aG, int aB, String aName) {
+        this(aIndex, aR, aG, aB, aName, EnumChatFormatting.GRAY);
+    }
+
+    Dyes(int aIndex, int aR, int aG, int aB, String aName, EnumChatFormatting formatting) {
         mIndex = (byte) aIndex;
         mName = aName;
-        mRGBa = new short[] {(short) aR, (short) aG, (short) aB, 0};
+        mRGBa = new short[] { (short) aR, (short) aG, (short) aB, 0 };
         mOriginalRGBa = mRGBa.clone();
+        this.formatting = formatting;
     }
 
     public static Dyes get(int aColor) {
@@ -81,7 +77,7 @@ public enum Dyes implements IColorModulationContainer {
     }
 
     public static Dyes get(String aColor) {
-        Object tObject = GT_Utility.getFieldContent(Dyes.class, aColor, false, false);
+        Object tObject = GTUtility.getFieldContent(Dyes.class, aColor, false, false);
         if (tObject instanceof Dyes) return (Dyes) tObject;
         return _NULL;
     }
@@ -128,5 +124,20 @@ public enum Dyes implements IColorModulationContainer {
 
     public static Dyes getDyeFromIndex(short index) {
         return index != -1 ? Dyes.get(index) : Dyes.MACHINE_METAL;
+    }
+
+    /**
+     * Transforms a dye index between the GT index for this color and the vanilla index for this color.
+     *
+     * @param color an integer between 0 and 15
+     * @return the transformed color
+     */
+    @Contract(pure = true)
+    public static int transformDyeIndex(final int color) {
+        if (color < 0 || color > 15) {
+            throw new IllegalArgumentException("Color passed to transformColor must be between 0 and 15");
+        }
+
+        return (~(byte) color) & 0xF;
     }
 }

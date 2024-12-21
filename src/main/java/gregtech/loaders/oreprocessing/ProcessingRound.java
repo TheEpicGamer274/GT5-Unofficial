@@ -1,48 +1,52 @@
 package gregtech.loaders.oreprocessing;
 
+import static gregtech.api.recipe.RecipeMaps.latheRecipes;
+import static gregtech.api.util.GTRecipeBuilder.TICKS;
+
+import net.minecraft.item.ItemStack;
+
 import appeng.core.Api;
-import gregtech.GT_Mod;
-import gregtech.api.enums.GT_Values;
+import gregtech.api.enums.GTValues;
 import gregtech.api.enums.Materials;
 import gregtech.api.enums.OrePrefixes;
 import gregtech.api.enums.SubTag;
-import gregtech.api.util.GT_ModHandler;
-import gregtech.api.util.GT_OreDictUnificator;
-import gregtech.api.util.GT_Utility;
-import gregtech.common.GT_Proxy;
-import net.minecraft.item.ItemStack;
+import gregtech.api.util.GTModHandler;
+import gregtech.api.util.GTOreDictUnificator;
+import gregtech.api.util.GTUtility;
+import gregtech.common.GTProxy;
 
 public class ProcessingRound implements gregtech.api.interfaces.IOreRecipeRegistrator {
+
     public ProcessingRound() {
         OrePrefixes.round.add(this);
     }
 
     @Override
-    public void registerOre(
-            OrePrefixes aPrefix, Materials aMaterial, String aOreDictName, String aModName, ItemStack aStack) {
+    public void registerOre(OrePrefixes aPrefix, Materials aMaterial, String aOreDictName, String aModName,
+        ItemStack aStack) {
         if (!aMaterial.contains(SubTag.NO_WORKING)) {
-            GT_Values.RA.addLatheRecipe(
-                    GT_OreDictUnificator.get(OrePrefixes.nugget, aMaterial, 1L),
-                    GT_Utility.copyAmount(1L, aStack),
-                    null,
-                    (int) Math.max(aMaterial.getMass() / 4L, 1L),
-                    8);
+            if (GTOreDictUnificator.get(OrePrefixes.nugget, aMaterial, 1L) != null) {
+                GTValues.RA.stdBuilder()
+                    .itemInputs(GTOreDictUnificator.get(OrePrefixes.nugget, aMaterial, 1L))
+                    .itemOutputs(GTUtility.copyAmount(1, aStack))
+                    .duration(((int) Math.max(aMaterial.getMass() / 4L, 1L)) * TICKS)
+                    .eut(8)
+                    .addTo(latheRecipes);
+            }
+
             if ((aMaterial.mUnificatable) && (aMaterial.mMaterialInto == aMaterial)) {
-                GT_ModHandler.addCraftingRecipe(
-                        GT_OreDictUnificator.get(OrePrefixes.round, aMaterial, 1L),
-                        GT_Proxy.tBits,
-                        new Object[] {"fX", "Xh", 'X', OrePrefixes.nugget.get(aMaterial)});
-                GT_ModHandler.addCraftingRecipe(
-                        GT_OreDictUnificator.get(OrePrefixes.round, aMaterial, 4L),
-                        GT_Proxy.tBits,
-                        new Object[] {"fXh", 'X', OrePrefixes.ingot.get(aMaterial)});
+                GTModHandler.addCraftingRecipe(
+                    GTOreDictUnificator.get(OrePrefixes.round, aMaterial, 1L),
+                    GTProxy.tBits,
+                    new Object[] { "fX", "Xh", 'X', OrePrefixes.nugget.get(aMaterial) });
+                GTModHandler.addCraftingRecipe(
+                    GTOreDictUnificator.get(OrePrefixes.round, aMaterial, 4L),
+                    GTProxy.tBits,
+                    new Object[] { "fXh", 'X', OrePrefixes.ingot.get(aMaterial) });
             }
         }
-        if (GT_Mod.gregtechproxy.mAE2Integration) {
-            Api.INSTANCE
-                    .registries()
-                    .matterCannon()
-                    .registerAmmo(GT_OreDictUnificator.get(OrePrefixes.round, aMaterial, 1L), aMaterial.getMass());
-        }
+        Api.INSTANCE.registries()
+            .matterCannon()
+            .registerAmmo(GTOreDictUnificator.get(OrePrefixes.round, aMaterial, 1L), aMaterial.getMass());
     }
 }

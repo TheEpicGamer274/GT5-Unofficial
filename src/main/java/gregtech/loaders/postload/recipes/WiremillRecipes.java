@@ -1,60 +1,41 @@
 package gregtech.loaders.postload.recipes;
 
-import gregtech.GT_Mod;
-import gregtech.api.enums.GT_Values;
-import gregtech.api.enums.Materials;
-import gregtech.api.enums.OrePrefixes;
-import gregtech.api.util.GT_ModHandler;
-import gregtech.api.util.GT_OreDictUnificator;
-import gregtech.api.util.GT_RecipeRegistrator;
+import static gregtech.api.recipe.RecipeMaps.wiremillRecipes;
+import static gregtech.api.util.GTRecipeBuilder.SECONDS;
+import static gregtech.api.util.GTRecipeRegistrator.registerWiremillRecipes;
+
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 
+import gregtech.api.enums.GTValues;
+import gregtech.api.enums.Materials;
+import gregtech.api.enums.MaterialsUEVplus;
+import gregtech.api.enums.OrePrefixes;
+import gregtech.api.enums.TierEU;
+import gregtech.api.util.GTModHandler;
+import gregtech.api.util.GTOreDictUnificator;
+
 public class WiremillRecipes implements Runnable {
+
     @Override
     public void run() {
-        GT_RecipeRegistrator.registerWiremillRecipes(
-                Materials.Graphene, 400, 2, OrePrefixes.dust, OrePrefixes.stick, 1);
 
-        GT_RecipeRegistrator.registerWiremillRecipes(Materials.SpaceTime, 400, 32_000);
+        registerWiremillRecipes(Materials.Graphene, 20 * SECONDS, 2, OrePrefixes.dust, OrePrefixes.stick, 1);
 
-        GT_Values.RA.addWiremillRecipe(
-                GT_OreDictUnificator.get(OrePrefixes.ingot, Materials.Polycaprolactam, 1L),
-                new ItemStack(Items.string, 32),
-                80,
-                48);
+        registerWiremillRecipes(MaterialsUEVplus.SpaceTime, 20 * SECONDS, (int) TierEU.RECIPE_LuV);
 
-        if (!GT_Mod.gregtechproxy.mDisableIC2Cables) {
-            GT_Values.RA.addWiremillRecipe(
-                    GT_OreDictUnificator.get(OrePrefixes.plate, Materials.Copper, 1L),
-                    GT_ModHandler.getIC2Item("copperCableItem", 3L),
-                    100,
-                    2);
-            GT_Values.RA.addWiremillRecipe(
-                    GT_OreDictUnificator.get(OrePrefixes.plate, Materials.AnnealedCopper, 1L),
-                    GT_ModHandler.getIC2Item("copperCableItem", 3L),
-                    100,
-                    2);
-            GT_Values.RA.addWiremillRecipe(
-                    GT_OreDictUnificator.get(OrePrefixes.plate, Materials.Tin, 1L),
-                    GT_ModHandler.getIC2Item("tinCableItem", 4L),
-                    150,
-                    1);
-            GT_Values.RA.addWiremillRecipe(
-                    GT_OreDictUnificator.get(OrePrefixes.plate, Materials.Iron, 1L),
-                    GT_ModHandler.getIC2Item("ironCableItem", 6L),
-                    200,
-                    2);
-            GT_Values.RA.addWiremillRecipe(
-                    GT_OreDictUnificator.get(OrePrefixes.plate, Materials.WroughtIron, 1L),
-                    GT_ModHandler.getIC2Item("ironCableItem", 6L),
-                    200,
-                    2);
-            GT_Values.RA.addWiremillRecipe(
-                    GT_OreDictUnificator.get(OrePrefixes.plate, Materials.Gold, 1L),
-                    GT_ModHandler.getIC2Item("goldCableItem", 6L),
-                    200,
-                    1);
-        }
+        GTValues.RA.stdBuilder()
+            .itemInputs(GTOreDictUnificator.get(OrePrefixes.ingot, Materials.Polycaprolactam, 1L))
+            .itemOutputs(new ItemStack(Items.string, 32))
+            .duration(4 * SECONDS)
+            .eut(48)
+            .addTo(wiremillRecipes);
+
+        GTValues.RA.stdBuilder()
+            .itemInputs(GTOreDictUnificator.get(OrePrefixes.pipeTiny, Materials.Steel, 1))
+            .itemOutputs(GTModHandler.getIC2Item("miningPipe", 1))
+            .duration(10 * SECONDS)
+            .eut(16)
+            .addTo(wiremillRecipes);
     }
 }

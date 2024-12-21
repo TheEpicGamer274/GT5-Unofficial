@@ -1,226 +1,402 @@
 package gregtech.loaders.postload.recipes;
 
-import static gregtech.loaders.postload.GT_MachineRecipeLoader.isGTPPLoaded;
+import static gregtech.api.enums.GTValues.M;
+import static gregtech.api.recipe.RecipeMaps.vacuumFreezerRecipes;
+import static gregtech.api.util.GTRecipeBuilder.HOURS;
+import static gregtech.api.util.GTRecipeBuilder.MINUTES;
+import static gregtech.api.util.GTRecipeBuilder.SECONDS;
+import static gregtech.api.util.GTRecipeBuilder.TICKS;
 
-import gregtech.api.enums.GT_Values;
-import gregtech.api.enums.ItemList;
-import gregtech.api.enums.Materials;
-import gregtech.api.enums.OrePrefixes;
-import gregtech.api.util.GT_ModHandler;
-import gregtech.api.util.GT_OreDictUnificator;
-import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 
+import gregtech.api.enums.GTValues;
+import gregtech.api.enums.ItemList;
+import gregtech.api.enums.Materials;
+import gregtech.api.enums.MaterialsUEVplus;
+import gregtech.api.enums.OrePrefixes;
+import gregtech.api.enums.TierEU;
+import gregtech.api.util.GTModHandler;
+import gregtech.api.util.GTOreDictUnificator;
+
 public class VacuumFreezerRecipes implements Runnable {
+
     @Override
     public void run() {
         // reactor parts vacuum
-        // reactor heat switch
-        GT_Values.RA.addVacuumFreezerRecipe(
-                GT_ModHandler.getIC2Item("reactorHeatSwitch", 1L, 32767),
-                GT_ModHandler.getIC2Item("reactorHeatSwitch", 1L, 1),
-                100);
-        GT_Values.RA.addVacuumFreezerRecipe(
-                GT_ModHandler.getIC2Item("reactorHeatSwitchCore", 1L, 32767),
-                GT_ModHandler.getIC2Item("reactorHeatSwitchCore", 1L, 1),
-                100);
-        GT_Values.RA.addVacuumFreezerRecipe(
-                GT_ModHandler.getIC2Item("reactorHeatSwitchSpread", 1L, 32767),
-                GT_ModHandler.getIC2Item("reactorHeatSwitchSpread", 1L, 1),
-                100);
-        GT_Values.RA.addVacuumFreezerRecipe(
-                GT_ModHandler.getIC2Item("reactorHeatSwitchDiamond", 1L, 32767),
-                GT_ModHandler.getIC2Item("reactorHeatSwitchDiamond", 1L, 1),
-                100);
-        // reactor vent
-        GT_Values.RA.addVacuumFreezerRecipe(
-                GT_ModHandler.getIC2Item("reactorVent", 1L, 32767),
-                GT_ModHandler.getIC2Item("reactorVent", 1L, 1),
-                100);
-        GT_Values.RA.addVacuumFreezerRecipe(
-                GT_ModHandler.getIC2Item("reactorVentCore", 1L, 32767),
-                GT_ModHandler.getIC2Item("reactorVentCore", 1L, 1),
-                100);
-        GT_Values.RA.addVacuumFreezerRecipe(
-                GT_ModHandler.getIC2Item("reactorVentGold", 1L, 32767),
-                GT_ModHandler.getIC2Item("reactorVentGold", 1L, 1),
-                100);
-        GT_Values.RA.addVacuumFreezerRecipe(
-                GT_ModHandler.getIC2Item("reactorVentDiamond", 1L, 32767),
-                GT_ModHandler.getIC2Item("reactorVentDiamond", 1L, 1),
-                100);
-        // reactor vent spread
-        GT_Values.RA.addVacuumFreezerRecipe(
-                GT_ModHandler.getIC2Item("reactorVentSpread", 1L, 32767),
-                GT_ModHandler.getIC2Item("reactorVentSpread", 1L, 0),
-                100);
-        // reactor coolant
-        GT_Values.RA.addVacuumFreezerRecipe(
-                GT_ModHandler.getIC2Item("reactorCoolantSimple", 1L, 32767),
-                GT_ModHandler.getIC2Item("reactorCoolantSimple", 1L, 1),
-                100);
-        GT_Values.RA.addVacuumFreezerRecipe(
-                GT_ModHandler.getIC2Item("reactorCoolantTriple", 1L, 32767),
-                GT_ModHandler.getIC2Item("reactorCoolantTriple", 1L, 1),
-                300);
-        GT_Values.RA.addVacuumFreezerRecipe(
-                GT_ModHandler.getIC2Item("reactorCoolantSix", 1L, 32767),
-                GT_ModHandler.getIC2Item("reactorCoolantSix", 1L, 1),
-                600);
-        GT_Values.RA.addVacuumFreezerRecipe(
-                ItemList.Reactor_Coolant_He_1.getWildcard(1L), ItemList.Reactor_Coolant_He_1.get(1L), 600);
-        GT_Values.RA.addVacuumFreezerRecipe(
-                ItemList.Reactor_Coolant_He_3.getWildcard(1L), ItemList.Reactor_Coolant_He_3.get(1L), 1800);
-        GT_Values.RA.addVacuumFreezerRecipe(
-                ItemList.Reactor_Coolant_He_6.getWildcard(1L), ItemList.Reactor_Coolant_He_6.get(1L), 3600);
-        GT_Values.RA.addVacuumFreezerRecipe(
-                ItemList.Reactor_Coolant_NaK_1.getWildcard(1L), ItemList.Reactor_Coolant_NaK_1.get(1L), 600);
-        GT_Values.RA.addVacuumFreezerRecipe(
-                ItemList.Reactor_Coolant_NaK_3.getWildcard(1L), ItemList.Reactor_Coolant_NaK_3.get(1L), 1800);
-        GT_Values.RA.addVacuumFreezerRecipe(
-                ItemList.Reactor_Coolant_NaK_6.getWildcard(1L), ItemList.Reactor_Coolant_NaK_6.get(1L), 3600);
-        GT_Values.RA.addVacuumFreezerRecipe(
-                ItemList.neutroniumHeatCapacitor.getWildcard(1L), ItemList.neutroniumHeatCapacitor.get(1L), 10000000);
-        GT_Values.RA.addVacuumFreezerRecipe(
-                ItemList.Reactor_Coolant_Sp_1.getWildcard(1L), ItemList.Reactor_Coolant_Sp_1.get(1L), 1800);
-        GT_Values.RA.addVacuumFreezerRecipe(
-                ItemList.Reactor_Coolant_Sp_2.getWildcard(1L), ItemList.Reactor_Coolant_Sp_2.get(1L), 3600);
-        GT_Values.RA.addVacuumFreezerRecipe(
-                ItemList.Reactor_Coolant_Sp_3.getWildcard(1L), ItemList.Reactor_Coolant_Sp_3.get(1L), 5400);
-        GT_Values.RA.addVacuumFreezerRecipe(
-                ItemList.Reactor_Coolant_Sp_6.getWildcard(1L), ItemList.Reactor_Coolant_Sp_6.get(1L), 10800);
+        {
+            // reactor heat switch
+            {
+                GTValues.RA.stdBuilder()
+                    .itemInputs(GTModHandler.getIC2Item("reactorHeatSwitch", 1L, 32767))
+                    .itemOutputs(GTModHandler.getIC2Item("reactorHeatSwitch", 1L, 1))
+                    .duration(5 * SECONDS)
+                    .eut(TierEU.RECIPE_MV)
+                    .addTo(vacuumFreezerRecipes);
+
+                GTValues.RA.stdBuilder()
+                    .itemInputs(GTModHandler.getIC2Item("reactorHeatSwitchCore", 1L, 32767))
+                    .itemOutputs(GTModHandler.getIC2Item("reactorHeatSwitchCore", 1L, 1))
+                    .duration(5 * SECONDS)
+                    .eut(TierEU.RECIPE_MV)
+                    .addTo(vacuumFreezerRecipes);
+
+                GTValues.RA.stdBuilder()
+                    .itemInputs(GTModHandler.getIC2Item("reactorHeatSwitchSpread", 1L, 32767))
+                    .itemOutputs(GTModHandler.getIC2Item("reactorHeatSwitchSpread", 1L, 1))
+                    .duration(5 * SECONDS)
+                    .eut(TierEU.RECIPE_MV)
+                    .addTo(vacuumFreezerRecipes);
+
+                GTValues.RA.stdBuilder()
+                    .itemInputs(GTModHandler.getIC2Item("reactorHeatSwitchDiamond", 1L, 32767))
+                    .itemOutputs(GTModHandler.getIC2Item("reactorHeatSwitchDiamond", 1L, 1))
+                    .duration(5 * SECONDS)
+                    .eut(TierEU.RECIPE_MV)
+                    .addTo(vacuumFreezerRecipes);
+            }
+
+            // reactor vent
+            {
+                GTValues.RA.stdBuilder()
+                    .itemInputs(GTModHandler.getIC2Item("reactorVent", 1L, 32767))
+                    .itemOutputs(GTModHandler.getIC2Item("reactorVent", 1L, 1))
+                    .duration(5 * SECONDS)
+                    .eut(TierEU.RECIPE_MV)
+                    .addTo(vacuumFreezerRecipes);
+
+                GTValues.RA.stdBuilder()
+                    .itemInputs(GTModHandler.getIC2Item("reactorVentCore", 1L, 32767))
+                    .itemOutputs(GTModHandler.getIC2Item("reactorVentCore", 1L, 1))
+                    .duration(5 * SECONDS)
+                    .eut(TierEU.RECIPE_MV)
+                    .addTo(vacuumFreezerRecipes);
+
+                GTValues.RA.stdBuilder()
+                    .itemInputs(GTModHandler.getIC2Item("reactorVentGold", 1L, 32767))
+                    .itemOutputs(GTModHandler.getIC2Item("reactorVentGold", 1L, 1))
+                    .duration(5 * SECONDS)
+                    .eut(TierEU.RECIPE_MV)
+                    .addTo(vacuumFreezerRecipes);
+
+                GTValues.RA.stdBuilder()
+                    .itemInputs(GTModHandler.getIC2Item("reactorVentDiamond", 1L, 32767))
+                    .itemOutputs(GTModHandler.getIC2Item("reactorVentDiamond", 1L, 1))
+                    .duration(5 * SECONDS)
+                    .eut(TierEU.RECIPE_MV)
+                    .addTo(vacuumFreezerRecipes);
+            }
+
+            // reactor vent spread
+            GTValues.RA.stdBuilder()
+                .itemInputs(GTModHandler.getIC2Item("reactorVentSpread", 1L, 32767))
+                .itemOutputs(GTModHandler.getIC2Item("reactorVentSpread", 1L, 0))
+                .duration(5 * SECONDS)
+                .eut(TierEU.RECIPE_MV)
+                .addTo(vacuumFreezerRecipes);
+
+            // reactor coolant
+            {
+
+                GTValues.RA.stdBuilder()
+                    .itemInputs(GTModHandler.getIC2Item("reactorCoolantSimple", 1L, 32767))
+                    .itemOutputs(GTModHandler.getIC2Item("reactorCoolantSimple", 1L, 1))
+                    .duration(10 * TICKS)
+                    .eut(TierEU.RECIPE_MV)
+                    .addTo(vacuumFreezerRecipes);
+
+                GTValues.RA.stdBuilder()
+                    .itemInputs(GTModHandler.getIC2Item("reactorCoolantTriple", 1L, 32767))
+                    .itemOutputs(GTModHandler.getIC2Item("reactorCoolantTriple", 1L, 1))
+                    .duration(1 * SECONDS + 10 * TICKS)
+                    .eut(TierEU.RECIPE_MV)
+                    .addTo(vacuumFreezerRecipes);
+
+                GTValues.RA.stdBuilder()
+                    .itemInputs(GTModHandler.getIC2Item("reactorCoolantSix", 1L, 32767))
+                    .itemOutputs(GTModHandler.getIC2Item("reactorCoolantSix", 1L, 1))
+                    .duration(3 * SECONDS)
+                    .eut(TierEU.RECIPE_MV)
+                    .addTo(vacuumFreezerRecipes);
+
+                GTValues.RA.stdBuilder()
+                    .itemInputs(ItemList.Reactor_Coolant_He_1.getWildcard(1L))
+                    .itemOutputs(ItemList.Reactor_Coolant_He_1.get(1L))
+                    .duration(3 * SECONDS)
+                    .eut(TierEU.RECIPE_MV)
+                    .addTo(vacuumFreezerRecipes);
+
+                GTValues.RA.stdBuilder()
+                    .itemInputs(ItemList.Reactor_Coolant_He_3.getWildcard(1L))
+                    .itemOutputs(ItemList.Reactor_Coolant_He_3.get(1L))
+                    .duration(9 * SECONDS)
+                    .eut(TierEU.RECIPE_MV)
+                    .addTo(vacuumFreezerRecipes);
+
+                GTValues.RA.stdBuilder()
+                    .itemInputs(ItemList.Reactor_Coolant_He_6.getWildcard(1L))
+                    .itemOutputs(ItemList.Reactor_Coolant_He_6.get(1L))
+                    .duration(18 * SECONDS)
+                    .eut(TierEU.RECIPE_MV)
+                    .addTo(vacuumFreezerRecipes);
+
+                GTValues.RA.stdBuilder()
+                    .itemInputs(ItemList.Reactor_Coolant_NaK_1.getWildcard(1L))
+                    .itemOutputs(ItemList.Reactor_Coolant_NaK_1.get(1L))
+                    .duration(3 * SECONDS)
+                    .eut(TierEU.RECIPE_MV)
+                    .addTo(vacuumFreezerRecipes);
+
+                GTValues.RA.stdBuilder()
+                    .itemInputs(ItemList.Reactor_Coolant_NaK_3.getWildcard(1L))
+                    .itemOutputs(ItemList.Reactor_Coolant_NaK_3.get(1L))
+                    .duration(9 * SECONDS)
+                    .eut(TierEU.RECIPE_MV)
+                    .addTo(vacuumFreezerRecipes);
+
+                GTValues.RA.stdBuilder()
+                    .itemInputs(ItemList.Reactor_Coolant_NaK_6.getWildcard(1L))
+                    .itemOutputs(ItemList.Reactor_Coolant_NaK_6.get(1L))
+                    .duration(18 * SECONDS)
+                    .eut(TierEU.RECIPE_MV)
+                    .addTo(vacuumFreezerRecipes);
+
+                GTValues.RA.stdBuilder()
+                    .itemInputs(ItemList.neutroniumHeatCapacitor.getWildcard(1L))
+                    .itemOutputs(ItemList.neutroniumHeatCapacitor.get(1L))
+                    .duration(13 * HOURS + 53 * MINUTES + 20 * SECONDS)
+                    .eut(TierEU.RECIPE_MV)
+                    .addTo(vacuumFreezerRecipes);
+
+                GTValues.RA.stdBuilder()
+                    .itemInputs(ItemList.Reactor_Coolant_Sp_1.getWildcard(1L))
+                    .itemOutputs(ItemList.Reactor_Coolant_Sp_1.get(1L))
+                    .duration(9 * SECONDS)
+                    .eut(TierEU.RECIPE_MV)
+                    .addTo(vacuumFreezerRecipes);
+
+                GTValues.RA.stdBuilder()
+                    .itemInputs(ItemList.Reactor_Coolant_Sp_2.getWildcard(1L))
+                    .itemOutputs(ItemList.Reactor_Coolant_Sp_2.get(1L))
+                    .duration(18 * SECONDS)
+                    .eut(TierEU.RECIPE_MV)
+                    .addTo(vacuumFreezerRecipes);
+
+                GTValues.RA.stdBuilder()
+                    .itemInputs(ItemList.Reactor_Coolant_Sp_3.getWildcard(1L))
+                    .itemOutputs(ItemList.Reactor_Coolant_Sp_3.get(1L))
+                    .duration(27 * SECONDS)
+                    .eut(TierEU.RECIPE_MV)
+                    .addTo(vacuumFreezerRecipes);
+
+                GTValues.RA.stdBuilder()
+                    .itemInputs(ItemList.Reactor_Coolant_Sp_6.getWildcard(1L))
+                    .itemOutputs(ItemList.Reactor_Coolant_Sp_6.get(1L))
+                    .duration(54 * SECONDS)
+                    .eut(TierEU.RECIPE_MV)
+                    .addTo(vacuumFreezerRecipes);
+
+            }
+        }
 
         // fluid vacuum
-        GT_Values.RA.addVacuumFreezerRecipe(
-                GT_OreDictUnificator.get(OrePrefixes.cell, Materials.Water, 1L),
-                GT_OreDictUnificator.get(OrePrefixes.cell, Materials.Ice, 1L),
-                50);
-        GT_Values.RA.addVacuumFreezerRecipe(
-                GT_OreDictUnificator.get(OrePrefixes.cell, Materials.Oxygen, 1L),
-                GT_OreDictUnificator.get(OrePrefixes.cell, Materials.LiquidOxygen, 1L),
-                1200,
-                480);
-        GT_Values.RA.addVacuumFreezerRecipe(
-                GT_OreDictUnificator.get(OrePrefixes.cell, Materials.Nitrogen, 1L),
-                GT_OreDictUnificator.get(OrePrefixes.cell, Materials.LiquidNitrogen, 1L),
-                1200,
-                480);
-        GT_Values.RA.addVacuumFreezerRecipe(
-                GT_ModHandler.getIC2Item("airCell", 1L),
-                GT_OreDictUnificator.get(OrePrefixes.cell, Materials.LiquidAir, 1L),
-                28,
-                480);
+        {
+            GTValues.RA.stdBuilder()
+                .itemInputs(GTOreDictUnificator.get(OrePrefixes.cell, Materials.Water, 1L))
+                .itemOutputs(GTOreDictUnificator.get(OrePrefixes.cell, Materials.Ice, 1L))
+                .duration(2 * SECONDS + 10 * TICKS)
+                .eut(TierEU.RECIPE_MV)
+                .addTo(vacuumFreezerRecipes);
 
-        GT_Values.RA.addVacuumFreezerRecipe(
-                ItemList.Reactor_Coolant_Sp_1.getWildcard(1L), ItemList.Reactor_Coolant_Sp_1.get(1L), 1800);
-        GT_Values.RA.addVacuumFreezerRecipe(
-                ItemList.Reactor_Coolant_Sp_2.getWildcard(1L), ItemList.Reactor_Coolant_Sp_2.get(1L), 3600);
-        GT_Values.RA.addVacuumFreezerRecipe(
-                ItemList.Reactor_Coolant_Sp_3.getWildcard(1L), ItemList.Reactor_Coolant_Sp_3.get(1L), 5400);
-        GT_Values.RA.addVacuumFreezerRecipe(
-                ItemList.Reactor_Coolant_Sp_6.getWildcard(1L), ItemList.Reactor_Coolant_Sp_6.get(1L), 10800);
+            GTValues.RA.stdBuilder()
+                .itemInputs(GTOreDictUnificator.get(OrePrefixes.cell, Materials.Oxygen, 1L))
+                .itemOutputs(GTOreDictUnificator.get(OrePrefixes.cell, Materials.LiquidOxygen, 1L))
+                .duration(1 * MINUTES)
+                .eut(TierEU.RECIPE_HV)
+                .addTo(vacuumFreezerRecipes);
+
+            GTValues.RA.stdBuilder()
+                .itemInputs(GTOreDictUnificator.get(OrePrefixes.cell, Materials.Nitrogen, 1L))
+                .itemOutputs(GTOreDictUnificator.get(OrePrefixes.cell, Materials.LiquidNitrogen, 1L))
+                .duration(1 * MINUTES)
+                .eut(TierEU.RECIPE_HV)
+                .addTo(vacuumFreezerRecipes);
+
+            GTValues.RA.stdBuilder()
+                .itemInputs(GTModHandler.getIC2Item("airCell", 1L))
+                .itemOutputs(GTOreDictUnificator.get(OrePrefixes.cell, Materials.LiquidAir, 1L))
+                .duration(1 * SECONDS + 8 * TICKS)
+                .eut(TierEU.RECIPE_HV)
+                .addTo(vacuumFreezerRecipes);
+        }
 
         // Freeze superconductors.
-        GT_Values.RA.addVacuumFreezerRecipe(
-                GT_OreDictUnificator.get(OrePrefixes.ingotHot, Materials.Pentacadmiummagnesiumhexaoxid, 1L),
-                GT_OreDictUnificator.get(OrePrefixes.ingot, Materials.Pentacadmiummagnesiumhexaoxid, 1L),
-                200,
-                120);
-        GT_Values.RA.addVacuumFreezerRecipe(
-                GT_OreDictUnificator.get(OrePrefixes.ingotHot, Materials.Titaniumonabariumdecacoppereikosaoxid, 1L),
-                GT_OreDictUnificator.get(OrePrefixes.ingot, Materials.Titaniumonabariumdecacoppereikosaoxid, 1L),
-                200,
-                480);
-        GT_Values.RA.addVacuumFreezerRecipe(
-                GT_OreDictUnificator.get(OrePrefixes.ingotHot, Materials.Uraniumtriplatinid, 1L),
-                GT_OreDictUnificator.get(OrePrefixes.ingot, Materials.Uraniumtriplatinid, 1L),
-                200,
-                1920);
-        GT_Values.RA.addVacuumFreezerRecipe(
-                GT_OreDictUnificator.get(OrePrefixes.ingotHot, Materials.Vanadiumtriindinid, 1L),
-                GT_OreDictUnificator.get(OrePrefixes.ingot, Materials.Vanadiumtriindinid, 1L),
-                200,
-                7680);
-        GT_Values.RA.addVacuumFreezerRecipe(
-                GT_OreDictUnificator.get(
+        {
+            GTValues.RA.stdBuilder()
+                .itemInputs(GTOreDictUnificator.get(OrePrefixes.ingotHot, Materials.Pentacadmiummagnesiumhexaoxid, 1L))
+                .itemOutputs(GTOreDictUnificator.get(OrePrefixes.ingot, Materials.Pentacadmiummagnesiumhexaoxid, 1L))
+                .duration(10 * SECONDS)
+                .eut(TierEU.RECIPE_MV)
+                .addTo(vacuumFreezerRecipes);
+
+            GTValues.RA.stdBuilder()
+                .itemInputs(
+                    GTOreDictUnificator.get(OrePrefixes.ingotHot, Materials.Titaniumonabariumdecacoppereikosaoxid, 1L))
+                .itemOutputs(
+                    GTOreDictUnificator.get(OrePrefixes.ingot, Materials.Titaniumonabariumdecacoppereikosaoxid, 1L))
+                .duration(10 * SECONDS)
+                .eut(TierEU.RECIPE_HV)
+                .addTo(vacuumFreezerRecipes);
+
+            GTValues.RA.stdBuilder()
+                .itemInputs(GTOreDictUnificator.get(OrePrefixes.ingotHot, Materials.Uraniumtriplatinid, 1L))
+                .itemOutputs(GTOreDictUnificator.get(OrePrefixes.ingot, Materials.Uraniumtriplatinid, 1L))
+                .duration(10 * SECONDS)
+                .eut(TierEU.RECIPE_EV)
+                .addTo(vacuumFreezerRecipes);
+
+            GTValues.RA.stdBuilder()
+                .itemInputs(GTOreDictUnificator.get(OrePrefixes.ingotHot, Materials.Vanadiumtriindinid, 1L))
+                .itemOutputs(GTOreDictUnificator.get(OrePrefixes.ingot, Materials.Vanadiumtriindinid, 1L))
+                .duration(10 * SECONDS)
+                .eut(TierEU.RECIPE_IV)
+                .addTo(vacuumFreezerRecipes);
+
+            GTValues.RA.stdBuilder()
+                .itemInputs(
+                    GTOreDictUnificator.get(
                         OrePrefixes.ingotHot,
                         Materials.Tetraindiumditindibariumtitaniumheptacoppertetrakaidekaoxid,
-                        1L),
-                GT_OreDictUnificator.get(
-                        OrePrefixes.ingot, Materials.Tetraindiumditindibariumtitaniumheptacoppertetrakaidekaoxid, 1L),
-                400,
-                30720);
-        GT_Values.RA.addVacuumFreezerRecipe(
-                GT_OreDictUnificator.get(OrePrefixes.ingotHot, Materials.Tetranaquadahdiindiumhexaplatiumosminid, 1L),
-                GT_OreDictUnificator.get(OrePrefixes.ingot, Materials.Tetranaquadahdiindiumhexaplatiumosminid, 1L),
-                400,
-                122880);
-        GT_Values.RA.addVacuumFreezerRecipe(
-                GT_OreDictUnificator.get(OrePrefixes.ingotHot, Materials.Longasssuperconductornameforuvwire, 1L),
-                GT_OreDictUnificator.get(OrePrefixes.ingot, Materials.Longasssuperconductornameforuvwire, 1L),
-                800,
-                491520);
-        GT_Values.RA.addVacuumFreezerRecipe(
-                GT_OreDictUnificator.get(OrePrefixes.ingotHot, Materials.Longasssuperconductornameforuhvwire, 1L),
-                GT_OreDictUnificator.get(OrePrefixes.ingot, Materials.Longasssuperconductornameforuhvwire, 1L),
-                1600,
-                1966080);
-        GT_Values.RA.addVacuumFreezerRecipe(
-                GT_OreDictUnificator.get(OrePrefixes.ingotHot, Materials.SuperconductorUEVBase, 1L),
-                GT_OreDictUnificator.get(OrePrefixes.ingot, Materials.SuperconductorUEVBase, 1L),
-                3200,
-                7864320);
-        GT_Values.RA.addVacuumFreezerRecipe(
-                GT_OreDictUnificator.get(OrePrefixes.ingotHot, Materials.SuperconductorUIVBase, 1L),
-                GT_OreDictUnificator.get(OrePrefixes.ingot, Materials.SuperconductorUIVBase, 1L),
-                3200,
-                30198988);
-        GT_Values.RA.addVacuumFreezerRecipe(
-                GT_OreDictUnificator.get(OrePrefixes.ingotHot, Materials.SuperconductorUMVBase, 1L),
-                GT_OreDictUnificator.get(OrePrefixes.ingot, Materials.SuperconductorUMVBase, 1L),
-                3200,
-                120795955);
+                        1L))
+                .itemOutputs(
+                    GTOreDictUnificator.get(
+                        OrePrefixes.ingot,
+                        Materials.Tetraindiumditindibariumtitaniumheptacoppertetrakaidekaoxid,
+                        1L))
+                .duration(20 * SECONDS)
+                .eut(TierEU.RECIPE_LuV)
+                .addTo(vacuumFreezerRecipes);
+
+            GTValues.RA.stdBuilder()
+                .itemInputs(
+                    GTOreDictUnificator
+                        .get(OrePrefixes.ingotHot, Materials.Tetranaquadahdiindiumhexaplatiumosminid, 1L))
+                .itemOutputs(
+                    GTOreDictUnificator.get(OrePrefixes.ingot, Materials.Tetranaquadahdiindiumhexaplatiumosminid, 1L))
+                .duration(20 * SECONDS)
+                .eut(TierEU.RECIPE_ZPM)
+                .addTo(vacuumFreezerRecipes);
+
+            GTValues.RA.stdBuilder()
+                .itemInputs(
+                    GTOreDictUnificator.get(OrePrefixes.ingotHot, Materials.Longasssuperconductornameforuvwire, 1L))
+                .itemOutputs(
+                    GTOreDictUnificator.get(OrePrefixes.ingot, Materials.Longasssuperconductornameforuvwire, 1L))
+                .duration(40 * SECONDS)
+                .eut(TierEU.RECIPE_UV)
+                .addTo(vacuumFreezerRecipes);
+
+            GTValues.RA.stdBuilder()
+                .itemInputs(
+                    GTOreDictUnificator.get(OrePrefixes.ingotHot, Materials.Longasssuperconductornameforuhvwire, 1L))
+                .itemOutputs(
+                    GTOreDictUnificator.get(OrePrefixes.ingot, Materials.Longasssuperconductornameforuhvwire, 1L))
+                .duration(1 * MINUTES + 20 * SECONDS)
+                .eut(TierEU.RECIPE_UHV)
+                .addTo(vacuumFreezerRecipes);
+
+            GTValues.RA.stdBuilder()
+                .itemInputs(GTOreDictUnificator.get(OrePrefixes.ingotHot, Materials.SuperconductorUEVBase, 1L))
+                .itemOutputs(GTOreDictUnificator.get(OrePrefixes.ingot, Materials.SuperconductorUEVBase, 1L))
+                .duration(2 * MINUTES + 40 * SECONDS)
+                .eut(TierEU.RECIPE_UEV)
+                .addTo(vacuumFreezerRecipes);
+
+            GTValues.RA.stdBuilder()
+                .itemInputs(GTOreDictUnificator.get(OrePrefixes.ingotHot, Materials.SuperconductorUIVBase, 1L))
+                .itemOutputs(GTOreDictUnificator.get(OrePrefixes.ingot, Materials.SuperconductorUIVBase, 1L))
+                .duration(2 * MINUTES + 40 * SECONDS)
+                .eut(TierEU.RECIPE_UIV)
+                .addTo(vacuumFreezerRecipes);
+
+            GTValues.RA.stdBuilder()
+                .itemInputs(GTOreDictUnificator.get(OrePrefixes.ingotHot, Materials.SuperconductorUMVBase, 1L))
+                .itemOutputs(GTOreDictUnificator.get(OrePrefixes.ingot, Materials.SuperconductorUMVBase, 1L))
+                .duration(2 * MINUTES + 40 * SECONDS)
+                .eut(TierEU.RECIPE_UMV)
+                .addTo(vacuumFreezerRecipes);
+        }
 
         // Plasma Freezing
-        GT_Values.RA.addVacuumFreezerRecipe(
-                GT_OreDictUnificator.get(OrePrefixes.cellPlasma, Materials.Americium, 1L),
-                GT_OreDictUnificator.get(OrePrefixes.cellMolten, Materials.Americium, 1L),
-                20,
-                30720);
-        GT_Values.RA.addVacuumFreezerRecipe(
-                GT_OreDictUnificator.get(OrePrefixes.cellPlasma, Materials.Helium, 1L),
-                GT_OreDictUnificator.get(OrePrefixes.cell, Materials.Helium, 1L),
-                5,
-                120);
-        GT_Values.RA.addVacuumFreezerRecipe(
-                GT_OreDictUnificator.get(OrePrefixes.cellPlasma, Materials.Nitrogen, 1L),
-                GT_OreDictUnificator.get(OrePrefixes.cell, Materials.Nitrogen, 1L),
-                28,
-                120);
-        GT_Values.RA.addVacuumFreezerRecipe(
-                GT_OreDictUnificator.get(OrePrefixes.cellPlasma, Materials.Oxygen, 1L),
-                GT_OreDictUnificator.get(OrePrefixes.cell, Materials.Oxygen, 1L),
-                32,
-                120);
-        GT_Values.RA.addVacuumFreezerRecipe(
-                GT_OreDictUnificator.get(OrePrefixes.cellPlasma, Materials.Radon, 1L),
-                GT_OreDictUnificator.get(OrePrefixes.cell, Materials.Radon, 1L),
-                110,
-                480);
-        GT_Values.RA.addVacuumFreezerRecipe(Materials.Boron.getPlasma(144L), Materials.Boron.getMolten(144L), 20, 120);
+        {
+            GTValues.RA.stdBuilder()
+                .itemInputs(GTOreDictUnificator.get(OrePrefixes.cellPlasma, Materials.Americium, 1L))
+                .itemOutputs(GTOreDictUnificator.get(OrePrefixes.cellMolten, Materials.Americium, 1L))
+                .duration(1 * SECONDS)
+                .eut(TierEU.RECIPE_LuV)
+                .addTo(vacuumFreezerRecipes);
 
-        if (isGTPPLoaded) {
-            GT_Values.RA.addVacuumFreezerRecipe(
-                    new ItemStack[] {GT_OreDictUnificator.get(OrePrefixes.ingotHot, Materials.TranscendentMetal, 1L)},
-                    new FluidStack[] {
-                        new FluidStack(FluidRegistry.getFluid("molten.titansteel"), 144),
-                        Materials.SuperCoolant.getFluid(1000)
-                    },
-                    new ItemStack[] {GT_OreDictUnificator.get(OrePrefixes.ingot, Materials.TranscendentMetal, 1L)},
-                    new FluidStack[] {GT_Values.NF},
-                    50 * 20,
-                    32_000_000);
+            GTValues.RA.stdBuilder()
+                .fluidInputs(Materials.Boron.getPlasma(144L))
+                .fluidOutputs(Materials.Boron.getMolten(144L))
+                .duration(1 * SECONDS)
+                .eut(12)
+                .addTo(vacuumFreezerRecipes);
         }
+
+        // hot transcendent metal ingot cooling
+        GTValues.RA.stdBuilder()
+            .itemInputs(GTOreDictUnificator.get(OrePrefixes.ingotHot, MaterialsUEVplus.TranscendentMetal, 1L))
+            .itemOutputs(GTOreDictUnificator.get(OrePrefixes.ingot, MaterialsUEVplus.TranscendentMetal, 1L))
+            .fluidInputs(
+                new FluidStack(FluidRegistry.getFluid("molten.titansteel"), 144),
+                Materials.SuperCoolant.getFluid(1000))
+            .duration(1 * SECONDS)
+            .eut(TierEU.RECIPE_UIV)
+            .addTo(vacuumFreezerRecipes);
+
+        // Proto-Halkonite
+        this.addProtoHalkonitePartRecipe(OrePrefixes.frameGt, 1);
+        this.addProtoHalkonitePartRecipe(OrePrefixes.ingot, 1);
+        this.addProtoHalkonitePartRecipe(OrePrefixes.plate, 1);
+        this.addProtoHalkonitePartRecipe(OrePrefixes.plateDouble, 1);
+        this.addProtoHalkonitePartRecipe(OrePrefixes.plateDense, 1);
+        this.addProtoHalkonitePartRecipe(OrePrefixes.stick, 2);
+        this.addProtoHalkonitePartRecipe(OrePrefixes.round, 8);
+        this.addProtoHalkonitePartRecipe(OrePrefixes.bolt, 8);
+        this.addProtoHalkonitePartRecipe(OrePrefixes.screw, 8);
+        this.addProtoHalkonitePartRecipe(OrePrefixes.ring, 4);
+        this.addProtoHalkonitePartRecipe(OrePrefixes.foil, 8);
+        this.addProtoHalkonitePartRecipe(OrePrefixes.gearGtSmall, 1);
+        this.addProtoHalkonitePartRecipe(OrePrefixes.rotor, 1);
+        this.addProtoHalkonitePartRecipe(OrePrefixes.stickLong, 1);
+        this.addProtoHalkonitePartRecipe(OrePrefixes.gearGt, 1);
+        this.addProtoHalkonitePartRecipe(OrePrefixes.wireFine, 8);
+        this.addProtoHalkonitePartRecipe(OrePrefixes.plateSuperdense, 1);
+
+        GTValues.RA.stdBuilder()
+            .itemInputs(GTOreDictUnificator.get(OrePrefixes.ingotHot, MaterialsUEVplus.Mellion, 9L))
+            .fluidInputs(MaterialsUEVplus.Creon.getPlasma(1296L))
+            .itemOutputs(GTOreDictUnificator.get(OrePrefixes.ingot, MaterialsUEVplus.Mellion, 9L))
+            .fluidOutputs(MaterialsUEVplus.Creon.getMolten(1296L))
+            .duration(20 * SECONDS)
+            .eut(TierEU.RECIPE_UMV)
+            .addTo(vacuumFreezerRecipes);
+    }
+
+    private void addProtoHalkonitePartRecipe(OrePrefixes prefix, final int multiplier) {
+        final int partFraction = (int) (144 * prefix.mMaterialAmount / M);
+
+        GTValues.RA.stdBuilder()
+            .itemInputs(GTOreDictUnificator.get(prefix, MaterialsUEVplus.HotProtoHalkonite, multiplier))
+            .itemOutputs(GTOreDictUnificator.get(prefix, MaterialsUEVplus.ProtoHalkonite, multiplier))
+            .fluidInputs(
+                MaterialsUEVplus.DimensionallyShiftedSuperfluid.getFluid((long) partFraction * multiplier / 4),
+                Materials.SuperCoolant.getFluid(partFraction * multiplier * 4L))
+            .duration((int) (multiplier * (SECONDS * partFraction / 144.0)))
+            .eut(TierEU.RECIPE_UIV)
+            .noOptimize()
+            .addTo(vacuumFreezerRecipes);
+
     }
 }

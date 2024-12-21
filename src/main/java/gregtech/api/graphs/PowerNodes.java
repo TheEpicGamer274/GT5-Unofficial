@@ -3,27 +3,20 @@ package gregtech.api.graphs;
 import gregtech.api.graphs.consumers.ConsumerNode;
 import gregtech.api.graphs.paths.PowerNodePath;
 
-/* look for and power node that need power
- *
- * how this works
- *
- * a node only contains nodes that has a higher value then it self except for 1 which is the return node
- * this node also contains the highest known node value of its network
- * this network only includes nodes that have a higher value then it self so it does not know the highest known value that
- * the return node knows
- *
- * with these rules we can know for the target node to be in the network of a node, the target node must have a value no
- * less than the node we are looking and no greater than the highest value that node knows
- * this way we don't have to go over the entire network to look for it
- *
- * we also hold a list of all consumers so we can check before looking if that consumer actually needs power
- * and only look for nodes that actually need power
- *
+/*
+ * look for and power node that need power how this works a node only contains nodes that has a higher value then it
+ * self except for 1 which is the return node this node also contains the highest known node value of its network this
+ * network only includes nodes that have a higher value then it self so it does not know the highest known value that
+ * the return node knows with these rules we can know for the target node to be in the network of a node, the target
+ * node must have a value no less than the node we are looking and no greater than the highest value that node knows
+ * this way we don't have to go over the entire network to look for it we also hold a list of all consumers so we can
+ * check before looking if that consumer actually needs power and only look for nodes that actually need power
  */
 public class PowerNodes {
+
     // check if the looked for node is next to or get the next node that is closer to it
-    public static long powerNode(
-            Node aCurrentNode, Node aPreviousNode, NodeList aConsumers, long aVoltage, long aMaxAmps) {
+    public static long powerNode(Node aCurrentNode, Node aPreviousNode, NodeList aConsumers, long aVoltage,
+        long aMaxAmps) {
         long tAmpsUsed = 0;
         ConsumerNode tConsumer = (ConsumerNode) aConsumers.getNode();
         int tLoopProtection = 0;
@@ -37,14 +30,18 @@ public class PowerNodes {
                         if (tNextNode.mNodeValue == tConsumer.mNodeValue) {
                             tAmpsUsed += processNodeInject(aCurrentNode, tConsumer, j, aMaxAmps - tAmpsUsed, aVoltage);
                             tConsumer = (ConsumerNode) aConsumers.getNextNode();
-                            break;
                         } else {
                             if (aPreviousNode == tNextNode) return tAmpsUsed;
                             tAmpsUsed += processNextNode(
-                                    aCurrentNode, tNextNode, aConsumers, j, aMaxAmps - tAmpsUsed, aVoltage);
+                                aCurrentNode,
+                                tNextNode,
+                                aConsumers,
+                                j,
+                                aMaxAmps - tAmpsUsed,
+                                aVoltage);
                             tConsumer = (ConsumerNode) aConsumers.getNode();
-                            break;
                         }
+                        break;
                     }
                 }
             } else {
@@ -55,7 +52,12 @@ public class PowerNodes {
                     if (tNextNode.mNodeValue > aCurrentNode.mNodeValue && tNextNode.mNodeValue < tTargetNodeValue) {
                         if (tNextNode == aPreviousNode) return tAmpsUsed;
                         tAmpsUsed += processNextNodeAbove(
-                                aCurrentNode, tNextNode, aConsumers, side, aMaxAmps - tAmpsUsed, aVoltage);
+                            aCurrentNode,
+                            tNextNode,
+                            aConsumers,
+                            side,
+                            aMaxAmps - tAmpsUsed,
+                            aVoltage);
                         tConsumer = (ConsumerNode) aConsumers.getNode();
                         break;
                     } else if (tNextNode.mNodeValue == tTargetNodeValue) {
@@ -77,8 +79,8 @@ public class PowerNodes {
 
     // checking if target node is next to it or has a higher value then current node value
     // these functions are different to either go down or up the stack
-    protected static long powerNodeAbove(
-            Node aCurrentNode, Node aPreviousNode, NodeList aConsumers, long aVoltage, long aMaxAmps) {
+    protected static long powerNodeAbove(Node aCurrentNode, Node aPreviousNode, NodeList aConsumers, long aVoltage,
+        long aMaxAmps) {
         long tAmpsUsed = 0;
         int tLoopProtection = 0;
         ConsumerNode tConsumer = (ConsumerNode) aConsumers.getNode();
@@ -93,7 +95,12 @@ public class PowerNodes {
                     if (tNextNode.mNodeValue > aCurrentNode.mNodeValue && tNextNode.mNodeValue < tTargetNodeValue) {
                         if (tNextNode == aPreviousNode) return tAmpsUsed;
                         tAmpsUsed += processNextNodeAbove(
-                                aCurrentNode, tNextNode, aConsumers, side, aMaxAmps - tAmpsUsed, aVoltage);
+                            aCurrentNode,
+                            tNextNode,
+                            aConsumers,
+                            side,
+                            aMaxAmps - tAmpsUsed,
+                            aVoltage);
                         tConsumer = (ConsumerNode) aConsumers.getNode();
                         break;
                     } else if (tNextNode.mNodeValue == tTargetNodeValue) {
@@ -113,13 +120,13 @@ public class PowerNodes {
         return tAmpsUsed;
     }
 
-    protected static long processNextNode(
-            Node aCurrentNode, Node aNextNode, NodeList aConsumers, int aSide, long aMaxAmps, long aVoltage) {
-        if (aCurrentNode.locks[aSide].isLocked()) {
+    protected static long processNextNode(Node aCurrentNode, Node aNextNode, NodeList aConsumers, int ordinalSide,
+        long aMaxAmps, long aVoltage) {
+        if (aCurrentNode.locks[ordinalSide].isLocked()) {
             aConsumers.getNextNode();
             return 0;
         }
-        final PowerNodePath tPath = (PowerNodePath) aCurrentNode.mNodePaths[aSide];
+        final PowerNodePath tPath = (PowerNodePath) aCurrentNode.mNodePaths[ordinalSide];
         final PowerNodePath tSelfPath = (PowerNodePath) aCurrentNode.mSelfPath;
         long tVoltLoss = 0;
         if (tSelfPath != null) {
@@ -134,13 +141,13 @@ public class PowerNodes {
         return tAmps;
     }
 
-    protected static long processNextNodeAbove(
-            Node aCurrentNode, Node aNextNode, NodeList aConsumers, int aSide, long aMaxAmps, long aVoltage) {
-        if (aCurrentNode.locks[aSide].isLocked()) {
+    protected static long processNextNodeAbove(Node aCurrentNode, Node aNextNode, NodeList aConsumers, int ordinalSide,
+        long aMaxAmps, long aVoltage) {
+        if (aCurrentNode.locks[ordinalSide].isLocked()) {
             aConsumers.getNextNode();
             return 0;
         }
-        final PowerNodePath tPath = (PowerNodePath) aCurrentNode.mNodePaths[aSide];
+        final PowerNodePath tPath = (PowerNodePath) aCurrentNode.mNodePaths[ordinalSide];
         final PowerNodePath tSelfPath = (PowerNodePath) aCurrentNode.mSelfPath;
         long tVoltLoss = 0;
         if (tSelfPath != null) {
@@ -155,10 +162,10 @@ public class PowerNodes {
         return tAmps;
     }
 
-    protected static long processNodeInject(
-            Node aCurrentNode, ConsumerNode aConsumer, int aSide, long aMaxAmps, long aVoltage) {
-        if (aCurrentNode.locks[aSide].isLocked()) return 0;
-        final PowerNodePath tPath = (PowerNodePath) aCurrentNode.mNodePaths[aSide];
+    protected static long processNodeInject(Node aCurrentNode, ConsumerNode aConsumer, int ordinalSide, long aMaxAmps,
+        long aVoltage) {
+        if (aCurrentNode.locks[ordinalSide].isLocked()) return 0;
+        final PowerNodePath tPath = (PowerNodePath) aCurrentNode.mNodePaths[ordinalSide];
         final PowerNodePath tSelfPath = (PowerNodePath) aCurrentNode.mSelfPath;
         long tVoltLoss = 0;
         if (tSelfPath != null) {

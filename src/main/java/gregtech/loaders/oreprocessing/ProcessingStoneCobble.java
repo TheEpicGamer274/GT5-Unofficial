@@ -1,47 +1,30 @@
 package gregtech.loaders.oreprocessing;
 
-import gregtech.api.enums.GT_Values;
-import gregtech.api.enums.ItemList;
-import gregtech.api.enums.Materials;
-import gregtech.api.enums.OrePrefixes;
-import gregtech.api.util.GT_OreDictUnificator;
-import gregtech.api.util.GT_Utility;
+import static gregtech.api.recipe.RecipeMaps.assemblerRecipes;
+import static gregtech.api.util.GTRecipeBuilder.SECONDS;
+
 import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 
+import gregtech.api.enums.GTValues;
+import gregtech.api.enums.Materials;
+import gregtech.api.enums.OrePrefixes;
+import gregtech.api.util.GTUtility;
+
 public class ProcessingStoneCobble implements gregtech.api.interfaces.IOreRecipeRegistrator {
+
     public ProcessingStoneCobble() {
         OrePrefixes.stoneCobble.add(this);
     }
 
     @Override
-    public void registerOre(
-            OrePrefixes aPrefix, Materials aMaterial, String aOreDictName, String aModName, ItemStack aStack) {
-        GT_Values.RA.addAssemblerRecipe(
-                GT_Utility.copyAmount(1L, aStack),
-                GT_OreDictUnificator.get(OrePrefixes.stick, Materials.Wood, 1L),
-                new ItemStack(Blocks.lever, 1),
-                400,
-                1);
-        GT_Values.RA.addAssemblerRecipe(
-                GT_Utility.copyAmount(8L, aStack),
-                ItemList.Circuit_Integrated.getWithDamage(0L, 8L),
-                new ItemStack(Blocks.furnace, 1),
-                400,
-                4);
-        GT_Values.RA.addAssemblerRecipe(
-                GT_Utility.copyAmount(7L, aStack),
-                GT_OreDictUnificator.get(OrePrefixes.dust, Materials.Redstone, 1L),
-                new ItemStack(Blocks.dropper, 1),
-                400,
-                4);
-        GT_Values.RA.addAssemblerRecipe(
-                GT_Utility.copyAmount(7L, aStack),
-                new ItemStack(Items.bow, 1, 0),
-                Materials.Redstone.getMolten(144L),
-                new ItemStack(Blocks.dispenser, 1),
-                400,
-                4);
+    public void registerOre(OrePrefixes aPrefix, Materials aMaterial, String aOreDictName, String aModName,
+        ItemStack aStack) {
+        GTValues.RA.stdBuilder()
+            .itemInputs(GTUtility.copyAmount(8, aStack), GTUtility.getIntegratedCircuit(8))
+            .itemOutputs(new ItemStack(Blocks.furnace, 1))
+            .duration(20 * SECONDS)
+            .eut(4)
+            .addTo(assemblerRecipes);
     }
 }

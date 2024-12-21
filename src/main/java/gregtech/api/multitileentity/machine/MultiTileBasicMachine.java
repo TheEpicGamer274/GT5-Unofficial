@@ -1,44 +1,116 @@
 package gregtech.api.multitileentity.machine;
 
-import static com.google.common.primitives.Ints.saturatedCast;
-import static gregtech.api.enums.GT_Values.emptyIconContainerArray;
+import static gregtech.api.enums.GTValues.*;
+import static gregtech.api.enums.TickTime.MINUTE;
 
-import com.gtnewhorizons.modularui.api.forge.IItemHandlerModifiable;
-import com.gtnewhorizons.modularui.api.forge.ItemStackHandler;
-import gregtech.api.enums.GT_Values;
-import gregtech.api.enums.GT_Values.NBT;
-import gregtech.api.enums.Textures;
-import gregtech.api.fluid.FluidTankGT;
-import gregtech.api.interfaces.IIconContainer;
-import gregtech.api.interfaces.ITexture;
-import gregtech.api.multitileentity.MultiTileEntityRegistry;
-import gregtech.api.multitileentity.base.BaseTickableMultiTileEntity;
-import gregtech.api.render.TextureFactory;
-import gregtech.api.util.GT_Util;
-import gregtech.api.util.GT_Utility;
-import net.minecraft.block.Block;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Objects;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityFurnace;
+import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.StatCollector;
+import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.IFluidTank;
 
-public class MultiTileBasicMachine extends BaseTickableMultiTileEntity {
-    private static final String TEXTURE_LOCATION = "multitileentity/machines/";
-    public IIconContainer[] mTexturesInactive = emptyIconContainerArray;
-    public IIconContainer[] mTexturesActive = emptyIconContainerArray;
+import org.jetbrains.annotations.ApiStatus.OverrideOnly;
 
-    protected int mParallel = 1;
-    protected boolean mActive = false;
-    protected long mStoredEnergy = 0;
-    protected FluidTankGT[] mTanksInput = GT_Values.emptyFluidTankGT, mTanksOutput = GT_Values.emptyFluidTankGT;
-    protected FluidStack[] mOutputFluids = GT_Values.emptyFluidStack;
+import com.gtnewhorizons.modularui.api.forge.IItemHandlerModifiable;
+import com.gtnewhorizons.modularui.api.forge.ItemStackHandler;
+import com.gtnewhorizons.modularui.api.screen.UIBuildContext;
 
-    protected final IItemHandlerModifiable mInputInventory = new ItemStackHandler(17);
-    protected final IItemHandlerModifiable mOutputInventory = new ItemStackHandler(15);
-    protected boolean mOutputInventoryChanged = false;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import gregtech.api.enums.GTValues;
+import gregtech.api.enums.GTValues.NBT;
+import gregtech.api.enums.InventoryType;
+import gregtech.api.enums.Mods;
+import gregtech.api.enums.SoundResource;
+import gregtech.api.enums.Textures;
+import gregtech.api.enums.Textures.BlockIcons.CustomIcon;
+import gregtech.api.enums.TickTime;
+import gregtech.api.enums.VoidingMode;
+import gregtech.api.gui.GUIHost;
+import gregtech.api.gui.GUIProvider;
+import gregtech.api.interfaces.ITexture;
+import gregtech.api.logic.FluidInventoryLogic;
+import gregtech.api.logic.ItemInventoryLogic;
+import gregtech.api.logic.MuTEProcessingLogic;
+import gregtech.api.logic.NullPowerLogic;
+import gregtech.api.logic.PowerLogic;
+import gregtech.api.logic.interfaces.PowerLogicHost;
+import gregtech.api.logic.interfaces.ProcessingLogicHost;
+import gregtech.api.metatileentity.GregTechTileClientEvents;
+import gregtech.api.multitileentity.MultiTileEntityRegistry;
+import gregtech.api.multitileentity.base.TickableMultiTileEntity;
+import gregtech.api.multitileentity.interfaces.IMultiTileMachine;
+import gregtech.api.render.TextureFactory;
+import gregtech.api.task.tasks.ProcessingTask;
+import gregtech.api.util.GTUtility;
+import gregtech.client.GTSoundLoop;
+import gregtech.common.gui.MachineGUIProvider;
+
+public abstract class MultiTileBasicMachine<P extends MuTEProcessingLogic<P>> extends TickableMultiTileEntity
+    implements IMultiTileMachine, ProcessingLogicHost<P>, PowerLogicHost, GUIHost {
+
+    protected static final int ACTIVE = B[0];
+    protected static final int TICKS_BETWEEN_RECIPE_CHECKS = 5 * TickTime.SECOND;
+    protected static final int POLLUTION_TICK = TickTime.SECOND;
+    protected static final byte INTERRUPT_SOUND_INDEX = 8;
+    protected static final byte PROCESS_START_SOUND_INDEX = 1;
+
+    protected static final IItemHandlerModifiable EMPTY_INVENTORY = new ItemStackHandler(0);
+
+    public ITexture activeOverlayTexture = null;
+    public ITexture activeOverlayGlowTexture = null;
+    public ITexture inactiveOverlayTexture = null;
+    public ITexture inactiveOverlayGlowTexture = null;
+
+    protected int maxParallel = 1;
+    protected boolean active = false;
+    protected int tier = 0;
+    protected long burnTime = 0;
+    protected long totalBurnTime = 0;
+
+    protected boolean outputInventoryChanged = false;
+    protected boolean powerShutDown = false;
+    protected boolean wasEnabled = false;
+    protected boolean canWork = true;
+    protected boolean isElectric = true;
+    protected boolean isSteam = false;
+    protected boolean acceptsFuel = false;
+
+    protected byte soundEvent = 0;
+    protected int soundEventValue = 0;
+    protected ItemInventoryLogic itemInput;
+    protected ItemInventoryLogic itemOutput;
+    protected FluidInventoryLogic fluidInput;
+    protected FluidInventoryLogic fluidOutput;
+
+    protected P processingLogic;
+    @Nonnull
+    protected VoidingMode voidingMode = VoidingMode.VOID_NONE;
+    protected boolean processingUpdate = false;
+    @Nonnull
+    protected PowerLogic power = createPowerLogic();
+    @Nonnull
+    protected GUIProvider<?> guiProvider = createGUIProvider();
+
+    @SideOnly(Side.CLIENT)
+    protected GTSoundLoop activitySoundLoop;
+
+    public MultiTileBasicMachine() {
+        new ProcessingTask<>(this);
+    }
 
     @Override
     public String getTileEntityName() {
@@ -46,144 +118,157 @@ public class MultiTileBasicMachine extends BaseTickableMultiTileEntity {
     }
 
     @Override
-    public void writeMultiTileNBT(NBTTagCompound aNBT) {
-        super.writeMultiTileNBT(aNBT);
-        if (mParallel > 0) aNBT.setInteger(NBT.PARALLEL, mParallel);
-        if (mActive) aNBT.setBoolean(NBT.ACTIVE, mActive);
-        if (mInputInventory != null && mInputInventory.getSlots() > 0)
-            writeInventory(aNBT, mInputInventory, NBT.INV_INPUT_LIST);
-        if (mOutputInventory != null && mOutputInventory.getSlots() > 0)
-            writeInventory(aNBT, mOutputInventory, NBT.INV_OUTPUT_LIST);
-        for (int i = 0; i < mTanksInput.length; i++) mTanksInput[i].writeToNBT(aNBT, NBT.TANK_IN + i);
-        for (int i = 0; i < mTanksOutput.length; i++) mTanksOutput[i].writeToNBT(aNBT, NBT.TANK_OUT + i);
-        if (mOutputFluids != null && mOutputFluids.length > 0) writeFluids(aNBT, mOutputFluids, NBT.FLUID_OUT);
+    public void writeMultiTileNBT(NBTTagCompound nbt) {
+        super.writeMultiTileNBT(nbt);
+        if (maxParallel > 0) {
+            nbt.setInteger(NBT.PARALLEL, maxParallel);
+        }
+
+        if (active) {
+            nbt.setBoolean(NBT.ACTIVE, active);
+        }
+
+        saveItemLogic(nbt);
+        saveFluidLogic(nbt);
+
+        if (processingLogic != null) {
+            NBTTagCompound processingLogicNBT = processingLogic.saveToNBT();
+            nbt.setTag("processingLogic", processingLogicNBT);
+        }
+
+        nbt.setInteger(NBT.TIER, tier);
+        nbt.setLong(NBT.BURN_TIME_LEFT, burnTime);
+        nbt.setLong(NBT.TOTAL_BURN_TIME, totalBurnTime);
+        nbt.setBoolean(NBT.ALLOWED_WORK, canWork);
+        nbt.setBoolean(NBT.ACTIVE, active);
+        power.saveToNBT(nbt);
     }
 
-    protected void writeFluids(NBTTagCompound aNBT, FluidStack[] fluids, String fluidListTag) {
-        if (fluids != null && fluids.length > 0) {
-            final NBTTagList tList = new NBTTagList();
-            for (final FluidStack tFluid : fluids) {
-                if (tFluid != null) {
-                    final NBTTagCompound tag = new NBTTagCompound();
-                    tFluid.writeToNBT(tag);
-                    tList.appendTag(tag);
-                }
-            }
-            aNBT.setTag(fluidListTag, tList);
+    protected void saveItemLogic(NBTTagCompound nbt) {
+        NBTTagCompound nbtListInput = itemInput.saveToNBT();
+        nbt.setTag(NBT.INV_INPUT_LIST, nbtListInput);
+        NBTTagCompound nbtListOutput = itemOutput.saveToNBT();
+        nbt.setTag(NBT.INV_OUTPUT_LIST, nbtListOutput);
+    }
+
+    protected void saveFluidLogic(NBTTagCompound nbt) {
+        NBTTagCompound fluidInputNBT = fluidInput.saveToNBT();
+        nbt.setTag(NBT.TANK_IN, fluidInputNBT);
+        NBTTagCompound fluidOutputNBT = fluidOutput.saveToNBT();
+        nbt.setTag(NBT.TANK_OUT, fluidOutputNBT);
+    }
+
+    @Override
+    public void readMultiTileNBT(NBTTagCompound nbt) {
+        super.readMultiTileNBT(nbt);
+        if (nbt.hasKey(NBT.PARALLEL)) {
+            maxParallel = Math.max(1, nbt.getInteger(NBT.PARALLEL));
+        }
+
+        if (nbt.hasKey(NBT.ACTIVE)) {
+            active = nbt.getBoolean(NBT.ACTIVE);
+        }
+
+        loadItemLogic(nbt);
+        loadFluidLogic(nbt);
+
+        if (nbt.hasKey("processingLogic")) {
+            P processingLogic = getProcessingLogic();
+            processingLogic.loadFromNBT(Objects.requireNonNull(nbt.getCompoundTag("processingLogic")));
+        }
+
+        tier = nbt.getInteger(NBT.TIER);
+        burnTime = nbt.getLong(NBT.BURN_TIME_LEFT);
+        totalBurnTime = nbt.getLong(NBT.TOTAL_BURN_TIME);
+        canWork = nbt.getBoolean(NBT.ALLOWED_WORK);
+        active = nbt.getBoolean(NBT.ACTIVE);
+        power.loadFromNBT(nbt);
+    }
+
+    protected void loadItemLogic(NBTTagCompound nbt) {
+        itemInput = new ItemInventoryLogic(nbt.getInteger(NBT.INV_OUTPUT_SIZE), tier);
+        itemOutput = new ItemInventoryLogic(nbt.getInteger(NBT.INV_OUTPUT_SIZE), tier);
+        if (nbt.hasKey(NBT.INV_INPUT_LIST)) {
+            itemInput.loadFromNBT(nbt.getCompoundTag(NBT.INV_INPUT_LIST));
+        }
+        if (nbt.hasKey(NBT.INV_OUTPUT_LIST)) {
+            itemOutput.loadFromNBT(nbt.getCompoundTag(NBT.INV_OUTPUT_LIST));
         }
     }
 
-    protected void writeInventory(NBTTagCompound aNBT, IItemHandlerModifiable inv, String invListTag) {
-        if (inv != null && inv.getSlots() > 0) {
-            final NBTTagList tList = new NBTTagList();
-            for (int tSlot = 0; tSlot < inv.getSlots(); tSlot++) {
-                final ItemStack tStack = inv.getStackInSlot(tSlot);
-                if (tStack != null) {
-                    final NBTTagCompound tag = new NBTTagCompound();
-                    tag.setByte("s", (byte) tSlot);
-                    tStack.writeToNBT(tag);
-                    tList.appendTag(tag);
-                }
-            }
-            aNBT.setTag(invListTag, tList);
+    protected void loadFluidLogic(NBTTagCompound nbt) {
+        fluidInput = new FluidInventoryLogic(16, 10000, tier);
+        fluidOutput = new FluidInventoryLogic(16, 10000, tier);
+        fluidInput.loadFromNBT(nbt.getCompoundTag(NBT.TANK_IN));
+        fluidOutput.loadFromNBT(nbt.getCompoundTag(NBT.TANK_OUT));
+    }
+
+    public boolean checkTexture(String modID, String resourcePath) {
+        try {
+            Minecraft.getMinecraft()
+                .getResourceManager()
+                .getResource(new ResourceLocation(modID, resourcePath));
+            return true;
+        } catch (IOException ignored) {
+            return false;
         }
     }
 
     @Override
-    public void readMultiTileNBT(NBTTagCompound aNBT) {
-        super.readMultiTileNBT(aNBT);
-        if (aNBT.hasKey(NBT.PARALLEL)) mParallel = Math.max(1, aNBT.getInteger(NBT.PARALLEL));
-        if (aNBT.hasKey(NBT.ACTIVE)) mActive = aNBT.getBoolean(NBT.ACTIVE);
-
-        /* Inventories */
-        loadInventory(aNBT, NBT.INV_INPUT_SIZE, NBT.INV_INPUT_LIST);
-        loadInventory(aNBT, NBT.INV_OUTPUT_SIZE, NBT.INV_OUTPUT_LIST);
-
-        /* Tanks */
-        long tCapacity = 1000;
-        if (aNBT.hasKey(NBT.TANK_CAPACITY)) tCapacity = saturatedCast(aNBT.getLong(NBT.TANK_CAPACITY));
-
-        mTanksInput = new FluidTankGT[getFluidInputCount()];
-        mTanksOutput = new FluidTankGT[getFluidOutputCount()];
-        mOutputFluids = new FluidStack[getFluidOutputCount()];
-
-        // TODO: See if we need the adjustable map here `.setCapacity(mRecipes, mParallel * 2L)` in place of the
-        // `setCapacityMultiplier`
-        for (int i = 0; i < mTanksInput.length; i++)
-            mTanksInput[i] = new FluidTankGT(tCapacity)
-                    .setCapacityMultiplier(mParallel * 2L)
-                    .readFromNBT(aNBT, NBT.TANK_IN + i);
-        for (int i = 0; i < mTanksOutput.length; i++)
-            mTanksOutput[i] = new FluidTankGT().readFromNBT(aNBT, NBT.TANK_OUT + i);
-        for (int i = 0; i < mOutputFluids.length; i++)
-            mOutputFluids[i] = FluidStack.loadFluidStackFromNBT(aNBT.getCompoundTag(NBT.FLUID_OUT + "." + i));
-    }
-
-    protected void loadInventory(NBTTagCompound aNBT, String sizeTag, String invListTag) {
-        final IItemHandlerModifiable inv = mInputInventory;
-        if (inv != null) {
-            final NBTTagList tList = aNBT.getTagList(invListTag, 10);
-            for (int i = 0; i < tList.tagCount(); i++) {
-                final NBTTagCompound tNBT = tList.getCompoundTagAt(i);
-                final int tSlot = tNBT.getShort("s");
-                if (tSlot >= 0 && tSlot < inv.getSlots()) inv.setStackInSlot(tSlot, GT_Utility.loadItem(tNBT));
+    public void loadTextures(String folder) {
+        super.loadTextures(folder);
+        for (StatusTextures textureName : StatusTextures.TEXTURES) {
+            ITexture texture = null;
+            String texturePath = "textures/blocks/multitileentity/" + folder + "/" + textureName.getName() + ".png";
+            if (!checkTexture(Mods.GregTech.ID, texturePath)) {
+                texture = TextureFactory.of(Textures.BlockIcons.VOID);
+            } else {
+                if (textureName.hasGlow()) {
+                    texture = TextureFactory.builder()
+                        .addIcon(new CustomIcon("multitileentity/" + folder + "/" + textureName.getName()))
+                        .glow()
+                        .build();
+                } else {
+                    texture = TextureFactory
+                        .of(new CustomIcon("multitileentity/" + folder + "/" + textureName.getName()));
+                }
+            }
+            switch (textureName) {
+                case Active -> activeOverlayTexture = texture;
+                case ActiveWithGlow -> activeOverlayGlowTexture = texture;
+                case Inactive -> inactiveOverlayTexture = texture;
+                case InactiveWithGlow -> inactiveOverlayGlowTexture = texture;
             }
         }
-    }
-
-    @Override
-    public void loadTextureNBT(NBTTagCompound aNBT) {
-        // Loading the registry
-        final String textureName = aNBT.getString(NBT.TEXTURE);
-        mTextures = new IIconContainer[] {
-            new Textures.BlockIcons.CustomIcon(TEXTURE_LOCATION + textureName + "/bottom"),
-            new Textures.BlockIcons.CustomIcon(TEXTURE_LOCATION + textureName + "/top"),
-            new Textures.BlockIcons.CustomIcon(TEXTURE_LOCATION + textureName + "/left"),
-            new Textures.BlockIcons.CustomIcon(TEXTURE_LOCATION + textureName + "/front"),
-            new Textures.BlockIcons.CustomIcon(TEXTURE_LOCATION + textureName + "/right"),
-            new Textures.BlockIcons.CustomIcon(TEXTURE_LOCATION + textureName + "/side")
-        };
-        mTexturesInactive = new IIconContainer[] {
-            new Textures.BlockIcons.CustomIcon(TEXTURE_LOCATION + textureName + "/overlay/inactive/bottom"),
-            new Textures.BlockIcons.CustomIcon(TEXTURE_LOCATION + textureName + "/overlay/inactive/top"),
-            new Textures.BlockIcons.CustomIcon(TEXTURE_LOCATION + textureName + "/overlay/inactive/left"),
-            new Textures.BlockIcons.CustomIcon(TEXTURE_LOCATION + textureName + "/overlay/inactive/front"),
-            new Textures.BlockIcons.CustomIcon(TEXTURE_LOCATION + textureName + "/overlay/inactive/right"),
-            new Textures.BlockIcons.CustomIcon(TEXTURE_LOCATION + textureName + "/overlay/inactive/back")
-        };
-        mTexturesActive = new IIconContainer[] {
-            new Textures.BlockIcons.CustomIcon(TEXTURE_LOCATION + textureName + "/overlay/active/bottom"),
-            new Textures.BlockIcons.CustomIcon(TEXTURE_LOCATION + textureName + "/overlay/active/top"),
-            new Textures.BlockIcons.CustomIcon(TEXTURE_LOCATION + textureName + "/overlay/active/left"),
-            new Textures.BlockIcons.CustomIcon(TEXTURE_LOCATION + textureName + "/overlay/active/front"),
-            new Textures.BlockIcons.CustomIcon(TEXTURE_LOCATION + textureName + "/overlay/active/right"),
-            new Textures.BlockIcons.CustomIcon(TEXTURE_LOCATION + textureName + "/overlay/active/back")
-        };
     }
 
     @Override
     public void copyTextures() {
-        // Loading an instance
-        final TileEntity tCanonicalTileEntity =
-                MultiTileEntityRegistry.getCanonicalTileEntity(getMultiTileEntityRegistryID(), getMultiTileEntityID());
-        if (tCanonicalTileEntity instanceof MultiTileBasicMachine) {
-            mTextures = ((MultiTileBasicMachine) tCanonicalTileEntity).mTextures;
-            mTexturesInactive = ((MultiTileBasicMachine) tCanonicalTileEntity).mTexturesInactive;
-            mTexturesActive = ((MultiTileBasicMachine) tCanonicalTileEntity).mTexturesActive;
-        } else {
-            mTextures = mTexturesInactive = mTexturesActive = emptyIconContainerArray;
+        super.copyTextures();
+        final TileEntity tCanonicalTileEntity = MultiTileEntityRegistry
+            .getReferenceTileEntity(getMultiTileEntityRegistryID(), getMultiTileEntityID());
+        if (!(tCanonicalTileEntity instanceof MultiTileBasicMachine canonicalEntity)) {
+            return;
         }
+        activeOverlayTexture = canonicalEntity.activeOverlayTexture;
+        activeOverlayGlowTexture = canonicalEntity.activeOverlayGlowTexture;
+        inactiveOverlayTexture = canonicalEntity.inactiveOverlayTexture;
+        inactiveOverlayGlowTexture = canonicalEntity.inactiveOverlayGlowTexture;
     }
 
     @Override
-    public ITexture[] getTexture(Block aBlock, byte aSide, boolean isActive, int aRenderPass) {
-        return new ITexture[] {
-            TextureFactory.of(mTextures[GT_Values.FACING_ROTATIONS[mFacing][aSide]], GT_Util.getRGBaArray(mRGBa)),
-            TextureFactory.of(
-                    (mActive ? mTexturesActive : mTexturesInactive)[GT_Values.FACING_ROTATIONS[mFacing][aSide]])
-        };
-    }
+    public ITexture getTexture(ForgeDirection side) {
+        final ITexture texture = super.getTexture(side);
+        if (side == facing) {
+            if (isActive()) {
+                return TextureFactory.of(texture, activeOverlayTexture, activeOverlayGlowTexture);
+            }
 
+            return TextureFactory.of(texture, inactiveOverlayTexture, inactiveOverlayGlowTexture);
+        }
+
+        return TextureFactory.of(texture, getCoverTexture(side));
+    }
     /*
      * Fluids
      */
@@ -205,149 +290,6 @@ public class MultiTileBasicMachine extends BaseTickableMultiTileEntity {
     @Override
     public void setLightValue(byte aLightValue) {}
 
-    @Override
-    public String getInventoryName() {
-        final String name = getCustomName();
-        if (name != null) return name;
-        final MultiTileEntityRegistry tRegistry = MultiTileEntityRegistry.getRegistry(getMultiTileEntityRegistryID());
-        return tRegistry == null ? getClass().getName() : tRegistry.getLocal(getMultiTileEntityID());
-    }
-
-    @Override
-    public boolean isUseableByPlayer(EntityPlayer aPlayer) {
-        return playerOwnsThis(aPlayer, false)
-                && mTickTimer > 40
-                && getTileEntityOffset(0, 0, 0) == this
-                && aPlayer.getDistanceSq(xCoord + 0.5, yCoord + 0.5, zCoord + 0.5) < 64
-                && allowInteraction(aPlayer);
-    }
-
-    @Override
-    public boolean isLiquidInput(byte aSide) {
-        return aSide != mFacing;
-    }
-
-    @Override
-    public boolean isLiquidOutput(byte aSide) {
-        return aSide != mFacing;
-    }
-
-    @Override
-    protected IFluidTank[] getFluidTanks(byte aSide) {
-        final boolean fluidInput = isLiquidInput(aSide);
-        final boolean fluidOutput = isLiquidOutput(aSide);
-
-        if (fluidInput && fluidOutput) {
-            final IFluidTank[] rTanks = new IFluidTank[mTanksInput.length + mTanksOutput.length];
-            System.arraycopy(mTanksInput, 0, rTanks, 0, mTanksInput.length);
-            System.arraycopy(mTanksOutput, 0, rTanks, mTanksInput.length, mTanksOutput.length);
-            return rTanks;
-        } else if (fluidInput) {
-            return mTanksInput;
-        } else if (fluidOutput) {
-            return mTanksOutput;
-        }
-        return GT_Values.emptyFluidTank;
-    }
-
-    @Override
-    public IFluidTank getFluidTankFillable(byte aSide, FluidStack aFluidToFill) {
-        if (!isLiquidInput(aSide)) return null;
-        for (FluidTankGT tankGT : mTanksInput) if (tankGT.contains(aFluidToFill)) return tankGT;
-        //        if (!mRecipes.containsInput(aFluidToFill, this, slot(mRecipes.mInputItemsCount +
-        // mRecipes.mOutputItemsCount))) return null;
-        for (FluidTankGT fluidTankGT : mTanksInput) if (fluidTankGT.isEmpty()) return fluidTankGT;
-        return null;
-    }
-
-    @Override
-    protected IFluidTank getFluidTankDrainable(byte aSide, FluidStack aFluidToDrain) {
-        if (!isLiquidOutput(aSide)) return null;
-        for (FluidTankGT fluidTankGT : mTanksOutput)
-            if (aFluidToDrain == null ? fluidTankGT.has() : fluidTankGT.contains(aFluidToDrain)) return fluidTankGT;
-
-        return null;
-    }
-
-    /*
-     * Energy
-     */
-
-    @Override
-    public boolean isEnetInput() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnetOutput() {
-        return true;
-    }
-
-    @Override
-    public boolean isUniversalEnergyStored(long aEnergyAmount) {
-        return getUniversalEnergyStored() >= aEnergyAmount;
-    }
-
-    @Override
-    public long getUniversalEnergyStored() {
-        return mStoredEnergy;
-    }
-
-    @Override
-    public long getUniversalEnergyCapacity() {
-        return 0;
-    }
-
-    @Override
-    public long getOutputAmperage() {
-        return 1;
-    }
-
-    @Override
-    public long getOutputVoltage() {
-        return 1;
-    }
-
-    @Override
-    public long getInputAmperage() {
-        return 1;
-    }
-
-    @Override
-    public long getInputVoltage() {
-        return 1;
-    }
-
-    public boolean isEnergyInputSide(byte aSide) {
-        return true;
-    }
-
-    public boolean isEnergyOutputSide(byte aSide) {
-        return true;
-    }
-
-    @Override
-    public boolean inputEnergyFrom(byte aSide) {
-        if (aSide == GT_Values.SIDE_UNKNOWN) return true;
-        if (aSide >= 0 && aSide < 6) {
-            if (isInvalid()) return false;
-            if (!getCoverInfoAtSide(aSide).letsEnergyIn()) return false;
-            if (isEnetInput()) return isEnergyInputSide(aSide);
-        }
-        return false;
-    }
-
-    @Override
-    public boolean outputsEnergyTo(byte aSide) {
-        if (aSide == GT_Values.SIDE_UNKNOWN) return true;
-        if (aSide >= 0 && aSide < 6) {
-            if (isInvalid()) return false;
-            if (!getCoverInfoAtSide(aSide).letsEnergyOut()) return false;
-            if (isEnetOutput()) return isEnergyOutputSide(aSide);
-        }
-        return false;
-    }
-
     /*
      * Inventory
      */
@@ -355,25 +297,503 @@ public class MultiTileBasicMachine extends BaseTickableMultiTileEntity {
     @Override
     public boolean hasInventoryBeenModified() {
         // True if the input inventory has changed
-        return mInventoryChanged;
+        return hasInventoryChanged;
     }
 
     public void markOutputInventoryBeenModified() {
-        mOutputInventoryChanged = true;
+        outputInventoryChanged = true;
     }
 
     public boolean hasOutputInventoryBeenModified() {
         // True if the output inventory has changed
-        return mOutputInventoryChanged;
+        return outputInventoryChanged;
+    }
+
+    public void markInputInventoryBeenModified() {
+        hasInventoryChanged = true;
+    }
+
+    // #region Machine
+
+    @Override
+    public void onPostTick(long tick, boolean isServerSide) {
+        if (isServerSide) {
+            runMachine(tick);
+        } else {
+            doActivitySound(getActivitySoundLoop());
+        }
+    }
+
+    /**
+     * Runs only on server side
+     *
+     * @param tick The current tick of the machine
+     */
+    protected void runMachine(long tick) {
+        if (acceptsFuel() && isActive() && !consumeFuel()) {
+            stopMachine(true);
+            return;
+        }
+
+        if (hasThingsToDo()) {
+            markDirty();
+            runningTick(tick);
+            return;
+        }
+
+        if (tick % TICKS_BETWEEN_RECIPE_CHECKS == 0 || hasWorkJustBeenEnabled()
+            || hasInventoryBeenModified() && isAllowedToWork()) {
+            wasEnabled = false;
+            if (checkRecipe()) {
+                setActive(true);
+                setSound(GregTechTileClientEvents.START_SOUND_LOOP, PROCESS_START_SOUND_INDEX);
+                updateSlots();
+                markDirty();
+                issueClientUpdate();
+            }
+        }
+    }
+
+    /**
+     * Runs only on server side
+     *
+     * @param tick The current tick of the machine
+     */
+    protected void runningTick(long tick) {
+        consumeEnergy();
+    }
+
+    /**
+     * Runs only on server side
+     */
+    protected boolean checkRecipe() {
+        return false;
+    }
+
+    /**
+     * Runs only on server side
+     */
+    protected void consumeEnergy() {
+        PowerLogic logic = getPowerLogic();
+
+        P processing = getProcessingLogic();
+
+        if (!logic.removeEnergyUnsafe(processing.getCalculatedEut())) {
+            stopMachine(true);
+        }
+    }
+
+    public void doSound(byte aIndex, double aX, double aY, double aZ) {
+        switch (aIndex) {
+            case PROCESS_START_SOUND_INDEX -> {
+                if (getProcessStartSound() != null)
+                    GTUtility.doSoundAtClient(getProcessStartSound(), getTimeBetweenProcessSounds(), 1.0F, aX, aY, aZ);
+            }
+            case INTERRUPT_SOUND_INDEX -> GTUtility
+                .doSoundAtClient(SoundResource.IC2_MACHINES_INTERRUPT_ONE, 100, 1.0F, aX, aY, aZ);
+        }
+    }
+
+    public void startSoundLoop(byte aIndex, double aX, double aY, double aZ) {
+        if (aIndex == PROCESS_START_SOUND_INDEX && getProcessStartSound() != null) {
+            GTUtility.doSoundAtClient(getProcessStartSound(), getTimeBetweenProcessSounds(), 1.0F, aX, aY, aZ);
+        }
+    }
+
+    protected ResourceLocation getProcessStartSound() {
+        return null;
+    }
+
+    protected int getTimeBetweenProcessSounds() {
+        return 100;
+    }
+
+    @SideOnly(Side.CLIENT)
+    protected void doActivitySound(ResourceLocation activitySound) {
+        if (isActive() && activitySound != null && activitySoundLoop == null) {
+            activitySoundLoop = new GTSoundLoop(activitySound, this, false, true);
+            Minecraft.getMinecraft()
+                .getSoundHandler()
+                .playSound(activitySoundLoop);
+            return;
+        }
+
+        if (activitySoundLoop != null) {
+            activitySoundLoop = null;
+        }
+
+    }
+
+    @SideOnly(Side.CLIENT)
+    protected ResourceLocation getActivitySoundLoop() {
+        return null;
+    }
+
+    protected ItemStack[] getInputItems() {
+        return itemInput.getStoredItems();
+    }
+
+    protected FluidStack[] getInputFluids() {
+        return fluidInput.getStoredFluids();
     }
 
     @Override
-    public boolean isItemValidForSlot(int aSlot, ItemStack aStack) {
+    public int getProgress() {
+        P processing = getProcessingLogic();
+        return processing.getProgress();
+    }
+
+    @Override
+    public int getMaxProgress() {
+        P processing = getProcessingLogic();
+        return processing.getDuration();
+    }
+
+    @Override
+    public boolean increaseProgress(int progressAmount) {
+        P processing = getProcessingLogic();
+        processing.increaseProgress(progressAmount);
+        return true;
+    }
+
+    @Override
+    public boolean hasThingsToDo() {
+        return getMaxProgress() > 0;
+    }
+
+    @Override
+    public boolean hasWorkJustBeenEnabled() {
+        return wasEnabled;
+    }
+
+    @Override
+    public void enableWorking() {
+        wasEnabled = true;
+        canWork = true;
+    }
+
+    @Override
+    public void disableWorking() {
+        canWork = false;
+    }
+
+    @Override
+    public boolean wasShutdown() {
+        return powerShutDown;
+    }
+
+    @Override
+    public boolean isAllowedToWork() {
+        return canWork;
+    }
+
+    @Override
+    public boolean isActive() {
+        return active;
+    }
+
+    @Override
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    protected boolean isElectric() {
+        return isElectric;
+    }
+
+    protected void setElectric(boolean isElectric) {
+        this.isElectric = isElectric;
+    }
+
+    protected boolean isSteam() {
+        return isSteam;
+    }
+
+    protected void setSteam(boolean isSteam) {
+        this.isSteam = isSteam;
+    }
+
+    protected boolean acceptsFuel() {
+        return acceptsFuel;
+    }
+
+    protected void setFuel(boolean acceptsFuel) {
+        this.acceptsFuel = acceptsFuel;
+    }
+
+    protected boolean consumeFuel() {
+        if (isElectric() || isSteam()) return false;
+        if (isActive() && burnTime <= 0) {
+            for (int i = 0; i < itemInput.getSlots(); i++) {
+                ItemStack item = itemInput.getItemInSlot(i);
+                if (item == null) continue;
+                int checkBurnTime = TileEntityFurnace.getItemBurnTime(item) / 10;
+                if (checkBurnTime <= 0) continue;
+                item.stackSize--;
+                burnTime = checkBurnTime;
+                totalBurnTime = checkBurnTime;
+                break;
+            }
+            updateSlots();
+        }
+
+        if (--burnTime < 0) {
+            burnTime = 0;
+            totalBurnTime = 0;
+            return false;
+        }
         return false;
     }
 
     @Override
-    public int getInventoryStackLimit() {
-        return 64;
+    protected void addDebugInfo(EntityPlayer player, int logLevel, ArrayList<String> list) {
+        list.add(
+            GTUtility.trans("186", "Owned by: ") + EnumChatFormatting.BLUE
+                + getOwnerName()
+                + EnumChatFormatting.RESET
+                + " ("
+                + EnumChatFormatting.AQUA
+                + getOwnerUuid()
+                + EnumChatFormatting.RESET
+                + ")");
+
+        if (acceptsFuel()) {
+            list.add("Fuel: " + EnumChatFormatting.GOLD + burnTime + "/" + totalBurnTime);
+        }
+
+        PowerLogic logic = getPowerLogic();
+        if (isElectric) {
+            list.add(
+                StatCollector.translateToLocal("GT5U.multiblock.energy") + ": "
+                    + EnumChatFormatting.GREEN
+                    + GTUtility.formatNumbers(logic.getStoredEnergy())
+                    + EnumChatFormatting.RESET
+                    + " EU / "
+                    + EnumChatFormatting.YELLOW
+                    + GTUtility.formatNumbers(logic.getCapacity())
+                    + EnumChatFormatting.RESET
+                    + " EU");
+            list.add(
+                StatCollector.translateToLocal("GT5U.multiblock.usage") + ": "
+                    + EnumChatFormatting.RED
+                    + GTUtility.formatNumbers(getProcessingLogic().getCalculatedEut())
+                    + EnumChatFormatting.RESET
+                    + " EU/t");
+            list.add(
+                StatCollector.translateToLocal("GT5U.multiblock.mei") + ": "
+                    + EnumChatFormatting.YELLOW
+                    + GTUtility.formatNumbers(logic.getVoltage())
+                    + EnumChatFormatting.RESET
+                    // TODO: Put ampere getter here, once that's variable
+                    + " EU/t(*2A) "
+                    + StatCollector.translateToLocal("GT5U.machines.tier")
+                    + ": "
+                    + EnumChatFormatting.YELLOW
+                    + VN[GTUtility.getTier(logic.getVoltage())]
+                    + EnumChatFormatting.RESET);
+        }
+
+        addProgressStringToScanner(player, logLevel, list);
+
+        // TODO: Add CPU load calculator
+        list.add(
+            "Average CPU load of ~" + GTUtility.formatNumbers(0)
+                + "ns over "
+                + GTUtility.formatNumbers(0)
+                + " ticks with worst time of "
+                + GTUtility.formatNumbers(0)
+                + "ns.");
     }
+
+    protected void addProgressStringToScanner(EntityPlayer player, int logLevel, ArrayList<String> list) {
+        P processing = getProcessingLogic();
+        int progressTime = processing.getProgress();
+        int maxProgressTime = processing.getDuration();
+        list.add(
+            StatCollector.translateToLocal("GT5U.multiblock.Progress") + ": "
+                + EnumChatFormatting.GREEN
+                + GTUtility.formatNumbers(progressTime > 20 ? progressTime / 20 : progressTime)
+                + EnumChatFormatting.RESET
+                + (progressTime > 20 ? " s / " : " ticks / ")
+                + EnumChatFormatting.YELLOW
+                + GTUtility.formatNumbers(maxProgressTime > 20 ? maxProgressTime / 20 : maxProgressTime)
+                + EnumChatFormatting.RESET
+                + (maxProgressTime > 20 ? " s" : " ticks"));
+    }
+
+    protected void stopMachine(boolean powerShutDown) {
+        setActive(false);
+        disableWorking();
+        if (powerShutDown) {
+            setSound(GregTechTileClientEvents.STOP_SOUND_LOOP, INTERRUPT_SOUND_INDEX);
+        }
+        issueClientUpdate();
+    }
+
+    protected void updateSlots() {
+        itemInput.update(false);
+        itemOutput.update(false);
+        fluidInput.update();
+        fluidOutput.update();
+    }
+
+    @Override
+    public int getBooleans() {
+        int booleans = 0;
+        if (isActive()) {
+            booleans |= ACTIVE;
+        }
+        return booleans;
+    }
+
+    @Override
+    public void setBooleans(int booleans) {
+        setActive((booleans & ACTIVE) == ACTIVE);
+    }
+
+    public boolean hasItemInput() {
+        return true;
+    }
+
+    public boolean hasItemOutput() {
+        return true;
+    }
+
+    public boolean hasFluidInput() {
+        return true;
+    }
+
+    public boolean hasFluidOutput() {
+        return true;
+    }
+
+    @Override
+    public void setSound(byte soundEvent, int soundEventValue) {
+        this.soundEvent = soundEvent;
+        this.soundEventValue = soundEventValue;
+        if (isServerSide()) {
+            return;
+        }
+
+        switch (soundEventValue) {
+            case PROCESS_START_SOUND_INDEX -> {
+                if (getProcessStartSound() != null) GTUtility.doSoundAtClient(
+                    getProcessStartSound(),
+                    getTimeBetweenProcessSounds(),
+                    1.0F,
+                    getXCoord(),
+                    getYCoord(),
+                    getZCoord());
+            }
+            case INTERRUPT_SOUND_INDEX -> GTUtility.doSoundAtClient(
+                SoundResource.IC2_MACHINES_INTERRUPT_ONE,
+                100,
+                1.0F,
+                getXCoord(),
+                getYCoord(),
+                getZCoord());
+        }
+
+    }
+
+    @Nullable
+    public ItemInventoryLogic getItemLogic(@Nonnull ForgeDirection side, @Nonnull InventoryType type) {
+        if (side == facing) return null;
+        return switch (type) {
+            case Input -> itemInput;
+            case Output -> itemOutput;
+            default -> null;
+        };
+    }
+
+    @Nullable
+    public FluidInventoryLogic getFluidLogic(@Nonnull ForgeDirection side, @Nonnull InventoryType type) {
+        if (side == facing) return null;
+        return switch (type) {
+            case Input -> fluidInput;
+            case Output -> fluidOutput;
+            default -> null;
+        };
+    }
+
+    @Override
+    @Nonnull
+    public P getProcessingLogic() {
+        if (processingLogic == null) {
+            processingLogic = createProcessingLogic().setMachineHost(this);
+        }
+        return Objects.requireNonNull(processingLogic);
+    }
+
+    @OverrideOnly
+    @Nonnull
+    protected abstract P createProcessingLogic();
+
+    @Override
+    public boolean isInputSeparated() {
+        return false;
+    }
+
+    @Nonnull
+    @Override
+    public VoidingMode getVoidMode() {
+        return voidingMode;
+    }
+
+    @Override
+    public boolean needsUpdate() {
+        return processingUpdate;
+    }
+
+    @Override
+    public void setProcessingUpdate(boolean update) {
+        processingUpdate = update;
+    }
+
+    @Override
+    @Nonnull
+    public PowerLogic getPowerLogic(@Nonnull ForgeDirection side) {
+        if (side == facing) return new NullPowerLogic();
+        return power;
+    }
+
+    @Override
+    @Nonnull
+    public ForgeDirection getPowerOutputSide() {
+        return Objects.requireNonNull(facing.getOpposite());
+    }
+
+    protected void updatePowerLogic() {
+        power.setEnergyCapacity(GTValues.V[tier] * power.getMaxAmperage() * 2 * MINUTE);
+        power.setMaxVoltage(GTValues.V[tier]);
+        power.setMaxAmperage(1);
+    }
+
+    @Nonnull
+    protected PowerLogic createPowerLogic() {
+        return new PowerLogic().setMaxAmperage(1)
+            .setType(PowerLogic.RECEIVER);
+    }
+
+    @Nonnull
+    protected GUIProvider<?> createGUIProvider() {
+        return new MachineGUIProvider<>(this);
+    }
+
+    @Nonnull
+    public GUIProvider<?> getGUI(@Nonnull UIBuildContext uiContext) {
+        return guiProvider;
+    }
+
+    @Override
+    public ItemStack getAsItem() {
+        return MultiTileEntityRegistry.getRegistry(getMultiTileEntityRegistryID())
+            .getItem(getMultiTileEntityID());
+    }
+
+    @Override
+    public String getMachineName() {
+        return StatCollector.translateToLocal(getAsItem().getUnlocalizedName());
+    }
+
 }

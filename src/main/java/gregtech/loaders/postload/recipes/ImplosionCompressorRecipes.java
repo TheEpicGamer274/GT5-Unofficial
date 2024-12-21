@@ -1,46 +1,85 @@
 package gregtech.loaders.postload.recipes;
 
-import static gregtech.api.util.GT_ModHandler.getModItem;
-import static gregtech.loaders.postload.GT_MachineRecipeLoader.isGalacticraftMarsLoaded;
+import static gregtech.api.enums.Mods.GalacticraftCore;
+import static gregtech.api.enums.Mods.GalacticraftMars;
+import static gregtech.api.recipe.RecipeMaps.implosionRecipes;
+import static gregtech.api.util.GTModHandler.getModItem;
+import static gregtech.api.util.GTRecipeBuilder.SECONDS;
 
-import gregtech.api.enums.GT_Values;
+import gregtech.api.enums.GTValues;
 import gregtech.api.enums.ItemList;
 import gregtech.api.enums.Materials;
 import gregtech.api.enums.OrePrefixes;
-import gregtech.api.util.GT_OreDictUnificator;
+import gregtech.api.enums.TierEU;
+import gregtech.api.util.GTOreDictUnificator;
+import gregtech.api.util.GTRecipeConstants;
+import gtnhlanth.common.register.WerkstoffMaterialPool;
 
 public class ImplosionCompressorRecipes implements Runnable {
+
     @Override
     public void run() {
-        GT_Values.RA.addImplosionRecipe(
-                ItemList.IC2_Compressed_Coal_Chunk.get(1L),
-                8,
+        GTValues.RA.stdBuilder()
+            .itemInputs(ItemList.IC2_Compressed_Coal_Chunk.get(1L))
+            .itemOutputs(
                 ItemList.IC2_Industrial_Diamond.get(1L),
-                GT_OreDictUnificator.get(OrePrefixes.dustTiny, Materials.DarkAsh, 4L));
+                GTOreDictUnificator.get(OrePrefixes.dustTiny, Materials.DarkAsh, 4L))
+            .metadata(GTRecipeConstants.ADDITIVE_AMOUNT, 8)
+            .duration(1 * SECONDS)
+            .eut(TierEU.RECIPE_LV)
+            .addTo(implosionRecipes);
 
-        GT_Values.RA.addImplosionRecipe(
-                ItemList.Ingot_IridiumAlloy.get(1L),
-                8,
-                GT_OreDictUnificator.get(OrePrefixes.plateAlloy, Materials.Iridium, 1L),
-                GT_OreDictUnificator.get(OrePrefixes.dustTiny, Materials.DarkAsh, 4L));
+        GTValues.RA.stdBuilder()
+            .itemInputs(ItemList.Ingot_IridiumAlloy.get(1L))
+            .itemOutputs(
+                GTOreDictUnificator.get(OrePrefixes.plateAlloy, Materials.Iridium, 1L),
+                GTOreDictUnificator.get(OrePrefixes.dustTiny, Materials.DarkAsh, 4L))
+            .metadata(GTRecipeConstants.ADDITIVE_AMOUNT, 8)
+            .duration(1 * SECONDS)
+            .eut(TierEU.RECIPE_LV)
+            .addTo(implosionRecipes);
 
-        if (isGalacticraftMarsLoaded) {
+        GTValues.RA.stdBuilder()
+            .itemInputs(WerkstoffMaterialPool.LanthanumHexaboride.get(OrePrefixes.dust, 4))
+            .itemOutputs(
+                WerkstoffMaterialPool.LanthanumHexaboride.get(OrePrefixes.gem, 3),
+                GTOreDictUnificator.get(OrePrefixes.dustTiny, Materials.DarkAsh, 12L))
+            .metadata(GTRecipeConstants.ADDITIVE_AMOUNT, 4)
+            .duration(1 * SECONDS)
+            .eut(TierEU.RECIPE_LV)
+            .addTo(implosionRecipes);
 
-            GT_Values.RA.addImplosionRecipe(
-                    ItemList.Ingot_Heavy1.get(1L),
-                    8,
-                    getModItem("GalacticraftCore", "item.heavyPlating", 1L),
-                    GT_OreDictUnificator.get(OrePrefixes.dustTiny, Materials.StainlessSteel, 1L));
-            GT_Values.RA.addImplosionRecipe(
-                    ItemList.Ingot_Heavy2.get(1L),
-                    16,
-                    getModItem("GalacticraftMars", "item.null", 1L, 3),
-                    GT_OreDictUnificator.get(OrePrefixes.dustTiny, Materials.TungstenSteel, 2L));
-            GT_Values.RA.addImplosionRecipe(
-                    ItemList.Ingot_Heavy3.get(1L),
-                    24,
-                    getModItem("GalacticraftMars", "item.itemBasicAsteroids", 1L),
-                    GT_OreDictUnificator.get(OrePrefixes.dustTiny, Materials.Platinum, 3L));
+        if (GalacticraftMars.isModLoaded()) {
+
+            GTValues.RA.stdBuilder()
+                .itemInputs(ItemList.Ingot_Heavy1.get(1L))
+                .itemOutputs(
+                    getModItem(GalacticraftCore.ID, "item.heavyPlating", 1L),
+                    GTOreDictUnificator.get(OrePrefixes.dustTiny, Materials.StainlessSteel, 1L))
+                .metadata(GTRecipeConstants.ADDITIVE_AMOUNT, 8)
+                .duration(1 * SECONDS)
+                .eut(TierEU.RECIPE_LV)
+                .addTo(implosionRecipes);
+
+            GTValues.RA.stdBuilder()
+                .itemInputs(ItemList.Ingot_Heavy2.get(1L))
+                .itemOutputs(
+                    getModItem(GalacticraftMars.ID, "item.null", 1L, 3),
+                    GTOreDictUnificator.get(OrePrefixes.dustTiny, Materials.TungstenSteel, 2L))
+                .metadata(GTRecipeConstants.ADDITIVE_AMOUNT, 16)
+                .duration(1 * SECONDS)
+                .eut(TierEU.RECIPE_LV)
+                .addTo(implosionRecipes);
+
+            GTValues.RA.stdBuilder()
+                .itemInputs(ItemList.Ingot_Heavy3.get(1L))
+                .itemOutputs(
+                    getModItem(GalacticraftMars.ID, "item.itemBasicAsteroids", 1L),
+                    GTOreDictUnificator.get(OrePrefixes.dustTiny, Materials.Platinum, 3L))
+                .metadata(GTRecipeConstants.ADDITIVE_AMOUNT, 24)
+                .duration(1 * SECONDS)
+                .eut(TierEU.RECIPE_LV)
+                .addTo(implosionRecipes);
         }
     }
 }

@@ -1,6 +1,8 @@
 package gregtech.api.enums;
 
+@Deprecated
 public enum ConfigCategories {
+
     news,
     general,
     machineconfig,
@@ -8,7 +10,7 @@ public enum ConfigCategories {
 
     public enum IDs {
         crops,
-        enchantments;
+        enchantments
     }
 
     public enum Materials {
@@ -16,18 +18,15 @@ public enum ConfigCategories {
         oreprocessingoutputmultiplier,
         blastfurnacerequirements,
         blastinductionsmelter,
-        ;
     }
 
     public enum Recipes {
-        researches,
         harderrecipes,
         gregtechrecipes,
         disabledrecipes,
         recipereplacements,
         storageblockcrafting,
-        storageblockdecrafting,
-        crops;
+        storageblockdecrafting
     }
 
     public enum Machines {
@@ -47,11 +46,11 @@ public enum ConfigCategories {
         massfabamplifier,
         maceration,
         rockcrushing,
-        pulverization;
+        pulverization
     }
 
     public enum Fuels {
-        boilerfuels;
+        boilerfuels
     }
 
     public enum Tools {
@@ -62,6 +61,6 @@ public enum ConfigCategories {
         hammertripleplate,
         hammerquadrupleplate,
         hammerquintupleplate,
-        scoop;
+        scoop
     }
 }

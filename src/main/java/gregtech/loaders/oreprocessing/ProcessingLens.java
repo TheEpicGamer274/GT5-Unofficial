@@ -1,65 +1,100 @@
 package gregtech.loaders.oreprocessing;
 
-import gregtech.api.GregTech_API;
-import gregtech.api.enums.GT_Values;
+import static gregtech.api.recipe.RecipeMaps.compressorRecipes;
+import static gregtech.api.recipe.RecipeMaps.latheRecipes;
+import static gregtech.api.util.GTRecipeBuilder.MINUTES;
+
+import net.minecraft.item.ItemStack;
+
+import gregtech.api.GregTechAPI;
+import gregtech.api.enums.GTValues;
 import gregtech.api.enums.Materials;
 import gregtech.api.enums.OrePrefixes;
 import gregtech.api.enums.Textures;
+import gregtech.api.enums.TierEU;
 import gregtech.api.interfaces.ITexture;
 import gregtech.api.render.TextureFactory;
-import gregtech.api.util.GT_OreDictUnificator;
-import net.minecraft.item.ItemStack;
+import gregtech.api.util.GTOreDictUnificator;
+import gregtech.api.util.GTRecipeBuilder;
+import gregtech.common.covers.CoverLens;
 
+@SuppressWarnings("RedundantLabeledSwitchRuleCodeBlock")
 public class ProcessingLens implements gregtech.api.interfaces.IOreRecipeRegistrator {
+
     public ProcessingLens() {
         OrePrefixes.lens.add(this);
     }
 
     @Override
-    public void registerOre(
-            OrePrefixes aPrefix, Materials aMaterial, String aOreDictName, String aModName, ItemStack aStack) {
+    public void registerOre(OrePrefixes aPrefix, Materials aMaterial, String aOreDictName, String aModName,
+        ItemStack aStack) {
+        // Blacklist materials which are handled by Werkstoff loader
+        if (aMaterial == Materials.Salt || aMaterial == Materials.RockSalt || aMaterial == Materials.Spodumene) return;
+
         switch (aMaterial.mName) {
-            case "Diamond":
-            case "Glass":
-                GT_Values.RA.addLatheRecipe(
-                        GT_OreDictUnificator.get(OrePrefixes.plate, aMaterial, 1L),
-                        GT_OreDictUnificator.get(OrePrefixes.lens, aMaterial, 1L),
-                        GT_OreDictUnificator.get(OrePrefixes.dustSmall, aMaterial, 1L),
-                        1200,
-                        30);
-                GT_Values.RA.addLatheRecipe(
-                        GT_OreDictUnificator.get(OrePrefixes.gemExquisite, aMaterial, 1L),
-                        GT_OreDictUnificator.get(OrePrefixes.lens, aMaterial, 3L),
-                        GT_OreDictUnificator.get(OrePrefixes.dust, aMaterial, 1L),
-                        2400,
-                        16);
-                break;
-            case "ChromaticGlass":
-                GT_Values.RA.addCompressorRecipe(
-                        GT_OreDictUnificator.get(OrePrefixes.dust, aMaterial, 16L),
-                        GT_OreDictUnificator.get(OrePrefixes.lens, aMaterial, 1L),
-                        600 * 20,
-                        1966080);
-                break;
-            default:
-                GT_Values.RA.addLatheRecipe(
-                        GT_OreDictUnificator.get(OrePrefixes.plate, aMaterial, 1L),
-                        GT_OreDictUnificator.get(OrePrefixes.lens, aMaterial, 1L),
-                        GT_OreDictUnificator.get(OrePrefixes.dustSmall, aMaterial, 1L),
-                        1200,
-                        120);
-                GT_Values.RA.addLatheRecipe(
-                        GT_OreDictUnificator.get(OrePrefixes.gemExquisite, aMaterial, 1L),
-                        GT_OreDictUnificator.get(OrePrefixes.lens, aMaterial, 1L),
-                        GT_OreDictUnificator.get(OrePrefixes.dust, aMaterial, 2L),
-                        2400,
-                        30);
-                final ITexture lensCoverTexture =
-                        TextureFactory.of(Textures.BlockIcons.OVERLAY_LENS, aMaterial.mRGBa, false);
-                GregTech_API.registerCover(
-                        aStack,
-                        TextureFactory.of(Textures.BlockIcons.MACHINE_CASINGS[2][0], lensCoverTexture),
-                        new gregtech.common.covers.GT_Cover_Lens(aMaterial.mColor.mIndex, lensCoverTexture));
+            case "Diamond", "Glass" -> {
+                GTValues.RA.stdBuilder()
+                    .itemInputs(GTOreDictUnificator.get(OrePrefixes.plate, aMaterial, 1L))
+                    .itemOutputs(
+                        GTOreDictUnificator.get(OrePrefixes.lens, aMaterial, 1L),
+                        GTOreDictUnificator.get(OrePrefixes.dustSmall, aMaterial, 1L))
+                    .duration(1 * MINUTES)
+                    .eut(TierEU.RECIPE_LV)
+                    .addTo(latheRecipes);
+
+                GTValues.RA.stdBuilder()
+                    .itemInputs(GTOreDictUnificator.get(OrePrefixes.gemExquisite, aMaterial, 1L))
+                    .itemOutputs(
+                        GTOreDictUnificator.get(OrePrefixes.lens, aMaterial, 3L),
+                        GTOreDictUnificator.get(OrePrefixes.dust, aMaterial, 1L))
+                    .duration(2 * MINUTES)
+                    .eut(16)
+                    .addTo(latheRecipes);
+            }
+            case "ChromaticGlass" -> {
+                GTValues.RA.stdBuilder()
+                    .itemInputs(GTOreDictUnificator.get(OrePrefixes.dust, aMaterial, 16L))
+                    .itemOutputs(GTOreDictUnificator.get(OrePrefixes.lens, aMaterial, 1L))
+                    .duration(10 * MINUTES)
+                    .eut(TierEU.RECIPE_UHV)
+                    .addTo(compressorRecipes);
+            }
+            default -> {
+                if (GTOreDictUnificator.get(OrePrefixes.plate, aMaterial, 1L) != null) {
+                    GTRecipeBuilder recipeBuilder = GTValues.RA.stdBuilder();
+                    recipeBuilder.itemInputs(GTOreDictUnificator.get(OrePrefixes.plate, aMaterial, 1L));
+                    if (GTOreDictUnificator.get(OrePrefixes.dustSmall, aMaterial, 1L) == null) {
+                        recipeBuilder.itemOutputs(GTOreDictUnificator.get(OrePrefixes.lens, aMaterial, 1L));
+                    } else {
+                        recipeBuilder.itemOutputs(
+                            GTOreDictUnificator.get(OrePrefixes.lens, aMaterial, 1L),
+                            GTOreDictUnificator.get(OrePrefixes.dustSmall, aMaterial, 1L));
+                    }
+                    recipeBuilder.duration(1 * MINUTES)
+                        .eut(TierEU.RECIPE_MV)
+                        .addTo(latheRecipes);
+                }
+                if (GTOreDictUnificator.get(OrePrefixes.gemExquisite, aMaterial, 1L) != null) {
+                    GTRecipeBuilder recipeBuilder = GTValues.RA.stdBuilder();
+                    recipeBuilder.itemInputs(GTOreDictUnificator.get(OrePrefixes.gemExquisite, aMaterial, 1L));
+                    if (GTOreDictUnificator.get(OrePrefixes.dust, aMaterial, 1L) == null) {
+                        recipeBuilder.itemOutputs(GTOreDictUnificator.get(OrePrefixes.lens, aMaterial, 1L));
+                    } else {
+                        recipeBuilder.itemOutputs(
+                            GTOreDictUnificator.get(OrePrefixes.lens, aMaterial, 1L),
+                            GTOreDictUnificator.get(OrePrefixes.dust, aMaterial, 2L));
+                    }
+                    recipeBuilder.duration(2 * MINUTES)
+                        .eut(TierEU.RECIPE_LV)
+                        .addTo(latheRecipes);
+                }
+                final ITexture lensCoverTexture = TextureFactory
+                    .of(Textures.BlockIcons.OVERLAY_LENS, aMaterial.mRGBa, false);
+                GregTechAPI.registerCover(
+                    aStack,
+                    TextureFactory.of(Textures.BlockIcons.MACHINE_CASINGS[2][0], lensCoverTexture),
+                    new CoverLens(aMaterial.mColor.mIndex, lensCoverTexture));
+            }
         }
     }
 }

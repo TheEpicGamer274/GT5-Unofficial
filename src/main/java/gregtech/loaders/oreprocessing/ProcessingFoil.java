@@ -1,31 +1,48 @@
 package gregtech.loaders.oreprocessing;
 
-import static gregtech.api.util.GT_Utility.calculateRecipeEU;
+import static gregtech.api.recipe.RecipeMaps.benderRecipes;
+import static gregtech.api.util.GTUtility.calculateRecipeEU;
 
-import gregtech.api.GregTech_API;
-import gregtech.api.enums.GT_Values;
+import net.minecraft.item.ItemStack;
+
+import gregtech.api.GregTechAPI;
+import gregtech.api.enums.GTValues;
 import gregtech.api.enums.Materials;
 import gregtech.api.enums.OrePrefixes;
 import gregtech.api.interfaces.IOreRecipeRegistrator;
 import gregtech.api.render.TextureFactory;
-import gregtech.api.util.GT_OreDictUnificator;
-import gregtech.api.util.GT_Utility;
-import net.minecraft.item.ItemStack;
+import gregtech.api.util.GTOreDictUnificator;
+import gregtech.api.util.GTUtility;
 
 public class ProcessingFoil implements IOreRecipeRegistrator {
+
     public ProcessingFoil() {
         OrePrefixes.foil.add(this);
     }
 
     @Override
-    public void registerOre(
-            OrePrefixes aPrefix, Materials aMaterial, String aOreDictName, String aModName, ItemStack aStack) {
-        GT_Values.RA.addBenderRecipe(
-                GT_Utility.copyAmount(1L, GT_OreDictUnificator.get(OrePrefixes.plate, aMaterial, 4L)),
-                GT_OreDictUnificator.get(OrePrefixes.foil, aMaterial, 4L),
-                (int) Math.max(aMaterial.getMass(), 1L),
-                calculateRecipeEU(aMaterial, 24));
-        GregTech_API.registerCover(
-                aStack, TextureFactory.of(aMaterial.mIconSet.mTextures[70], aMaterial.mRGBa, false), null);
+    public void registerOre(OrePrefixes prefix, Materials material, String oreDictName, String modName,
+        ItemStack stack) {
+        // Blacklist materials which are handled by Werkstoff loader
+        if (material == Materials.Calcium || material == Materials.Magnesia) return;
+
+        registerBenderRecipe(material);
+        registerCover(stack, material);
+    }
+
+    private void registerBenderRecipe(Materials material) {
+        GTValues.RA.stdBuilder()
+            .itemInputs(
+                GTUtility.copyAmount(1, GTOreDictUnificator.get(OrePrefixes.plate, material, 4L)),
+                GTUtility.getIntegratedCircuit(1))
+            .itemOutputs(GTOreDictUnificator.get(OrePrefixes.foil, material, 4L))
+            .duration((int) Math.max(material.getMass(), 1L))
+            .eut(calculateRecipeEU(material, 24))
+            .addTo(benderRecipes);
+    }
+
+    private void registerCover(ItemStack stack, Materials material) {
+        GregTechAPI
+            .registerCover(stack, TextureFactory.of(material.mIconSet.mTextures[70], material.mRGBa, false), null);
     }
 }

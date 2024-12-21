@@ -5,7 +5,7 @@ import net.minecraftforge.fluids.Fluid;
 /**
  * Implement this interface if your MetaTileEntity supports fluid lock mechanism.
  */
-@SuppressWarnings({"BooleanMethodIsAlwaysInverted"})
+@SuppressWarnings({ "BooleanMethodIsAlwaysInverted" })
 public interface IFluidLockable {
 
     /**
@@ -16,14 +16,12 @@ public interface IFluidLockable {
     String getLockedFluidName();
 
     /**
-     * Set fluid lock state.
-     * Would be useful when you don't necessarily want to change mode when locked fluid is changed.
+     * Set fluid lock state. Would be useful when you don't necessarily want to change mode when locked fluid is
+     * changed.
      */
     void lockFluid(boolean lock);
 
     boolean isFluidLocked();
 
-    boolean allowChangingLockedFluid(String name);
-
-    default void onFluidLockPacketReceived(String name) {}
+    boolean acceptsFluidLock(String name);
 }

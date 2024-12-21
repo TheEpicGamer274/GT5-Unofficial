@@ -1,14 +1,17 @@
 package gregtech.api.interfaces;
 
-import gregtech.api.GregTech_API;
 import java.util.List;
+
 import net.minecraft.item.ItemStack;
 
+import gregtech.api.GregTechAPI;
+
 /**
- *  Implement this interface if your tileentity (or metatileentity) supports configuration circuits
- *  to resolve recipe conflicts.
+ * Implement this interface if your tileentity (or metatileentity) supports configuration circuits to resolve recipe
+ * conflicts.
  */
 public interface IConfigurationCircuitSupport {
+
     /**
      *
      * @return Integrated circuit slot index in the machine inventory
@@ -17,11 +20,11 @@ public interface IConfigurationCircuitSupport {
 
     /**
      * Return a list of possible configuration circuit this machine expects.
-     *
+     * <p>
      * This list is unmodifiable. Its elements are not supposed to be modified in any way!
      */
     default List<ItemStack> getConfigurationCircuits() {
-        return GregTech_API.getConfigurationCircuitList(100);
+        return GregTechAPI.getConfigurationCircuitList(100);
     }
 
     /**

@@ -1,36 +1,50 @@
 package gregtech.loaders.postload.recipes;
 
-import static gregtech.api.util.GT_ModHandler.getModItem;
+import static gregtech.api.enums.Mods.Forestry;
+import static gregtech.api.recipe.RecipeMaps.latheRecipes;
+import static gregtech.api.util.GTModHandler.getModItem;
+import static gregtech.api.util.GTRecipeBuilder.SECONDS;
+import static gregtech.api.util.GTRecipeBuilder.TICKS;
 
-import gregtech.api.enums.GT_Values;
-import gregtech.api.enums.Materials;
-import gregtech.api.enums.OrePrefixes;
-import gregtech.api.util.GT_OreDictUnificator;
-import gregtech.loaders.postload.GT_MachineRecipeLoader;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 
+import gregtech.api.enums.GTValues;
+import gregtech.api.enums.Materials;
+import gregtech.api.enums.OrePrefixes;
+import gregtech.api.util.GTOreDictUnificator;
+import gtnhlanth.common.register.WerkstoffMaterialPool;
+
 public class LatheRecipes implements Runnable {
+
     @Override
     public void run() {
-        GT_Values.RA.addLatheRecipe(
-                new ItemStack(Blocks.wooden_slab, 1, GT_Values.W),
+        GTValues.RA.stdBuilder()
+            .itemInputs(new ItemStack(Blocks.wooden_slab, 1, GTValues.W))
+            .itemOutputs(
                 new ItemStack(Items.bowl, 1),
-                GT_OreDictUnificator.get(OrePrefixes.dustSmall, Materials.Wood, 1),
-                50,
-                8);
-        GT_Values.RA.addLatheRecipe(
-                getModItem(GT_MachineRecipeLoader.aTextForestry, "slabs", 1L, GT_Values.W),
+                GTOreDictUnificator.get(OrePrefixes.dustSmall, Materials.Wood, 1))
+            .duration(2 * SECONDS + 10 * TICKS)
+            .eut(8)
+            .addTo(latheRecipes);
+
+        GTValues.RA.stdBuilder()
+            .itemInputs(getModItem(Forestry.ID, "slabs", 1L, GTValues.W))
+            .itemOutputs(
                 new ItemStack(Items.bowl, 1),
-                GT_OreDictUnificator.get(OrePrefixes.dustSmall, Materials.Wood, 1),
-                50,
-                8);
-        GT_Values.RA.addLatheRecipe(
-                getModItem(GT_MachineRecipeLoader.aTextEBXL, "woodslab", 1L, GT_Values.W),
-                new ItemStack(Items.bowl, 1),
-                GT_OreDictUnificator.get(OrePrefixes.dustSmall, Materials.Wood, 1),
-                50,
-                8);
+                GTOreDictUnificator.get(OrePrefixes.dustSmall, Materials.Wood, 1))
+            .duration(2 * SECONDS + 10 * TICKS)
+            .eut(8)
+            .addTo(latheRecipes);
+
+        GTValues.RA.stdBuilder()
+            .itemInputs(WerkstoffMaterialPool.LanthanumHexaboride.get(OrePrefixes.gemFlawless, 1))
+            .itemOutputs(
+                WerkstoffMaterialPool.LanthanumHexaboride.get(OrePrefixes.stickLong, 1),
+                WerkstoffMaterialPool.LanthanumHexaboride.get(OrePrefixes.dust, 1))
+            .duration((100 * SECONDS))
+            .eut(16)
+            .addTo(latheRecipes);
     }
 }

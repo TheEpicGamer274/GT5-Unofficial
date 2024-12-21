@@ -1,63 +1,95 @@
 package gregtech.loaders.postload.recipes;
 
-import gregtech.api.enums.GT_Values;
+import static gregtech.api.recipe.RecipeMaps.fluidHeaterRecipes;
+import static gregtech.api.util.GTRecipeBuilder.SECONDS;
+import static gregtech.api.util.GTRecipeBuilder.TICKS;
+
+import gregtech.api.enums.GTValues;
 import gregtech.api.enums.Materials;
-import gregtech.api.util.GT_ModHandler;
-import gregtech.api.util.GT_Utility;
+import gregtech.api.enums.TierEU;
+import gregtech.api.util.GTModHandler;
+import gregtech.api.util.GTUtility;
 
 public class FluidHeaterRecipes implements Runnable {
+
     @Override
     public void run() {
-        GT_Values.RA.addFluidHeaterRecipe(
-                GT_Utility.getIntegratedCircuit(1),
-                Materials.GrowthMediumRaw.getFluid(1000L),
-                Materials.GrowthMediumSterilized.getFluid(1000L),
-                200,
-                7680);
-        GT_Values.RA.addFluidHeaterRecipe(
-                GT_Utility.getIntegratedCircuit(1),
-                Materials.BioMediumRaw.getFluid(1000L),
-                Materials.BioMediumSterilized.getFluid(1000L),
-                200,
-                30720);
 
-        GT_Values.RA.addFluidHeaterRecipe(
-                GT_Utility.getIntegratedCircuit(1), Materials.Water.getFluid(6L), Materials.Water.getGas(960L), 30, 30);
-        GT_Values.RA.addFluidHeaterRecipe(
-                GT_Utility.getIntegratedCircuit(1),
-                GT_ModHandler.getDistilledWater(6L),
-                Materials.Water.getGas(960L),
-                30,
-                30);
-        GT_Values.RA.addFluidHeaterRecipe(
-                GT_Utility.getIntegratedCircuit(1),
-                Materials.SeedOil.getFluid(16L),
-                Materials.FryingOilHot.getFluid(16L),
-                16,
-                30);
-        GT_Values.RA.addFluidHeaterRecipe(
-                GT_Utility.getIntegratedCircuit(1),
-                Materials.FishOil.getFluid(16L),
-                Materials.FryingOilHot.getFluid(16L),
-                16,
-                30);
+        GTValues.RA.stdBuilder()
+            .itemInputs(GTUtility.getIntegratedCircuit(1))
+            .fluidInputs(Materials.GrowthMediumRaw.getFluid(1000))
+            .fluidOutputs(Materials.GrowthMediumSterilized.getFluid(1000))
+            .duration(10 * SECONDS)
+            .eut(TierEU.RECIPE_IV)
+            .addTo(fluidHeaterRecipes);
 
+        GTValues.RA.stdBuilder()
+            .itemInputs(GTUtility.getIntegratedCircuit(1))
+            .fluidInputs(Materials.BioMediumRaw.getFluid(1000))
+            .fluidOutputs(Materials.BioMediumSterilized.getFluid(1000))
+            .duration(10 * SECONDS)
+            .eut(TierEU.RECIPE_LuV)
+            .addTo(fluidHeaterRecipes);
+
+        GTValues.RA.stdBuilder()
+            .itemInputs(GTUtility.getIntegratedCircuit(1))
+            .fluidInputs(Materials.Water.getFluid(6))
+            .fluidOutputs(Materials.Water.getGas(960))
+            .duration(1 * SECONDS + 10 * TICKS)
+            .eut(30)
+            .addTo(fluidHeaterRecipes);
+
+        GTValues.RA.stdBuilder()
+            .itemInputs(GTUtility.getIntegratedCircuit(1))
+            .fluidInputs(GTModHandler.getDistilledWater(6))
+            .fluidOutputs(Materials.Water.getGas(960))
+            .duration(1 * SECONDS + 10 * TICKS)
+            .eut(30)
+            .addTo(fluidHeaterRecipes);
+
+        GTValues.RA.stdBuilder()
+            .itemInputs(GTUtility.getIntegratedCircuit(1))
+            .fluidInputs(Materials.SeedOil.getFluid(16))
+            .fluidOutputs(Materials.FryingOilHot.getFluid(16))
+            .duration(16 * TICKS)
+            .eut(30)
+            .addTo(fluidHeaterRecipes);
+
+        GTValues.RA.stdBuilder()
+            .itemInputs(GTUtility.getIntegratedCircuit(1))
+            .fluidInputs(Materials.FishOil.getFluid(16))
+            .fluidOutputs(Materials.FryingOilHot.getFluid(16))
+            .duration(16 * TICKS)
+            .eut(30)
+            .addTo(fluidHeaterRecipes);
         // Ca(CH3COO)2 = CH3COCH3 + CaO + CO2
-        GT_Values.RA.addFluidHeaterRecipe(
-                GT_Utility.getIntegratedCircuit(1),
-                Materials.CalciumAcetateSolution.getFluid(1000),
-                Materials.Acetone.getFluid(1000),
-                80,
-                30);
 
+        GTValues.RA.stdBuilder()
+            .itemInputs(GTUtility.getIntegratedCircuit(1))
+            .fluidInputs(Materials.CalciumAcetateSolution.getFluid(1000))
+            .fluidOutputs(Materials.Acetone.getFluid(1000))
+            .duration(4 * SECONDS)
+            .eut(30)
+            .addTo(fluidHeaterRecipes);
         // Fluid Sodium
-        GT_Values.RA.addFluidHeaterRecipe(Materials.Sodium.getDust(1), Materials.Sodium.getFluid(1000), 200, 120);
 
-        GT_Values.RA.addFluidHeaterRecipe(
-                GT_Utility.getIntegratedCircuit(1),
-                Materials.Acetone.getFluid(1000),
-                Materials.Ethenone.getGas(1000),
-                160,
-                160);
+        GTValues.RA.stdBuilder()
+            .itemInputs(Materials.Sodium.getDust(1))
+            .fluidInputs(
+
+            )
+            .fluidOutputs(Materials.Sodium.getFluid(1000))
+            .duration(10 * SECONDS)
+            .eut(TierEU.RECIPE_MV)
+            .addTo(fluidHeaterRecipes);
+
+        GTValues.RA.stdBuilder()
+            .itemInputs(GTUtility.getIntegratedCircuit(1))
+            .fluidInputs(Materials.Acetone.getFluid(1000))
+            .fluidOutputs(Materials.Ethenone.getGas(1000))
+            .duration(8 * SECONDS)
+            .eut(160)
+            .addTo(fluidHeaterRecipes);
+
     }
 }

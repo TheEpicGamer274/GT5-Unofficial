@@ -1,22 +1,28 @@
 package gregtech.api.interfaces.tileentity;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import gregtech.api.interfaces.IDescribable;
-import gregtech.api.interfaces.metatileentity.IMetaTileEntity;
-import gregtech.api.interfaces.modularui.IAddInventorySlots;
-import gregtech.api.interfaces.modularui.IGetGUITextureSet;
-import gregtech.common.blocks.GT_Block_Machines;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import javax.annotation.Nonnull;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.IFluidHandler;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import gregtech.api.interfaces.IDescribable;
+import gregtech.api.interfaces.metatileentity.IMetaTileEntity;
+import gregtech.api.interfaces.modularui.IAddInventorySlots;
+import gregtech.api.interfaces.modularui.IGetGUITextureSet;
+import gregtech.api.util.shutdown.ShutDownReason;
+import gregtech.common.blocks.BlockMachines;
 
 /**
  * A simple compound Interface for all my TileEntities.
@@ -25,20 +31,10 @@ import net.minecraftforge.fluids.IFluidHandler;
  * <p/>
  * It can cause Problems to include this Interface!
  */
-public interface IGregTechTileEntity
-        extends ITexturedTileEntity,
-                IGearEnergyTileEntity,
-                ICoverable,
-                IFluidHandler,
-                ITurnable,
-                IGregTechDeviceInformation,
-                IUpgradableMachine,
-                IDigitalChest,
-                IDescribable,
-                IMachineBlockUpdateable,
-                IGregtechWailaProvider,
-                IGetGUITextureSet,
-                IAddInventorySlots {
+public interface IGregTechTileEntity extends ITexturedTileEntity, IGearEnergyTileEntity, ICoverable, IFluidHandler,
+    ITurnable, IGregTechDeviceInformation, IUpgradableMachine, IDigitalChest, IDescribable, IMachineBlockUpdateable,
+    IGregtechWailaProvider, IGetGUITextureSet, IAddInventorySlots {
+
     /**
      * gets the Error displayed on the GUI
      */
@@ -65,11 +61,11 @@ public interface IGregTechTileEntity
     IMetaTileEntity getMetaTileEntity();
 
     /**
-     * Sets the MetaTileEntity.
-     * Even though this uses the Universal Interface, certain BaseMetaTileEntities only accept one kind of MetaTileEntity
-     * so only use this if you are sure its the correct one or you will get a Class cast Error.
+     * Sets the MetaTileEntity. Even though this uses the Universal Interface, certain BaseMetaTileEntities only accept
+     * one kind of MetaTileEntity so only use this if you are sure its the correct one or you will get a Class cast
+     * Error.
      *
-     * @param aMetaTileEntity
+     * @param aMetaTileEntity a MetaTileEntity
      */
     void setMetaTileEntity(IMetaTileEntity aMetaTileEntity);
 
@@ -136,15 +132,16 @@ public interface IGregTechTileEntity
     /**
      * Called when rightclicking the TileEntity
      */
-    boolean onRightclick(EntityPlayer aPlayer, byte aSide, float aX, float aY, float aZ);
+    boolean onRightclick(EntityPlayer aPlayer, ForgeDirection side, float aX, float aY, float aZ);
 
-    float getBlastResistance(byte aSide);
+    float getBlastResistance(ForgeDirection side);
 
     default void onBlockDestroyed() {}
 
     ArrayList<ItemStack> getDrops();
 
-    /** Check if the item at the specific index should be dropped or not
+    /**
+     * Check if the item at the specific index should be dropped or not
      *
      * @param index Index that will be checked
      * @return True if it should drop, else false
@@ -156,14 +153,8 @@ public interface IGregTechTileEntity
      */
     int getLightOpacity();
 
-    void addCollisionBoxesToList(
-            World aWorld,
-            int aX,
-            int aY,
-            int aZ,
-            AxisAlignedBB inputAABB,
-            List<AxisAlignedBB> outputAABB,
-            Entity collider);
+    void addCollisionBoxesToList(World aWorld, int aX, int aY, int aZ, AxisAlignedBB inputAABB,
+        List<AxisAlignedBB> outputAABB, Entity collider);
 
     AxisAlignedBB getCollisionBoundingBoxFromPool(World aWorld, int aX, int aY, int aZ);
 
@@ -184,19 +175,18 @@ public interface IGregTechTileEntity
      */
     @Override
     default boolean isMachineBlockUpdateRecursive() {
-        return !isDead()
-                && getMetaTileEntity() != null
-                && getMetaTileEntity().getBaseMetaTileEntity() == this
-                && getMetaTileEntity().isMachineBlockUpdateRecursive();
+        return !isDead() && getMetaTileEntity() != null
+            && getMetaTileEntity().getBaseMetaTileEntity() == this
+            && getMetaTileEntity().isMachineBlockUpdateRecursive();
     }
 
-    default void setShutdownStatus(boolean newStatus) {
-        return;
-    }
+    default void setShutdownStatus(boolean newStatus) {}
+
+    default void setShutDownReason(@Nonnull ShutDownReason reason) {}
 
     /**
-     * A randomly called display update to be able to add particles or other items for display
-     * The event is proxied by the {@link GT_Block_Machines#randomDisplayTick}
+     * A randomly called display update to be able to add particles or other items for display The event is proxied by
+     * the {@link BlockMachines#randomDisplayTick}
      */
     @SideOnly(Side.CLIENT)
     default void onRandomDisplayTick() {
@@ -204,4 +194,13 @@ public interface IGregTechTileEntity
             getMetaTileEntity().onRandomDisplayTick(this);
         }
     }
+
+    /**
+     * gets the time statistics used for CPU timing
+     */
+    default int[] getTimeStatistics() {
+        return null;
+    }
+
+    default void startTimeStatistics() {}
 }

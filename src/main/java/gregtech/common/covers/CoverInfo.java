@@ -1,62 +1,77 @@
 package gregtech.common.covers;
 
-import static gregtech.api.enums.GT_Values.SIDE_UNKNOWN;
-
-import com.gtnewhorizons.modularui.api.screen.ModularWindow;
-import gregtech.api.GregTech_API;
-import gregtech.api.gui.modularui.GT_CoverUIBuildContext;
-import gregtech.api.interfaces.ITexture;
-import gregtech.api.interfaces.tileentity.ICoverable;
-import gregtech.api.util.GT_CoverBehaviorBase;
-import gregtech.api.util.ISerializableObject;
 import java.lang.ref.WeakReference;
+import java.util.List;
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.StatCollector;
+import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 
-public final class CoverInfo {
-    private static final String NBT_SIDE = "s", NBT_ID = "id", NBT_DATA = "d";
+import org.jetbrains.annotations.NotNull;
 
-    public static final CoverInfo EMPTY_INFO = new CoverInfo(SIDE_UNKNOWN, null);
-    private byte coverSide;
+import com.gtnewhorizons.modularui.api.screen.ModularWindow;
+
+import gregtech.api.GregTechAPI;
+import gregtech.api.gui.modularui.CoverUIBuildContext;
+import gregtech.api.interfaces.ITexture;
+import gregtech.api.interfaces.tileentity.ICoverable;
+import gregtech.api.util.CoverBehaviorBase;
+import gregtech.api.util.GTUtility;
+import gregtech.api.util.ISerializableObject;
+
+public final class CoverInfo {
+
+    private static final String NBT_SIDE = "s", NBT_ID = "id", NBT_DATA = "d", NBT_TICK_RATE_ADDITION = "tra";
+
+    // One minute
+    public static final int MAX_TICK_RATE_ADDITION = 1200;
+
+    public static final CoverInfo EMPTY_INFO = new CoverInfo(ForgeDirection.UNKNOWN, null);
+    private final ForgeDirection coverSide;
     private int coverID = 0;
-    private GT_CoverBehaviorBase<?> coverBehavior = null;
-    private ISerializableObject coverData = null;
+    private CoverBehaviorBase<?> coverBehavior;
+    private ISerializableObject coverData;
     private final WeakReference<ICoverable> coveredTile;
     private boolean needsUpdate = false;
 
-    public CoverInfo(byte aSide, ICoverable aTile) {
-        coverSide = aSide;
+    private int tickRateAddition = 0;
+
+    public CoverInfo(ForgeDirection side, ICoverable aTile) {
+        coverSide = side;
         coveredTile = new WeakReference<>(aTile);
+        coverBehavior = GregTechAPI.sNoBehavior;
     }
 
-    public CoverInfo(byte aSide, int aID, ICoverable aTile, ISerializableObject aCoverData) {
-        coverSide = aSide;
+    public CoverInfo(ForgeDirection side, int aID, ICoverable aTile, ISerializableObject aCoverData) {
+        coverSide = side;
         coverID = aID;
-        coverBehavior = GregTech_API.getCoverBehaviorNew(aID);
+        coverBehavior = GregTechAPI.getCoverBehaviorNew(aID);
         coverData = aCoverData == null ? coverBehavior.createDataObject() : aCoverData;
         coveredTile = new WeakReference<>(aTile);
     }
 
     public CoverInfo(ICoverable aTile, NBTTagCompound aNBT) {
-        coverSide = aNBT.getByte(NBT_SIDE);
+        coverSide = ForgeDirection.getOrientation(aNBT.getByte(NBT_SIDE));
         coverID = aNBT.getInteger(NBT_ID);
-        coverBehavior = GregTech_API.getCoverBehaviorNew(coverID);
-        coverData = aNBT.hasKey(NBT_DATA)
-                ? coverBehavior.createDataObject(aNBT.getTag(NBT_DATA))
-                : coverBehavior.createDataObject();
+        coverBehavior = GregTechAPI.getCoverBehaviorNew(coverID);
+        coverData = aNBT.hasKey(NBT_DATA) ? coverBehavior.createDataObject(aNBT.getTag(NBT_DATA))
+            : coverBehavior.createDataObject();
         coveredTile = new WeakReference<>(aTile);
+        tickRateAddition = aNBT.hasKey(NBT_TICK_RATE_ADDITION) ? aNBT.getInteger(NBT_TICK_RATE_ADDITION) : 0;
     }
 
     public boolean isValid() {
-        return coverID != 0 && coverSide != SIDE_UNKNOWN;
+        return coverID != 0 && coverSide != ForgeDirection.UNKNOWN;
     }
 
     public NBTTagCompound writeToNBT(NBTTagCompound aNBT) {
-        aNBT.setByte(NBT_SIDE, coverSide);
+        aNBT.setByte(NBT_SIDE, (byte) coverSide.ordinal());
         aNBT.setInteger(NBT_ID, coverID);
+        aNBT.setInteger(NBT_TICK_RATE_ADDITION, tickRateAddition);
         if (coverData != null) aNBT.setTag(NBT_DATA, coverData.saveDataToNBT());
 
         return aNBT;
@@ -74,14 +89,13 @@ public final class CoverInfo {
         needsUpdate = aUpdate;
     }
 
-    public GT_CoverBehaviorBase<?> getCoverBehavior() {
-        if (coverBehavior != null) return coverBehavior;
-        return GregTech_API.sNoBehavior;
+    public CoverBehaviorBase<?> getCoverBehavior() {
+        return coverBehavior;
     }
 
     public ISerializableObject getCoverData() {
         if (coverData != null) return coverData;
-        return GregTech_API.sNoBehavior.createDataObject();
+        return GregTechAPI.sNoBehavior.createDataObject();
     }
 
     public boolean onCoverRemoval(boolean aForced) {
@@ -117,10 +131,10 @@ public final class CoverInfo {
     }
 
     public int getTickRate() {
-        return getCoverBehavior().getTickRate(coverSide, coverID, coverData, coveredTile.get());
+        return getMinimumTickRate() + tickRateAddition;
     }
 
-    public byte getSide() {
+    public ForgeDirection getSide() {
         return coverSide;
     }
 
@@ -134,7 +148,11 @@ public final class CoverInfo {
 
     public ISerializableObject doCoverThings(long aTickTimer, byte aRedstone) {
         return getCoverBehavior()
-                .doCoverThings(coverSide, aRedstone, coverID, coverData, coveredTile.get(), aTickTimer);
+            .doCoverThings(coverSide, aRedstone, coverID, coverData, coveredTile.get(), aTickTimer);
+    }
+
+    public void onCoverUnload() {
+        getCoverBehavior().onCoverUnload(coverSide, coverID, coverData, coveredTile.get());
     }
 
     public void onBaseTEDestroyed() {
@@ -142,7 +160,7 @@ public final class CoverInfo {
     }
 
     public void updateCoverBehavior() {
-        coverBehavior = GregTech_API.getCoverBehaviorNew(coverID);
+        coverBehavior = GregTechAPI.getCoverBehaviorNew(coverID);
     }
 
     public void preDataChanged(int aCoverID, ISerializableObject aCoverData) {
@@ -158,8 +176,12 @@ public final class CoverInfo {
     }
 
     public ModularWindow createWindow(EntityPlayer player) {
-        final GT_CoverUIBuildContext buildContext =
-                new GT_CoverUIBuildContext(player, coverID, coverSide, coveredTile.get(), true);
+        final CoverUIBuildContext buildContext = new CoverUIBuildContext(
+            player,
+            coverID,
+            coverSide,
+            coveredTile.get(),
+            true);
         return getCoverBehavior().createWindow(buildContext);
     }
 
@@ -169,10 +191,6 @@ public final class CoverInfo {
 
     public boolean hasCoverGUI() {
         return getCoverBehavior().hasCoverGUI();
-    }
-
-    public boolean useModularUI() {
-        return getCoverBehavior().useModularUI();
     }
 
     public boolean letsItemsIn(int aSlot) {
@@ -213,7 +231,7 @@ public final class CoverInfo {
 
     public boolean onCoverRightClick(EntityPlayer aPlayer, float aX, float aY, float aZ) {
         return getCoverBehavior()
-                .onCoverRightClick(coverSide, coverID, coverData, coveredTile.get(), aPlayer, aX, aY, aZ);
+            .onCoverRightClick(coverSide, coverID, coverData, coveredTile.get(), aPlayer, aX, aY, aZ);
     }
 
     public boolean onCoverShiftRightClick(EntityPlayer aPlayer) {
@@ -222,7 +240,50 @@ public final class CoverInfo {
 
     public ISerializableObject onCoverScrewdriverClick(EntityPlayer aPlayer, float aX, float aY, float aZ) {
         return getCoverBehavior()
-                .onCoverScrewdriverClick(coverSide, coverID, coverData, coveredTile.get(), aPlayer, aX, aY, aZ);
+            .onCoverScrewdriverClick(coverSide, coverID, coverData, coveredTile.get(), aPlayer, aX, aY, aZ);
+    }
+
+    public void onCoverJackhammer(EntityPlayer aPlayer) {
+        adjustTickRateMultiplier(aPlayer.isSneaking());
+
+        GTUtility.sendChatToPlayer(
+            aPlayer,
+            StatCollector.translateToLocalFormatted("gt.cover.info.chat.tick_rate", getCurrentTickRateFormatted()));
+    }
+
+    /**
+     * Adjusts the tick rate by one step.
+     *
+     * @param isDecreasing If true, lower one step.
+     */
+    public void adjustTickRateMultiplier(final boolean isDecreasing) {
+        final int currentTickRate = getTickRate();
+        final int stepAmount = currentTickRate == 20 ? (isDecreasing ? 5 : 20) : (currentTickRate < 20 ? 5 : 20);
+
+        tickRateAddition = clamp(tickRateAddition + (isDecreasing ? -1 : 1) * stepAmount);
+        tickRateAddition = clamp(tickRateAddition - (getTickRate() % stepAmount));
+    }
+
+    /**
+     * Returns information about the cover's tick rate.
+     *
+     * @return An instance of tick rate components
+     */
+    @NotNull
+    public CoverInfo.ClientTickRateFormatter getCurrentTickRateFormatted() {
+        return new ClientTickRateFormatter(getTickRate());
+    }
+
+    public int getMinimumTickRate() {
+        return getCoverBehavior().getTickRate(coverSide, coverID, coverData, coveredTile.get());
+    }
+
+    public int getTickRateAddition() {
+        return tickRateAddition;
+    }
+
+    public void setTickRateAddition(final int tickRateAddition) {
+        this.tickRateAddition = clamp(tickRateAddition);
     }
 
     public Block getFacadeBlock() {
@@ -231,5 +292,44 @@ public final class CoverInfo {
 
     public int getFacadeMeta() {
         return getCoverBehavior().getFacadeMeta(coverSide, coverID, coverData, coveredTile.get());
+    }
+
+    @NotNull
+    public List<String> getAdditionalTooltip(ISerializableObject data) {
+        return getCoverBehavior().getAdditionalTooltip(data);
+    }
+
+    private static int clamp(int input) {
+        return Math.min(MAX_TICK_RATE_ADDITION, Math.max(0, input));
+    }
+
+    public static final class ClientTickRateFormatter {
+
+        /** A translation key for the type of time units being used (e.g.: "tick", "seconds".) */
+        private final String unitI18NKey;
+        /** A number representing a quantity of time. */
+        private final int tickRate;
+
+        /**
+         * Converts a given tick rate into a human-friendly format.
+         *
+         * @param tickRate The rate at which something ticks, in ticks per operation.
+         */
+        public ClientTickRateFormatter(final int tickRate) {
+            if (tickRate < 20) {
+                this.unitI18NKey = tickRate == 1 ? "gt.time.tick.singular" : "gt.time.tick.plural";
+                this.tickRate = tickRate;
+            } else {
+                this.unitI18NKey = tickRate == 20 ? "gt.time.second.singular" : "gt.time.second.plural";
+                this.tickRate = tickRate / 20;
+            }
+        }
+
+        public String toString() {
+            return StatCollector.translateToLocalFormatted(
+                "gt.cover.info.format.tick_rate",
+                tickRate,
+                StatCollector.translateToLocal(unitI18NKey));
+        }
     }
 }

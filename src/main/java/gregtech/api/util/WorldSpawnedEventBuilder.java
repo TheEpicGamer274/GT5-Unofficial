@@ -3,6 +3,7 @@ package gregtech.api.util;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.Vec3;
@@ -10,6 +11,7 @@ import net.minecraft.world.World;
 
 @SuppressWarnings("unused")
 public abstract class WorldSpawnedEventBuilder implements Runnable {
+
     private static final String ILLEGAL_STATE_STR1 = "Position, identifier and world must be set";
     /* Variables */
 
@@ -47,6 +49,7 @@ public abstract class WorldSpawnedEventBuilder implements Runnable {
     /* Interfaces */
 
     private interface IPositionedWorldSpawnedEvent {
+
         Vec3 getPosition();
 
         IPositionedWorldSpawnedEvent setPosition(Vec3 position);
@@ -55,18 +58,21 @@ public abstract class WorldSpawnedEventBuilder implements Runnable {
     }
 
     private interface IEntityWorldSpawnedEvent {
+
         Entity getEntity();
 
         IEntityWorldSpawnedEvent setEntity(Entity entity);
     }
 
     private interface IEntityPlayerWorldSpawnedEvent {
+
         EntityPlayer getEntityPlayer();
 
         IEntityPlayerWorldSpawnedEvent setEntityPlayer(EntityPlayer entity);
     }
 
     private interface IStringIdentifierWorldSpawnedEvent {
+
         String getIdentifier();
 
         IStringIdentifierWorldSpawnedEvent setIdentifier(String identifier);
@@ -75,6 +81,7 @@ public abstract class WorldSpawnedEventBuilder implements Runnable {
     }
 
     private interface ISoundWorldSpawnedEvent {
+
         float getPitch();
 
         float getVolume();
@@ -87,7 +94,7 @@ public abstract class WorldSpawnedEventBuilder implements Runnable {
     /* Abstract Classes */
 
     private abstract static class EntityWorldSpawnedEventBuilder extends WorldSpawnedEventBuilder
-            implements IEntityWorldSpawnedEvent {
+        implements IEntityWorldSpawnedEvent {
 
         private Entity entity;
 
@@ -104,7 +111,7 @@ public abstract class WorldSpawnedEventBuilder implements Runnable {
     }
 
     private abstract static class PositionedEntityWorldSpawnedEventBuilder extends EntityWorldSpawnedEventBuilder
-            implements IPositionedWorldSpawnedEvent {
+        implements IPositionedWorldSpawnedEvent {
 
         private Vec3 position;
 
@@ -127,7 +134,8 @@ public abstract class WorldSpawnedEventBuilder implements Runnable {
     }
 
     private abstract static class PositionedWorldSpawnedEventBuilder extends WorldSpawnedEventBuilder
-            implements IPositionedWorldSpawnedEvent {
+        implements IPositionedWorldSpawnedEvent {
+
         private Vec3 position;
 
         @Override
@@ -149,7 +157,8 @@ public abstract class WorldSpawnedEventBuilder implements Runnable {
     }
 
     private abstract static class StringIdentifierPositionedWorldSpawnedEventBuilder
-            extends PositionedWorldSpawnedEventBuilder implements IStringIdentifierWorldSpawnedEvent {
+        extends PositionedWorldSpawnedEventBuilder implements IStringIdentifierWorldSpawnedEvent {
+
         private String identifier;
 
         @Override
@@ -171,7 +180,7 @@ public abstract class WorldSpawnedEventBuilder implements Runnable {
     }
 
     private abstract static class SoundStringIdentifierPositionedWorldSpawnedEventBuilder
-            extends StringIdentifierPositionedWorldSpawnedEventBuilder implements ISoundWorldSpawnedEvent {
+        extends StringIdentifierPositionedWorldSpawnedEventBuilder implements ISoundWorldSpawnedEvent {
 
         private float pitch;
         private float volume;
@@ -249,15 +258,14 @@ public abstract class WorldSpawnedEventBuilder implements Runnable {
             if (getPosition() == null || getIdentifier() == null || getMotion() == null || getWorld() == null)
                 throw new IllegalStateException("Position, identifier, motion and world must be set");
 
-            getWorld()
-                    .spawnParticle(
-                            getIdentifier(),
-                            getPosition().xCoord,
-                            getPosition().yCoord,
-                            getPosition().zCoord,
-                            getMotion().xCoord,
-                            getMotion().yCoord,
-                            getMotion().zCoord);
+            getWorld().spawnParticle(
+                getIdentifier(),
+                getPosition().xCoord,
+                getPosition().yCoord,
+                getPosition().zCoord,
+                getMotion().xCoord,
+                getMotion().yCoord,
+                getMotion().zCoord);
         }
     }
 
@@ -303,14 +311,13 @@ public abstract class WorldSpawnedEventBuilder implements Runnable {
             if (getPosition() == null || getIdentifier() == null || getWorld() == null)
                 throw new IllegalStateException(ILLEGAL_STATE_STR1);
 
-            getWorld()
-                    .playSoundEffect(
-                            getPosition().xCoord,
-                            getPosition().yCoord,
-                            getPosition().zCoord,
-                            getIdentifier(),
-                            getPitch(),
-                            getVolume());
+            getWorld().playSoundEffect(
+                getPosition().xCoord,
+                getPosition().yCoord,
+                getPosition().zCoord,
+                getIdentifier(),
+                getPitch(),
+                getVolume());
         }
     }
 
@@ -362,15 +369,14 @@ public abstract class WorldSpawnedEventBuilder implements Runnable {
             if (getPosition() == null || getIdentifier() == null || getWorld() == null)
                 throw new IllegalStateException(ILLEGAL_STATE_STR1);
 
-            getWorld()
-                    .playSound(
-                            getPosition().xCoord,
-                            getPosition().yCoord,
-                            getPosition().zCoord,
-                            getIdentifier(),
-                            getPitch(),
-                            getVolume(),
-                            isProximity());
+            getWorld().playSound(
+                getPosition().xCoord,
+                getPosition().yCoord,
+                getPosition().zCoord,
+                getIdentifier(),
+                getPitch(),
+                getVolume(),
+                isProximity());
         }
     }
 
@@ -404,12 +410,16 @@ public abstract class WorldSpawnedEventBuilder implements Runnable {
             if (getPosition() == null || getIdentifier() == null || getWorld() == null)
                 throw new IllegalStateException(ILLEGAL_STATE_STR1);
 
-            getWorld().playRecord(getIdentifier(), (int) getPosition().xCoord, (int) getPosition().yCoord, (int)
-                    getPosition().zCoord);
+            getWorld().playRecord(
+                getIdentifier(),
+                (int) getPosition().xCoord,
+                (int) getPosition().yCoord,
+                (int) getPosition().zCoord);
         }
     }
 
     public static final class ExplosionEffectEventBuilder extends PositionedEntityWorldSpawnedEventBuilder {
+
         private boolean isFlaming, isSmoking;
         private float strength;
 
@@ -460,15 +470,14 @@ public abstract class WorldSpawnedEventBuilder implements Runnable {
             if (getPosition() == null || getWorld() == null)
                 throw new IllegalStateException("Position and world must be set");
 
-            getWorld()
-                    .newExplosion(
-                            getEntity(),
-                            getPosition().xCoord,
-                            getPosition().yCoord,
-                            getPosition().zCoord,
-                            strength,
-                            isFlaming,
-                            isSmoking);
+            getWorld().newExplosion(
+                getEntity(),
+                getPosition().xCoord,
+                getPosition().yCoord,
+                getPosition().zCoord,
+                strength,
+                isFlaming,
+                isSmoking);
         }
     }
 
@@ -476,7 +485,7 @@ public abstract class WorldSpawnedEventBuilder implements Runnable {
      * Positional Data is rounded down due to this targeting a block.
      */
     public static final class ExtinguishFireEffectEventBuilder extends PositionedWorldSpawnedEventBuilder
-            implements IEntityPlayerWorldSpawnedEvent {
+        implements IEntityPlayerWorldSpawnedEvent {
 
         private int side;
         private EntityPlayer entityPlayer;
@@ -521,18 +530,17 @@ public abstract class WorldSpawnedEventBuilder implements Runnable {
             if (getEntityPlayer() == null || getPosition() == null || getWorld() == null)
                 throw new IllegalStateException("EntityPlayer, position and world must be set");
 
-            getWorld()
-                    .extinguishFire(
-                            getEntityPlayer(),
-                            (int) getPosition().xCoord,
-                            (int) getPosition().yCoord,
-                            (int) getPosition().zCoord,
-                            side);
+            getWorld().extinguishFire(
+                getEntityPlayer(),
+                (int) getPosition().xCoord,
+                (int) getPosition().yCoord,
+                (int) getPosition().zCoord,
+                side);
         }
     }
 
     public static final class SoundAtEntityEventBuilder extends EntityWorldSpawnedEventBuilder
-            implements ISoundWorldSpawnedEvent, IStringIdentifierWorldSpawnedEvent {
+        implements ISoundWorldSpawnedEvent, IStringIdentifierWorldSpawnedEvent {
 
         private float pitch;
         private float volume;
@@ -597,7 +605,7 @@ public abstract class WorldSpawnedEventBuilder implements Runnable {
     }
 
     public static final class SoundToNearExceptEventBuilder extends WorldSpawnedEventBuilder
-            implements ISoundWorldSpawnedEvent, IStringIdentifierWorldSpawnedEvent, IEntityPlayerWorldSpawnedEvent {
+        implements ISoundWorldSpawnedEvent, IStringIdentifierWorldSpawnedEvent, IEntityPlayerWorldSpawnedEvent {
 
         private float pitch;
         private float volume;

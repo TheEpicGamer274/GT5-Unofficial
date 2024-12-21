@@ -1,11 +1,33 @@
 package gregtech.api.multitileentity.interfaces;
 
-import net.minecraft.util.ChunkCoordinates;
+import java.util.UUID;
 
-public interface IMultiBlockPart extends IMultiTileEntity {
+import net.minecraft.util.ChunkCoordinates;
+import net.minecraftforge.common.util.ForgeDirection;
+
+import gregtech.api.logic.interfaces.FluidInventoryLogicHost;
+import gregtech.api.logic.interfaces.ItemInventoryLogicHost;
+
+public interface IMultiBlockPart extends IMultiTileEntity, ItemInventoryLogicHost, FluidInventoryLogicHost {
+
     ChunkCoordinates getTargetPos();
 
-    void setTargetPos(ChunkCoordinates aTargetPos);
+    void setLockedInventoryIndex(int aIndex);
 
-    boolean tickCoverAtSide(byte aSide, long aTickTimer);
+    int getLockedInventoryIndex();
+
+    UUID getLockedInventory();
+
+    boolean tickCoverAtSide(ForgeDirection side, long aTickTimer);
+
+    boolean shouldTick(long tickTimer);
+
+    int getMode();
+
+    void setMode(int mode);
+
+    int getAllowedModes();
+
+    void setAllowedModes(int allowedModes);
+
 }

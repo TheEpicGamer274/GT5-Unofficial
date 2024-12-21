@@ -1,21 +1,30 @@
 package gregtech.api.enums;
 
-import static gregtech.api.enums.GT_Values.MOD_ID_IC2;
+import static gregtech.api.enums.Mods.GregTech;
+import static gregtech.api.enums.Mods.IndustrialCraft2;
+import static gregtech.api.enums.Mods.TecTech;
 
-import com.google.common.collect.Maps;
 import java.util.EnumSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
 import net.minecraft.util.ResourceLocation;
+
+import com.google.common.collect.Maps;
+
+import gregtech.api.GregTechAPI;
 
 /**
  * Enumerates known sounds with id and resource-location
  *
- * <p>Note that the id serve no specific purpose, if for legacy compatibility of
- * a plausible yet unimplemented network packet weight optimization.</p>
+ * <p>
+ * Note that the id serve no specific purpose, if for legacy compatibility of a plausible yet unimplemented network
+ * packet weight optimization.
+ * </p>
  */
 public enum SoundResource {
+
     RANDOM_BREAK(0, "random.break"),
     RANDOM_ANVIL_USE(1, "random.anvil_use"),
     RANDOM_ANVIL_BREAK(2, "random.anvil_break"),
@@ -24,31 +33,81 @@ public enum SoundResource {
     RANDOM_EXPLODE(5, "random.explode"),
     FIRE_IGNITE(6, "fire.ignite"),
 
-    IC2_TOOLS_WRENCH(100, MOD_ID_IC2, "tools.Wrench"),
-    IC2_TOOLS_RUBBER_TRAMPOLINE(101, MOD_ID_IC2, "tools.RubberTrampoline"),
-    IC2_TOOLS_PAINTER(102, MOD_ID_IC2, "tools.Painter"),
-    IC2_TOOLS_BATTERY_USE(103, MOD_ID_IC2, "tools.BatteryUse"),
-    IC2_TOOLS_CHAINSAW_CHAINSAW_USE_ONE(104, MOD_ID_IC2, "tools.chainsaw.ChainsawUseOne"),
-    IC2_TOOLS_CHAINSAW_CHAINSAW_USE_TWO(105, MOD_ID_IC2, "tools.chainsaw.ChainsawUseTwo"),
-    IC2_TOOLS_DRILL_DRILL_SOFT(106, MOD_ID_IC2, "tools.drill.DrillSoft"),
-    IC2_TOOLS_DRILL_DRILL_HARD(107, MOD_ID_IC2, "tools.drill.DrillHard"),
-    IC2_TOOLS_OD_SCANNER(108, MOD_ID_IC2, "tools.ODScanner"),
-    IC2_TOOLS_INSULATION_CUTTERS(109, MOD_ID_IC2, "tools.InsulationCutters"),
+    IC2_TOOLS_WRENCH(100, IndustrialCraft2.ID, "tools.Wrench"),
+    IC2_TOOLS_RUBBER_TRAMPOLINE(101, IndustrialCraft2.ID, "tools.RubberTrampoline"),
+    IC2_TOOLS_PAINTER(102, IndustrialCraft2.ID, "tools.Painter"),
+    IC2_TOOLS_BATTERY_USE(103, IndustrialCraft2.ID, "tools.BatteryUse"),
+    IC2_TOOLS_CHAINSAW_CHAINSAW_USE_ONE(104, IndustrialCraft2.ID, "tools.chainsaw.ChainsawUseOne"),
+    IC2_TOOLS_CHAINSAW_CHAINSAW_USE_TWO(105, IndustrialCraft2.ID, "tools.chainsaw.ChainsawUseTwo"),
+    IC2_TOOLS_DRILL_DRILL_SOFT(106, IndustrialCraft2.ID, "tools.drill.DrillSoft"),
+    IC2_TOOLS_DRILL_DRILL_HARD(107, IndustrialCraft2.ID, "tools.drill.DrillHard"),
+    IC2_TOOLS_OD_SCANNER(108, IndustrialCraft2.ID, "tools.ODScanner"),
+    IC2_TOOLS_INSULATION_CUTTERS(109, IndustrialCraft2.ID, "tools.InsulationCutters"),
 
-    IC2_MACHINES_EXTRACTOR_OP(200, MOD_ID_IC2, "machines.ExtractorOp"),
-    IC2_MACHINES_MACERATOR_OP(201, MOD_ID_IC2, "machines.MaceratorOp"),
-    IC2_MACHINES_INDUCTION_LOOP(202, MOD_ID_IC2, "machines.InductionLoop"),
-    IC2_MACHINES_COMPRESSOR_OP(203, MOD_ID_IC2, "machines.CompressorOp"),
-    IC2_MACHINES_RECYCLER_OP(204, MOD_ID_IC2, "machines.RecyclerOp"),
-    IC2_MACHINES_MINER_OP(205, MOD_ID_IC2, "machines.MinerOp"),
-    IC2_MACHINES_PUMP_OP(206, MOD_ID_IC2, "machines.PumpOp"),
-    IC2_MACHINES_ELECTROFURNACE_LOOP(207, MOD_ID_IC2, "machines.ElectroFurnaceLoop"),
+    IC2_MACHINES_EXTRACTOR_OP(200, IndustrialCraft2.ID, "machines.ExtractorOp"),
+    IC2_MACHINES_MACERATOR_OP(201, IndustrialCraft2.ID, "machines.MaceratorOp"),
+    IC2_MACHINES_INDUCTION_LOOP(202, IndustrialCraft2.ID, "machines.InductionLoop"),
+    IC2_MACHINES_COMPRESSOR_OP(203, IndustrialCraft2.ID, "machines.CompressorOp"),
+    IC2_MACHINES_RECYCLER_OP(204, IndustrialCraft2.ID, "machines.RecyclerOp"),
+    IC2_MACHINES_MINER_OP(205, IndustrialCraft2.ID, "machines.MinerOp"),
+    IC2_MACHINES_PUMP_OP(206, IndustrialCraft2.ID, "machines.PumpOp"),
+    IC2_MACHINES_ELECTROFURNACE_LOOP(207, IndustrialCraft2.ID, "machines.ElectroFurnaceLoop"),
     @Deprecated
-    DEPRECATED_DUPE_OF_IC2_MACHINES_INDUCTION_LOOP(208, MOD_ID_IC2, "machines.InductionLoop"),
-    IC2_MACHINES_MACHINE_OVERLOAD(209, MOD_ID_IC2, "machines.MachineOverload"),
-    IC2_MACHINES_INTERRUPT_ONE(210, MOD_ID_IC2, "machines.InterruptOne"),
-    IC2_MACHINES_KA_CHING(211, MOD_ID_IC2, "machines.KaChing"),
-    IC2_MACHINES_MAGNETIZER_LOOP(212, MOD_ID_IC2, "machines.MagnetizerLoop"),
+    DEPRECATED_DUPE_OF_IC2_MACHINES_INDUCTION_LOOP(208, IndustrialCraft2.ID, "machines.InductionLoop"),
+    IC2_MACHINES_MACHINE_OVERLOAD(209, IndustrialCraft2.ID, "machines.MachineOverload"),
+    IC2_MACHINES_INTERRUPT_ONE(210, IndustrialCraft2.ID, "machines.InterruptOne"),
+    IC2_MACHINES_KA_CHING(211, IndustrialCraft2.ID, "machines.KaChing"),
+    IC2_MACHINES_MAGNETIZER_LOOP(212, IndustrialCraft2.ID, "machines.MagnetizerLoop"),
+
+    GT_MACHINES_FUSION_LOOP(230, GregTech.ID, "machines.FusionLoop"),
+    GT_MACHINES_DISTILLERY_LOOP(231, GregTech.ID, "machines.DistilleryLoop"),
+    GT_MACHINES_PLASMAFORGE_LOOP(232, GregTech.ID, "machines.PlasmaForgeLoop"),
+    GT_MACHINES_STEAM_WASHER_LOOP(233, GregTech.ID, "machines.SteamWasherLoop"),
+    GT_MACHINES_WATER_PUMP_LOOP(234, GregTech.ID, "machines.WaterPumpLoop"),
+    GT_MACHINES_STEAM_CENTRIFUGE_LOOP(235, GregTech.ID, "machines.SteamCentrifugeLoop"),
+
+    GT_MACHINES_PURIFICATIONPLANT_LOOP(236, GregTech.ID, "machines.PurificationPlantLoop"),
+    GT_MACHINES_PURIFICATION_PH_LOOP(237, GregTech.ID, "machines.PurificationPhLoop"),
+    GT_MACHINES_COAGULATION_LOOP(238, GregTech.ID, "machines.PurificationCoagulationLoop"),
+    GT_MACHINES_OZONATION_LOOP(239, GregTech.ID, "machines.PurificationOzonationLoop"),
+    GT_MACHINES_PURIFICATION_PLASMA_LOOP(240, GregTech.ID, "machines.PurificationPlasmaLoop"),
+
+    GT_MACHINES_MULTI_LATHE_LOOP(241, GregTech.ID, "machines.MultiLatheLoop"),
+    GT_MACHINES_MULTI_AUTOCLAVE_LOOP(242, GregTech.ID, "machines.MultiAutoclaveLoop"),
+
+    GT_SPRAYCAN_SHAKE(243, GregTech.ID, "items.spraycan_shake"),
+    GT_SPRAYCAN_LOCK(244, GregTech.ID, "items.spraycan_lock"),
+    GT_SPRAYCAN_UNLOCK(245, GregTech.ID, "items.spraycan_unlock"),
+
+    GT_MACHINES_BLACK_HOLE_COMPRESSOR(246, GregTech.ID, "machines.BlackHoleCompressorLoop"),
+
+    GT_MACHINES_MULTI_PRECISE_LOOP(247, GregTech.ID, "machines.MTEPreciseAssembler"),
+    GT_MACHINES_MULTI_ORE_WASHER_PLANT_LOOP(248, GregTech.ID, "machines.MTEIndustrialWashPlant"),
+    GT_MACHINES_MULTI_MEGA_VACUUM_FREEZER_LOOP(249, GregTech.ID, "machines.MTEMegaVacuumFreezer"),
+    GT_MACHINES_MULTI_VACUUM_FREEZER_LOOP(250, GregTech.ID, "machines.MTEVacuumFreezer"),
+    GT_MACHINES_EXTREME_ENTITY_CRUSHER_LOOP(251, GregTech.ID, "machines.MTEExtremeEntityCrusher"),
+    GT_MACHINES_CUTTING_MACHINE_LOOP(252, GregTech.ID, "machines.MTEIndustrialCuttingMachine"),
+    GT_MACHINES_ARC_FURNACE_LOOP(253, GregTech.ID, "machines.MTEIndustrialArcFurnace"),
+    GT_MACHINES_MEGA_INDUSTRIAL_APIARY_LOOP(254, GregTech.ID, "machines.MTEMegaIndustrialApiary"),
+    GT_MACHINES_ALGAE_LOOP(255, GregTech.ID, "machines.MTEAlgaePondBase"),
+    GT_MACHINES_THERMAL_CENTRIFUGE_LOOP(256, GregTech.ID, "machines.MTEIndustrialThermalCentrifuge"),
+    GT_MACHINES_SIFTER_LOOP(257, GregTech.ID, "machines.MTEIndustrialSifter"),
+    GT_MACHINES_EYE_OF_HARMONY_LOOP(258, GregTech.ID, "machines.MTEEyeOfHarmony"),
+    GT_MACHINES_EBF_LOOP(259, GregTech.ID, "machines.MTEElectricBlastFurnace"),
+    GT_MACHINES_ADV_FREEZER_LOOP(260, GregTech.ID, "machines.MTEIndustrialVacuumFreezer"),
+    GT_MACHINES_GOD_FORGE_LOOP(261, GregTech.ID, "machines.MTEForgeOfGods"),
+    GT_MACHINES_MEGA_BLAST_FURNACE_LOOP(262, GregTech.ID, "machines.MTEMegaBlastFurnace"),
+    GT_MACHINES_OIL_DRILL_LOOP(263, GregTech.ID, "machines.MTEOilDrillBase"),
+    GT_MACHINES_QUANTUM_FORCE_TRANSFORMER_LOOP(264, GregTech.ID, "machines.MTEQuantumForceTransformer"),
+    GT_MACHINES_ADV_EBF_LOOP(265, GregTech.ID, "machines.MTEAdvEBF"),
+    GT_MACHINES_LARGE_TURBINES_LOOP(266, GregTech.ID, "machines.MTELargeTurbine"),
+    TECTECH_MACHINES_FX_LOW_FREQ(267, TecTech.ID, "fx_lo_freq"),
+    TECTECH_MACHINES_FX_HIGH_FREQ(268, TecTech.ID, "fx_hi_freq"),
+    TECTECH_MACHINES_NOISE(269, TecTech.ID, "fx_noise"),
+    TECTECH_MACHINES_FX_WHOOUM(270, TecTech.ID, "fx_whooum"),
+
+    GUI_BUTTON_DOWN(-1, GregTech.ID, "gui.buttonDown"),
+    GUI_BUTTON_UP(-1, GregTech.ID, "gui.buttonUp"),
 
     /*
      * Other Minecraft Sounds that were missing
@@ -291,11 +350,19 @@ public enum SoundResource {
     private static final Map<String, SoundResource> RESOURCE_STR_SOUND_MAP = new ConcurrentHashMap<>();
 
     static {
-        EnumSet.allOf(SoundResource.class).forEach(sound -> {
-            if (sound.id >= 0) ID_SOUND_MAP.put(sound.id, sound);
-        });
         EnumSet.allOf(SoundResource.class)
-                .forEach(sound -> RESOURCE_STR_SOUND_MAP.put(sound.resourceLocation.toString(), sound));
+            .forEach(sound -> {
+                if (sound.id < 0) {
+                    return;
+                }
+
+                if (ID_SOUND_MAP.containsKey(sound.id)) {
+                    throw new IllegalStateException(String.format("Sound ID %s is already occupied!", sound.id));
+                }
+                ID_SOUND_MAP.put(sound.id, sound);
+            });
+        EnumSet.allOf(SoundResource.class)
+            .forEach(sound -> RESOURCE_STR_SOUND_MAP.put(sound.resourceLocation.toString(), sound));
     }
 
     /**
@@ -340,9 +407,11 @@ public enum SoundResource {
     /**
      * Provides a backward-compatible Sounds {@code Map<Integer, String>} sound list
      *
-     * @return The map for the deprecated {@link gregtech.api.GregTech_API#sSoundList}
+     * @return The map for the deprecated {@link GregTechAPI#sSoundList}
      * @deprecated This method is planned for removal.
-     * <p>Use this {@link SoundResource} enum instead.</p>
+     *             <p>
+     *             Use this {@link SoundResource} enum instead.
+     *             </p>
      */
     @Deprecated
     public static Map<Integer, String> asSoundList() {

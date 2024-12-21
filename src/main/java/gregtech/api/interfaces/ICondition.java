@@ -1,11 +1,13 @@
 package gregtech.api.interfaces;
 
 public interface ICondition<O> {
+
     boolean isTrue(O aObject);
 
     // Utility Classes for adding relations between Conditions.
 
     class Not<O> implements ICondition<O> {
+
         private final ICondition<O> mCondition;
 
         public Not(ICondition<O> aCondition) {
@@ -19,8 +21,10 @@ public interface ICondition<O> {
     }
 
     class Or<O> implements ICondition<O> {
+
         private final ICondition<O>[] mConditions;
 
+        @SafeVarargs
         public Or(ICondition<O>... aConditions) {
             mConditions = aConditions;
         }
@@ -33,8 +37,10 @@ public interface ICondition<O> {
     }
 
     class Nor<O> implements ICondition<O> {
+
         private final ICondition<O>[] mConditions;
 
+        @SafeVarargs
         public Nor(ICondition<O>... aConditions) {
             mConditions = aConditions;
         }
@@ -47,8 +53,10 @@ public interface ICondition<O> {
     }
 
     class And<O> implements ICondition<O> {
+
         private final ICondition<O>[] mConditions;
 
+        @SafeVarargs
         public And(ICondition<O>... aConditions) {
             mConditions = aConditions;
         }
@@ -61,8 +69,10 @@ public interface ICondition<O> {
     }
 
     class Nand<O> implements ICondition<O> {
+
         private final ICondition<O>[] mConditions;
 
+        @SafeVarargs
         public Nand(ICondition<O>... aConditions) {
             mConditions = aConditions;
         }
@@ -75,6 +85,7 @@ public interface ICondition<O> {
     }
 
     class Xor<O> implements ICondition<O> {
+
         private final ICondition<O> mCondition1, mCondition2;
 
         public Xor(ICondition<O> aCondition1, ICondition<O> aCondition2) {
@@ -89,6 +100,7 @@ public interface ICondition<O> {
     }
 
     class Equal<O> implements ICondition<O> {
+
         private final ICondition<O> mCondition1, mCondition2;
 
         public Equal(ICondition<O> aCondition1, ICondition<O> aCondition2) {

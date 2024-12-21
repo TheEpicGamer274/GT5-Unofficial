@@ -1,9 +1,12 @@
 package gregtech.api.interfaces.metatileentity;
 
+import net.minecraftforge.common.util.ForgeDirection;
+
 /**
  * For pipes, wires, and other MetaTiles which need to be decided whether they should connect to the block at each side.
  */
 public interface IConnectable {
+
     int NO_CONNECTION = 0b00000000;
     int CONNECTED_DOWN = 0b00000001;
     int CONNECTED_UP = 0b00000010;
@@ -17,15 +20,15 @@ public interface IConnectable {
     int HAS_FOAM = 0b11000000;
 
     /**
-     * Try to connect to the Block at the specified side
-     * returns the connection state. Non-positive values for failed, others for succeeded.
+     * Try to connect to the Block at the specified side returns the connection state. Non-positive values for failed,
+     * others for succeeded.
      */
-    int connect(byte aSide);
+    int connect(ForgeDirection side);
 
     /**
      * Try to disconnect to the Block at the specified side
      */
-    void disconnect(byte aSide);
+    void disconnect(ForgeDirection side);
 
-    boolean isConnectedAtSide(int aSide);
+    boolean isConnectedAtSide(ForgeDirection side);
 }

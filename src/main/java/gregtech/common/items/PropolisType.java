@@ -1,9 +1,10 @@
 package gregtech.common.items;
 
 import gregtech.api.enums.Materials;
-import gregtech.api.util.GT_LanguageManager;
+import gregtech.api.util.GTLanguageManager;
 
 public enum PropolisType {
+
     End("End", true),
     Ectoplasma("Ectoplasma", true),
     Arcaneshard("Arcaneshard", true),
@@ -14,15 +15,15 @@ public enum PropolisType {
     Endium("Endium", true),
     Fireessence("Fireessence", true);
 
-    private static int[] colours =
-            new int[] {0xCC00FA, 0xDCB0E5, 0x9010AD, 0xFFFF00, 0x911ECE, 0x161616, 0xEE053D, 0xa0ffff, 0xD41238};
+    private static final int[] colours = new int[] { 0xCC00FA, 0xDCB0E5, 0x9010AD, 0xFFFF00, 0x911ECE, 0x161616,
+        0xEE053D, 0xa0ffff, 0xD41238 };
 
     public boolean showInList;
     public Materials material;
     public int chance;
-    private String name;
+    private final String name;
 
-    private PropolisType(String pName, boolean show) {
+    PropolisType(String pName, boolean show) {
         this.name = pName;
         this.showInList = show;
     }
@@ -32,10 +33,11 @@ public enum PropolisType {
     }
 
     public String getName() {
-        //		return "gt.comb."+this.name;
-        return GT_LanguageManager.addStringLocalization(
-                "propolis." + this.name,
-                this.name.substring(0, 1).toUpperCase() + this.name.substring(1) + " Propolis");
+        // return "gt.comb."+this.name;
+        return GTLanguageManager.addStringLocalization(
+            "propolis." + this.name,
+            this.name.substring(0, 1)
+                .toUpperCase() + this.name.substring(1) + " Propolis");
     }
 
     public int getColours() {

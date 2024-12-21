@@ -1,20 +1,24 @@
 package gregtech.api.graphs;
 
-import gregtech.api.graphs.consumers.ConsumerNode;
-import gregtech.api.graphs.paths.NodePath;
 import java.util.ArrayList;
+
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 
+import gregtech.api.graphs.consumers.ConsumerNode;
+import gregtech.api.graphs.paths.NodePath;
+
 // base Node class
 public class Node {
+
     public Node(int aNodeValue, TileEntity aTileEntity, ArrayList<ConsumerNode> aConsumers) {
         this.mNodeValue = aNodeValue;
         this.mTileEntity = aTileEntity;
         this.mConsumers = aConsumers;
         mHighestNodeValue = aNodeValue;
         // you don't want to generate map multiple times in the same tick
-        mCreationTime = MinecraftServer.getServer().getTickCounter();
+        mCreationTime = MinecraftServer.getServer()
+            .getTickCounter();
     }
 
     public final TileEntity mTileEntity;
@@ -28,7 +32,8 @@ public class Node {
     public int mNodeValue;
     public int mHighestNodeValue;
 
-    public class ReturnPair {
+    public static class ReturnPair {
+
         public NodePath mReturnPath;
         public Lock returnLock;
     }

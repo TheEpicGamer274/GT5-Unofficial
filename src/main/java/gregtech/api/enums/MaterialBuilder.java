@@ -1,22 +1,24 @@
 package gregtech.api.enums;
 
-import gregtech.api.objects.MaterialStack;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import gregtech.api.objects.MaterialStack;
+
 public class MaterialBuilder {
+
     public static final int DIESEL = 0, GAS = 1, THERMAL = 2, SEMIFLUID = 3, PLASMA = 4, MAGIC = 5;
 
-    private int metaItemSubID;
-    private TextureSet iconSet;
+    private final int metaItemSubID;
+    private final TextureSet iconSet;
     private float toolSpeed = 1.0f;
     private int durability = 0;
     private int toolQuality = 0;
     private int types = 0;
     private int r = 255, g = 255, b = 255, a = 0;
     private String name;
-    private String defaultLocalName;
+    private final String defaultLocalName;
     private int fuelType = 0;
     private int fuelPower = 0;
     private int meltingPoint = 0;
@@ -29,49 +31,48 @@ public class MaterialBuilder {
     private Dyes color = Dyes._NULL;
     private int extraData = 0;
     private List<MaterialStack> materialList = new ArrayList<>();
-    private List<TC_Aspects.TC_AspectStack> aspects = new ArrayList<>();
+    private List<TCAspects.TC_AspectStack> aspects = new ArrayList<>();
     private boolean hasCorrespondingFluid = false;
     private boolean hasCorrespondingGas = false;
     private boolean canBeCracked = false;
-    private boolean canBeSteamCracked = false;
     private int liquidTemperature = 300;
     private int gasTemperature = 300;
 
     public MaterialBuilder(int metaItemSubID, TextureSet iconSet, String defaultLocalName) {
         this.metaItemSubID = metaItemSubID;
         this.iconSet = iconSet;
-        this.name = defaultLocalName.replace(" ", "").replace("-", "");
+        this.name = defaultLocalName.replace(" ", "")
+            .replace("-", "");
         this.defaultLocalName = defaultLocalName;
     }
 
     public Materials constructMaterial() {
         return new Materials(
-                        metaItemSubID,
-                        iconSet,
-                        toolSpeed,
-                        durability,
-                        toolQuality,
-                        types,
-                        r,
-                        g,
-                        b,
-                        a,
-                        name,
-                        defaultLocalName,
-                        fuelType,
-                        fuelPower,
-                        meltingPoint,
-                        blastFurnaceTemp,
-                        blastFurnaceRequired,
-                        transparent,
-                        oreValue,
-                        densityMultiplier,
-                        densityDivider,
-                        color,
-                        extraData,
-                        materialList,
-                        aspects)
-                .setHasCorrespondingFluid(hasCorrespondingFluid)
+            metaItemSubID,
+            iconSet,
+            toolSpeed,
+            durability,
+            toolQuality,
+            types,
+            r,
+            g,
+            b,
+            a,
+            name,
+            defaultLocalName,
+            fuelType,
+            fuelPower,
+            meltingPoint,
+            blastFurnaceTemp,
+            blastFurnaceRequired,
+            transparent,
+            oreValue,
+            densityMultiplier,
+            densityDivider,
+            color,
+            extraData,
+            materialList,
+            aspects).setHasCorrespondingFluid(hasCorrespondingFluid)
                 .setHasCorrespondingGas(hasCorrespondingGas)
                 .setCanBeCracked(canBeCracked);
     }
@@ -241,7 +242,7 @@ public class MaterialBuilder {
         return this;
     }
 
-    public MaterialBuilder setAspects(List<TC_Aspects.TC_AspectStack> aspects) {
+    public MaterialBuilder setAspects(List<TCAspects.TC_AspectStack> aspects) {
         this.aspects = aspects;
         return this;
     }

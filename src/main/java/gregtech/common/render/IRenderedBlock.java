@@ -1,21 +1,24 @@
 package gregtech.common.render;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import gregtech.api.enums.Textures;
-import gregtech.api.interfaces.ITexture;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.IBlockAccess;
+import net.minecraftforge.common.util.ForgeDirection;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import gregtech.api.enums.Textures;
+import gregtech.api.interfaces.ITexture;
 
 public interface IRenderedBlock {
+
     /** @return the Textures to be rendered */
     @SideOnly(Side.CLIENT)
-    ITexture[] getTexture(Block aBlock, byte aSide, int aRenderPass, boolean[] aShouldSideBeRendered);
+    ITexture[] getTexture(Block aBlock, ForgeDirection side, int aRenderPass, boolean[] aShouldSideBeRendered);
 
     @SideOnly(Side.CLIENT)
-    ITexture[] getTexture(Block aBlock, byte aSide, boolean isActive, int aRenderPass);
+    ITexture[] getTexture(Block aBlock, ForgeDirection side, boolean isActive, int aRenderPass);
 
     /** gets the Amount of Render Passes for this TileEntity or similar Handler. Only gets called once per Rendering. */
     @SideOnly(Side.CLIENT)
@@ -50,16 +53,18 @@ public interface IRenderedBlock {
     IRenderedBlock passRenderingToObject(IBlockAccess aWorld, int aX, int aY, int aZ);
 
     class ErrorRenderer implements IRenderedBlockSideCheck, IRenderedBlock {
+
         public static final ErrorRenderer INSTANCE = new ErrorRenderer();
         public ITexture[] mErrorTexture = Textures.BlockIcons.ERROR_RENDERING;
 
         @Override
-        public ITexture[] getTexture(Block aBlock, byte aSide, int aRenderPass, boolean[] aShouldSideBeRendered) {
+        public ITexture[] getTexture(Block aBlock, ForgeDirection side, int aRenderPass,
+            boolean[] aShouldSideBeRendered) {
             return mErrorTexture;
         }
 
         @Override
-        public ITexture[] getTexture(Block aBlock, byte aSide, boolean isActive, int aRenderPass) {
+        public ITexture[] getTexture(Block aBlock, ForgeDirection side, boolean isActive, int aRenderPass) {
             return mErrorTexture;
         }
 
@@ -80,7 +85,7 @@ public interface IRenderedBlock {
         }
 
         @Override
-        public boolean renderFullBlockSide(Block aBlock, RenderBlocks aRenderer, byte aSide) {
+        public boolean renderFullBlockSide(Block aBlock, RenderBlocks aRenderer, ForgeDirection side) {
             return true;
         }
 
@@ -97,12 +102,12 @@ public interface IRenderedBlock {
         @Override
         public boolean renderBlock(Block aBlock, RenderBlocks aRenderer, IBlockAccess aWorld, int aX, int aY, int aZ) {
             aBlock.setBlockBounds(-0.25F, -0.25F, -0.25F, 1.25F, 1.25F, 1.25F);
-            GT_Renderer_Block.renderNegativeYFacing(aWorld, aRenderer, aBlock, aX, aY, aZ, mErrorTexture, false);
-            GT_Renderer_Block.renderPositiveYFacing(aWorld, aRenderer, aBlock, aX, aY, aZ, mErrorTexture, false);
-            GT_Renderer_Block.renderNegativeZFacing(aWorld, aRenderer, aBlock, aX, aY, aZ, mErrorTexture, false);
-            GT_Renderer_Block.renderPositiveZFacing(aWorld, aRenderer, aBlock, aX, aY, aZ, mErrorTexture, false);
-            GT_Renderer_Block.renderNegativeXFacing(aWorld, aRenderer, aBlock, aX, aY, aZ, mErrorTexture, false);
-            GT_Renderer_Block.renderPositiveXFacing(aWorld, aRenderer, aBlock, aX, aY, aZ, mErrorTexture, false);
+            GTRendererBlock.renderNegativeYFacing(aWorld, aRenderer, aBlock, aX, aY, aZ, mErrorTexture, false);
+            GTRendererBlock.renderPositiveYFacing(aWorld, aRenderer, aBlock, aX, aY, aZ, mErrorTexture, false);
+            GTRendererBlock.renderNegativeZFacing(aWorld, aRenderer, aBlock, aX, aY, aZ, mErrorTexture, false);
+            GTRendererBlock.renderPositiveZFacing(aWorld, aRenderer, aBlock, aX, aY, aZ, mErrorTexture, false);
+            GTRendererBlock.renderNegativeXFacing(aWorld, aRenderer, aBlock, aX, aY, aZ, mErrorTexture, false);
+            GTRendererBlock.renderPositiveXFacing(aWorld, aRenderer, aBlock, aX, aY, aZ, mErrorTexture, false);
             return true;
         }
     }

@@ -1,19 +1,22 @@
 package gregtech.common.items;
 
-import static gregtech.api.enums.GT_Values.MOD_ID;
+import static gregtech.api.enums.Mods.GregTech;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import forestry.api.core.Tabs;
 import java.util.List;
+
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import forestry.api.core.Tabs;
+
 public class ItemPollen extends Item {
+
     @SideOnly(Side.CLIENT)
     private IIcon secondIcon;
 
@@ -22,7 +25,7 @@ public class ItemPollen extends Item {
         this.setCreativeTab(Tabs.tabApiculture);
         this.setHasSubtypes(true);
         this.setUnlocalizedName("gt.pollen");
-        GameRegistry.registerItem(this, "gt.pollen", MOD_ID);
+        GameRegistry.registerItem(this, "gt.pollen", GregTech.ID);
     }
 
     public ItemStack getStackForType(PollenType type) {
@@ -35,7 +38,7 @@ public class ItemPollen extends Item {
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void getSubItems(Item item, CreativeTabs tabs, List list) {
+    public void getSubItems(Item item, CreativeTabs tabs, List<ItemStack> list) {
         for (PollenType type : PollenType.values()) {
             if (type.showInList) {
                 list.add(this.getStackForType(type));

@@ -1,22 +1,27 @@
 package gregtech.api.interfaces;
 
-import com.google.common.collect.ImmutableList;
-import com.gtnewhorizon.structurelib.structure.IStructureElement;
-import gregtech.api.interfaces.metatileentity.IMetaTileEntity;
-import gregtech.api.interfaces.tileentity.IGregTechTileEntity;
-import gregtech.api.util.GT_StructureUtility;
-import gregtech.api.util.IGT_HatchAdder;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.BiPredicate;
 import java.util.function.ToLongFunction;
+
+import net.minecraft.block.Block;
 import net.minecraftforge.common.util.ForgeDirection;
 
+import com.google.common.collect.ImmutableList;
+import com.gtnewhorizon.structurelib.structure.IStructureElement;
+
+import gregtech.api.interfaces.metatileentity.IMetaTileEntity;
+import gregtech.api.interfaces.tileentity.IGregTechTileEntity;
+import gregtech.api.util.GTStructureUtility;
+import gregtech.api.util.IGTHatchAdder;
+
 public interface IHatchElement<T> {
+
     List<? extends Class<? extends IMetaTileEntity>> mteClasses();
 
-    IGT_HatchAdder<? super T> adder();
+    IGTHatchAdder<? super T> adder();
 
     String name();
 
@@ -38,7 +43,7 @@ public interface IHatchElement<T> {
         return new HatchElement<>(aClasses, null, null, null, this);
     }
 
-    default <T2 extends T> IHatchElement<T2> withAdder(IGT_HatchAdder<T2> aAdder) {
+    default <T2 extends T> IHatchElement<T2> withAdder(IGTHatchAdder<T2> aAdder) {
         if (aAdder == null) throw new IllegalArgumentException();
         return new HatchElement<>(null, aAdder, null, null, this);
     }
@@ -55,35 +60,48 @@ public interface IHatchElement<T> {
 
     default <T2 extends T> IStructureElement<T2> newAny(int aCasingIndex, int aDot) {
         if (aCasingIndex < 0 || aDot < 0) throw new IllegalArgumentException();
-        return GT_StructureUtility.<T2>buildHatchAdder()
-                .anyOf(this)
-                .casingIndex(aCasingIndex)
-                .dot(aDot)
-                .continueIfSuccess()
-                .build();
+        return GTStructureUtility.<T2>buildHatchAdder()
+            .anyOf(this)
+            .casingIndex(aCasingIndex)
+            .dot(aDot)
+            .continueIfSuccess()
+            .exclusive()
+            .build();
+    }
+
+    default <T2 extends T> IStructureElement<T2> newAnyOrCasing(int aCasingIndex, int aDot, Block casingBlock,
+        int casingMeta) {
+        if (aCasingIndex < 0 || aDot < 0) throw new IllegalArgumentException();
+        return GTStructureUtility.<T2>buildHatchAdder()
+            .anyOf(this)
+            .casingIndex(aCasingIndex)
+            .dot(aDot)
+            .continueIfSuccess()
+            .buildAndChain(com.gtnewhorizon.structurelib.structure.StructureUtility.ofBlock(casingBlock, casingMeta));
     }
 
     default <T2 extends T> IStructureElement<T2> newAny(int aCasingIndex, int aDot, ForgeDirection... allowedFacings) {
         if (aCasingIndex < 0 || aDot < 0) throw new IllegalArgumentException();
-        return GT_StructureUtility.<T2>buildHatchAdder()
-                .anyOf(this)
-                .casingIndex(aCasingIndex)
-                .dot(aDot)
-                .continueIfSuccess()
-                .allowOnly(allowedFacings)
-                .build();
+        return GTStructureUtility.<T2>buildHatchAdder()
+            .anyOf(this)
+            .casingIndex(aCasingIndex)
+            .dot(aDot)
+            .continueIfSuccess()
+            .allowOnly(allowedFacings)
+            .exclusive()
+            .build();
     }
 
-    default <T2 extends T> IStructureElement<T2> newAny(
-            int aCasingIndex, int aDot, BiPredicate<? super T2, ? super IGregTechTileEntity> aShouldSkip) {
+    default <T2 extends T> IStructureElement<T2> newAny(int aCasingIndex, int aDot,
+        BiPredicate<? super T2, ? super IGregTechTileEntity> aShouldSkip) {
         if (aCasingIndex < 0 || aDot < 0 || aShouldSkip == null) throw new IllegalArgumentException();
-        return GT_StructureUtility.<T2>buildHatchAdder()
-                .anyOf(this)
-                .casingIndex(aCasingIndex)
-                .dot(aDot)
-                .shouldSkip(aShouldSkip)
-                .continueIfSuccess()
-                .build();
+        return GTStructureUtility.<T2>buildHatchAdder()
+            .anyOf(this)
+            .casingIndex(aCasingIndex)
+            .dot(aDot)
+            .shouldSkip(aShouldSkip)
+            .continueIfSuccess()
+            .build();
     }
 
     default <T2 extends T> IHatchElement<T2> or(IHatchElement<? super T2> fallback) {
@@ -92,6 +110,7 @@ public interface IHatchElement<T> {
 }
 
 class HatchElementEither<T> implements IHatchElement<T> {
+
     private final IHatchElement<? super T> first, second;
     private ImmutableList<? extends Class<? extends IMetaTileEntity>> mMteClasses;
     private String name;
@@ -103,17 +122,19 @@ class HatchElementEither<T> implements IHatchElement<T> {
 
     @Override
     public List<? extends Class<? extends IMetaTileEntity>> mteClasses() {
-        if (mMteClasses == null)
-            mMteClasses = ImmutableList.<Class<? extends IMetaTileEntity>>builder()
-                    .addAll(first.mteClasses())
-                    .addAll(second.mteClasses())
-                    .build();
+        if (mMteClasses == null) mMteClasses = ImmutableList.<Class<? extends IMetaTileEntity>>builder()
+            .addAll(first.mteClasses())
+            .addAll(second.mteClasses())
+            .build();
         return mMteClasses;
     }
 
     @Override
-    public IGT_HatchAdder<? super T> adder() {
-        return ((t, te, i) -> first.adder().apply(t, te, i) || second.adder().apply(t, te, i));
+    public IGTHatchAdder<? super T> adder() {
+        return ((t, te, i) -> first.adder()
+            .apply(t, te, i)
+            || second.adder()
+                .apply(t, te, i));
     }
 
     @Override
@@ -129,18 +150,15 @@ class HatchElementEither<T> implements IHatchElement<T> {
 }
 
 class HatchElement<T> implements IHatchElement<T> {
+
     private final List<Class<? extends IMetaTileEntity>> mClasses;
-    private final IGT_HatchAdder<? super T> mAdder;
+    private final IGTHatchAdder<? super T> mAdder;
     private final String mName;
     private final IHatchElement<? super T> mBacking;
     private final ToLongFunction<? super T> mCount;
 
-    public HatchElement(
-            List<Class<? extends IMetaTileEntity>> aMteClasses,
-            IGT_HatchAdder<? super T> aAdder,
-            String aName,
-            ToLongFunction<? super T> aCount,
-            IHatchElement<? super T> aBacking) {
+    public HatchElement(List<Class<? extends IMetaTileEntity>> aMteClasses, IGTHatchAdder<? super T> aAdder,
+        String aName, ToLongFunction<? super T> aCount, IHatchElement<? super T> aBacking) {
         this.mClasses = aMteClasses;
         this.mAdder = aAdder;
         this.mName = aName;
@@ -154,7 +172,7 @@ class HatchElement<T> implements IHatchElement<T> {
     }
 
     @Override
-    public IGT_HatchAdder<? super T> adder() {
+    public IGTHatchAdder<? super T> adder() {
         return mAdder == null ? mBacking.adder() : mAdder;
     }
 
@@ -175,7 +193,7 @@ class HatchElement<T> implements IHatchElement<T> {
     }
 
     @Override
-    public <T2 extends T> IHatchElement<T2> withAdder(IGT_HatchAdder<T2> aAdder) {
+    public <T2 extends T> IHatchElement<T2> withAdder(IGTHatchAdder<T2> aAdder) {
         if (aAdder == null) throw new IllegalArgumentException();
         return new HatchElement<>(mClasses, aAdder, mName, mCount, mBacking);
     }

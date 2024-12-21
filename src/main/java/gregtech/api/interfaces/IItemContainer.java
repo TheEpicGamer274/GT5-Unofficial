@@ -5,6 +5,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 public interface IItemContainer {
+
     Item getItem();
 
     Block getBlock();
@@ -26,6 +27,10 @@ public interface IItemContainer {
     IItemContainer set(Item aItem);
 
     IItemContainer set(ItemStack aStack);
+
+    default IItemContainer hidden() {
+        return this;
+    }
 
     IItemContainer registerOre(Object... aOreNames);
 

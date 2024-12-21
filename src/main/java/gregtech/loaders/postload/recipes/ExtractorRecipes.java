@@ -1,113 +1,206 @@
 package gregtech.loaders.postload.recipes;
 
-import static gregtech.api.util.GT_ModHandler.getModItem;
-import static gregtech.loaders.postload.GT_MachineRecipeLoader.isEBXLLoaded;
+import static gregtech.api.recipe.RecipeMaps.extractorRecipes;
+import static gregtech.api.util.GTModHandler.getIC2Item;
+import static gregtech.api.util.GTRecipeBuilder.SECONDS;
+import static gregtech.api.util.GTRecipeBuilder.WILDCARD;
 
-import gregtech.api.enums.ItemList;
-import gregtech.api.enums.Materials;
-import gregtech.api.enums.OrePrefixes;
-import gregtech.api.util.GT_ModHandler;
-import gregtech.api.util.GT_OreDictUnificator;
-import gregtech.loaders.postload.GT_MachineRecipeLoader;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 
+import gregtech.api.enums.GTValues;
+import gregtech.api.enums.ItemList;
+import gregtech.api.enums.Materials;
+import gregtech.api.enums.OrePrefixes;
+import gregtech.api.util.GTOreDictUnificator;
+
 public class ExtractorRecipes implements Runnable {
+
     @Override
     public void run() {
-        GT_ModHandler.addExtractionRecipe(new ItemStack(Blocks.bookshelf, 1, 32767), new ItemStack(Items.book, 3, 0));
-        GT_ModHandler.addExtractionRecipe(
-                new ItemStack(Items.slime_ball, 1),
-                GT_OreDictUnificator.get(OrePrefixes.dust, Materials.RawRubber, 2L));
-        GT_ModHandler.addExtractionRecipe(
-                ItemList.IC2_Resin.get(1L), GT_OreDictUnificator.get(OrePrefixes.dust, Materials.RawRubber, 3L));
-        GT_ModHandler.addExtractionRecipe(
-                GT_ModHandler.getIC2Item("rubberSapling", 1L),
-                GT_OreDictUnificator.get(OrePrefixes.dust, Materials.RawRubber, 1L));
-        GT_ModHandler.addExtractionRecipe(
-                GT_ModHandler.getIC2Item("rubberLeaves", 16L),
-                GT_OreDictUnificator.get(OrePrefixes.dust, Materials.RawRubber, 1L));
-        GT_ModHandler.addExtractionRecipe(ItemList.Cell_Air.get(1L), ItemList.Cell_Empty.get(1L));
-        if (isEBXLLoaded) {
-            GT_ModHandler.addExtractionRecipe(
-                    getModItem(GT_MachineRecipeLoader.aTextEBXL, "waterplant1", 1, 0), new ItemStack(Items.dye, 4, 2));
-            GT_ModHandler.addExtractionRecipe(
-                    getModItem(GT_MachineRecipeLoader.aTextEBXL, "vines", 1, 0), new ItemStack(Items.dye, 4, 1));
-            GT_ModHandler.addExtractionRecipe(
-                    getModItem(GT_MachineRecipeLoader.aTextEBXL, "flower3", 1, 11), new ItemStack(Items.dye, 4, 11));
-            GT_ModHandler.addExtractionRecipe(
-                    getModItem(GT_MachineRecipeLoader.aTextEBXL, "flower3", 1, 10), new ItemStack(Items.dye, 4, 5));
-            GT_ModHandler.addExtractionRecipe(
-                    getModItem(GT_MachineRecipeLoader.aTextEBXL, "flower3", 1, 9), new ItemStack(Items.dye, 4, 14));
-            GT_ModHandler.addExtractionRecipe(
-                    getModItem(GT_MachineRecipeLoader.aTextEBXL, "flower3", 1, 8), new ItemStack(Items.dye, 4, 14));
-            GT_ModHandler.addExtractionRecipe(
-                    getModItem(GT_MachineRecipeLoader.aTextEBXL, "flower3", 1, 7), new ItemStack(Items.dye, 4, 1));
-            GT_ModHandler.addExtractionRecipe(
-                    getModItem(GT_MachineRecipeLoader.aTextEBXL, "flower3", 1, 6), new ItemStack(Items.dye, 4, 1));
-            GT_ModHandler.addExtractionRecipe(
-                    getModItem(GT_MachineRecipeLoader.aTextEBXL, "flower3", 1, 5), new ItemStack(Items.dye, 4, 11));
-            GT_ModHandler.addExtractionRecipe(
-                    getModItem(GT_MachineRecipeLoader.aTextEBXL, "flower3", 1, 0), new ItemStack(Items.dye, 4, 9));
-            GT_ModHandler.addExtractionRecipe(
-                    getModItem(GT_MachineRecipeLoader.aTextEBXL, "flower3", 1, 4), new ItemStack(Items.dye, 4, 11));
-            GT_ModHandler.addExtractionRecipe(
-                    getModItem(GT_MachineRecipeLoader.aTextEBXL, "flower3", 1, 3), new ItemStack(Items.dye, 4, 13));
-            GT_ModHandler.addExtractionRecipe(
-                    getModItem(GT_MachineRecipeLoader.aTextEBXL, "flower1", 1, 3), new ItemStack(Items.dye, 4, 5));
-            GT_ModHandler.addExtractionRecipe(
-                    getModItem(GT_MachineRecipeLoader.aTextEBXL, "flower3", 1, 2), new ItemStack(Items.dye, 4, 5));
-            GT_ModHandler.addExtractionRecipe(
-                    getModItem(GT_MachineRecipeLoader.aTextEBXL, "flower1", 1, 1), new ItemStack(Items.dye, 4, 12));
-            GT_ModHandler.addExtractionRecipe(
-                    getModItem(GT_MachineRecipeLoader.aTextEBXL, "flower2", 1, 15), new ItemStack(Items.dye, 4, 11));
-            GT_ModHandler.addExtractionRecipe(
-                    getModItem(GT_MachineRecipeLoader.aTextEBXL, "flower2", 1, 14), new ItemStack(Items.dye, 4, 1));
-            GT_ModHandler.addExtractionRecipe(
-                    getModItem(GT_MachineRecipeLoader.aTextEBXL, "flower2", 1, 13), new ItemStack(Items.dye, 4, 9));
-            GT_ModHandler.addExtractionRecipe(
-                    getModItem(GT_MachineRecipeLoader.aTextEBXL, "flower2", 1, 12), new ItemStack(Items.dye, 4, 14));
-            GT_ModHandler.addExtractionRecipe(
-                    getModItem(GT_MachineRecipeLoader.aTextEBXL, "flower2", 1, 11), new ItemStack(Items.dye, 4, 7));
-            GT_ModHandler.addExtractionRecipe(
-                    getModItem(GT_MachineRecipeLoader.aTextEBXL, "flower1", 1, 7), new ItemStack(Items.dye, 4, 7));
-            GT_ModHandler.addExtractionRecipe(
-                    getModItem(GT_MachineRecipeLoader.aTextEBXL, "flower1", 1, 2), new ItemStack(Items.dye, 4, 11));
-            GT_ModHandler.addExtractionRecipe(
-                    getModItem(GT_MachineRecipeLoader.aTextEBXL, "flower3", 1, 13), new ItemStack(Items.dye, 4, 6));
-            GT_ModHandler.addExtractionRecipe(
-                    getModItem(GT_MachineRecipeLoader.aTextEBXL, "flower2", 1, 6), new ItemStack(Items.dye, 4, 12));
-            GT_ModHandler.addExtractionRecipe(
-                    getModItem(GT_MachineRecipeLoader.aTextEBXL, "flower2", 1, 5), new ItemStack(Items.dye, 4, 10));
-            GT_ModHandler.addExtractionRecipe(
-                    getModItem(GT_MachineRecipeLoader.aTextEBXL, "flower2", 1, 2), new ItemStack(Items.dye, 4, 1));
-            GT_ModHandler.addExtractionRecipe(
-                    getModItem(GT_MachineRecipeLoader.aTextEBXL, "flower2", 1, 1), new ItemStack(Items.dye, 4, 9));
-            GT_ModHandler.addExtractionRecipe(
-                    getModItem(GT_MachineRecipeLoader.aTextEBXL, "flower2", 1, 0), new ItemStack(Items.dye, 4, 13));
+        addExtractionRecipe(new ItemStack(Blocks.bookshelf, 1, WILDCARD), new ItemStack(Items.book, 3, 0));
+        addExtractionRecipe(
+            new ItemStack(Items.slime_ball, 1),
+            GTOreDictUnificator.get(OrePrefixes.dust, Materials.RawRubber, 2L));
+        addExtractionRecipe(
+            ItemList.IC2_Resin.get(1L),
+            GTOreDictUnificator.get(OrePrefixes.dust, Materials.RawRubber, 3L));
+        addExtractionRecipe(
+            getIC2Item("rubberSapling", 1L),
+            GTOreDictUnificator.get(OrePrefixes.dust, Materials.RawRubber, 1L));
+        addExtractionRecipe(
+            getIC2Item("rubberLeaves", 16L),
+            GTOreDictUnificator.get(OrePrefixes.dust, Materials.RawRubber, 1L));
 
-            GT_ModHandler.addExtractionRecipe(
-                    getModItem(GT_MachineRecipeLoader.aTextEBXL, "flower2", 1, 7),
-                    getModItem(GT_MachineRecipeLoader.aTextEBXL, "extrabiomes.dye", 1, 0));
-            GT_ModHandler.addExtractionRecipe(
-                    getModItem(GT_MachineRecipeLoader.aTextEBXL, "flower3", 1, 1),
-                    getModItem(GT_MachineRecipeLoader.aTextEBXL, "extrabiomes.dye", 1, 1));
-            GT_ModHandler.addExtractionRecipe(
-                    getModItem(GT_MachineRecipeLoader.aTextEBXL, "flower3", 1, 12),
-                    getModItem(GT_MachineRecipeLoader.aTextEBXL, "extrabiomes.dye", 1, 1));
-            GT_ModHandler.addExtractionRecipe(
-                    getModItem(GT_MachineRecipeLoader.aTextEBXL, "flower2", 1, 4),
-                    getModItem(GT_MachineRecipeLoader.aTextEBXL, "extrabiomes.dye", 1, 1));
-            GT_ModHandler.addExtractionRecipe(
-                    getModItem(GT_MachineRecipeLoader.aTextEBXL, "flower1", 1, 6),
-                    getModItem(GT_MachineRecipeLoader.aTextEBXL, "extrabiomes.dye", 1, 2));
-            GT_ModHandler.addExtractionRecipe(
-                    getModItem(GT_MachineRecipeLoader.aTextEBXL, "flower2", 1, 8),
-                    getModItem(GT_MachineRecipeLoader.aTextEBXL, "extrabiomes.dye", 1, 3));
-            GT_ModHandler.addExtractionRecipe(
-                    getModItem(GT_MachineRecipeLoader.aTextEBXL, "flower2", 1, 3),
-                    getModItem(GT_MachineRecipeLoader.aTextEBXL, "extrabiomes.dye", 1, 3));
-        }
+        addExtractionRecipe(ItemList.Cell_Air.get(1L), ItemList.Cell_Empty.get(1L));
+        addExtractionRecipe(getIC2Item("filledTinCan", 1), getIC2Item("tinCan", 1));
+        addExtractionRecipe(new ItemStack(Blocks.clay, 1), new ItemStack(Items.clay_ball, 4));
+        addExtractionRecipe(new ItemStack(Blocks.brick_block, 1), new ItemStack(Items.brick, 4));
+        addExtractionRecipe(new ItemStack(Blocks.nether_brick, 1), new ItemStack(Items.netherbrick, 4));
+        addExtractionRecipe(new ItemStack(Blocks.snow, 1), new ItemStack(Items.snowball, 4));
+        addExtractionRecipe(ItemList.Cell_Water.get(1), getIC2Item("hydratingCell", 1));
+
+        GTValues.RA.stdBuilder()
+            .itemInputs(ItemList.Battery_SU_LV_SulfuricAcid.get(1L))
+            .itemOutputs(ItemList.Battery_Hull_LV.get(1L))
+            .duration(15 * SECONDS)
+            .eut(2)
+            .addTo(extractorRecipes);
+        GTValues.RA.stdBuilder()
+            .itemInputs(ItemList.Battery_SU_LV_Mercury.get(1L))
+            .itemOutputs(ItemList.Battery_Hull_LV.get(1L))
+            .duration(15 * SECONDS)
+            .eut(2)
+            .addTo(extractorRecipes);
+        GTValues.RA.stdBuilder()
+            .itemInputs(ItemList.Battery_SU_MV_SulfuricAcid.get(1L))
+            .itemOutputs(ItemList.Battery_Hull_MV.get(1L))
+            .duration(15 * SECONDS)
+            .eut(2)
+            .addTo(extractorRecipes);
+        GTValues.RA.stdBuilder()
+            .itemInputs(ItemList.Battery_SU_MV_Mercury.get(1L))
+            .itemOutputs(ItemList.Battery_Hull_MV.get(1L))
+            .duration(15 * SECONDS)
+            .eut(2)
+            .addTo(extractorRecipes);
+        GTValues.RA.stdBuilder()
+            .itemInputs(ItemList.Battery_SU_HV_SulfuricAcid.get(1L))
+            .itemOutputs(ItemList.Battery_Hull_HV.get(1L))
+            .duration(15 * SECONDS)
+            .eut(2)
+            .addTo(extractorRecipes);
+        GTValues.RA.stdBuilder()
+            .itemInputs(ItemList.Battery_SU_HV_Mercury.get(1L))
+            .itemOutputs(ItemList.Battery_Hull_HV.get(1L))
+            .duration(15 * SECONDS)
+            .eut(2)
+            .addTo(extractorRecipes);
+        GTValues.RA.stdBuilder()
+            .itemInputs(ItemList.Battery_RE_LV_Cadmium.get(1L))
+            .itemOutputs(ItemList.Battery_Hull_LV.get(1L))
+            .duration(15 * SECONDS)
+            .eut(2)
+            .addTo(extractorRecipes);
+        GTValues.RA.stdBuilder()
+            .itemInputs(ItemList.Battery_RE_LV_Lithium.get(1L))
+            .itemOutputs(ItemList.Battery_Hull_LV.get(1L))
+            .duration(15 * SECONDS)
+            .eut(2)
+            .addTo(extractorRecipes);
+        GTValues.RA.stdBuilder()
+            .itemInputs(ItemList.Battery_RE_LV_Sodium.get(1L))
+            .itemOutputs(ItemList.Battery_Hull_LV.get(1L))
+            .duration(15 * SECONDS)
+            .eut(2)
+            .addTo(extractorRecipes);
+        GTValues.RA.stdBuilder()
+            .itemInputs(ItemList.Battery_RE_MV_Cadmium.get(1L))
+            .itemOutputs(ItemList.Battery_Hull_MV.get(1L))
+            .duration(15 * SECONDS)
+            .eut(2)
+            .addTo(extractorRecipes);
+        GTValues.RA.stdBuilder()
+            .itemInputs(ItemList.Battery_RE_MV_Lithium.get(1L))
+            .itemOutputs(ItemList.Battery_Hull_MV.get(1L))
+            .duration(15 * SECONDS)
+            .eut(2)
+            .addTo(extractorRecipes);
+        GTValues.RA.stdBuilder()
+            .itemInputs(ItemList.Battery_RE_MV_Sodium.get(1L))
+            .itemOutputs(ItemList.Battery_Hull_MV.get(1L))
+            .duration(15 * SECONDS)
+            .eut(2)
+            .addTo(extractorRecipes);
+        GTValues.RA.stdBuilder()
+            .itemInputs(ItemList.Battery_RE_HV_Cadmium.get(1L))
+            .itemOutputs(ItemList.Battery_Hull_HV.get(1L))
+            .duration(15 * SECONDS)
+            .eut(2)
+            .addTo(extractorRecipes);
+        GTValues.RA.stdBuilder()
+            .itemInputs(ItemList.Battery_RE_HV_Lithium.get(1L))
+            .itemOutputs(ItemList.Battery_Hull_HV.get(1L))
+            .duration(15 * SECONDS)
+            .eut(2)
+            .addTo(extractorRecipes);
+        GTValues.RA.stdBuilder()
+            .itemInputs(ItemList.Battery_RE_HV_Sodium.get(1L))
+            .itemOutputs(ItemList.Battery_Hull_HV.get(1L))
+            .duration(15 * SECONDS)
+            .eut(2)
+            .addTo(extractorRecipes);
+
+        GTValues.RA.stdBuilder()
+            .itemInputs(ItemList.BatteryHull_EV_Full.get(1L))
+            .itemOutputs(ItemList.BatteryHull_EV.get(1L))
+            .duration(15 * SECONDS)
+            .eut(2)
+            .addTo(extractorRecipes);
+        GTValues.RA.stdBuilder()
+            .itemInputs(ItemList.BatteryHull_IV_Full.get(1L))
+            .itemOutputs(ItemList.BatteryHull_IV.get(1L))
+            .duration(15 * SECONDS)
+            .eut(2)
+            .addTo(extractorRecipes);
+        GTValues.RA.stdBuilder()
+            .itemInputs(ItemList.BatteryHull_LuV_Full.get(1L))
+            .itemOutputs(ItemList.BatteryHull_LuV.get(1L))
+            .duration(15 * SECONDS)
+            .eut(2)
+            .addTo(extractorRecipes);
+        GTValues.RA.stdBuilder()
+            .itemInputs(ItemList.BatteryHull_ZPM_Full.get(1L))
+            .itemOutputs(ItemList.BatteryHull_ZPM.get(1L))
+            .duration(15 * SECONDS)
+            .eut(2)
+            .addTo(extractorRecipes);
+        GTValues.RA.stdBuilder()
+            .itemInputs(ItemList.BatteryHull_UV_Full.get(1L))
+            .itemOutputs(ItemList.BatteryHull_UV.get(1L))
+            .duration(15 * SECONDS)
+            .eut(2)
+            .addTo(extractorRecipes);
+        GTValues.RA.stdBuilder()
+            .itemInputs(ItemList.BatteryHull_UHV_Full.get(1L))
+            .itemOutputs(ItemList.BatteryHull_UHV.get(1L))
+            .duration(15 * SECONDS)
+            .eut(2)
+            .addTo(extractorRecipes);
+        GTValues.RA.stdBuilder()
+            .itemInputs(ItemList.BatteryHull_UEV_Full.get(1L))
+            .itemOutputs(ItemList.BatteryHull_UEV.get(1L))
+            .duration(15 * SECONDS)
+            .eut(2)
+            .addTo(extractorRecipes);
+        GTValues.RA.stdBuilder()
+            .itemInputs(ItemList.BatteryHull_UIV_Full.get(1L))
+            .itemOutputs(ItemList.BatteryHull_UIV.get(1L))
+            .duration(15 * SECONDS)
+            .eut(2)
+            .addTo(extractorRecipes);
+        GTValues.RA.stdBuilder()
+            .itemInputs(ItemList.BatteryHull_UMV_Full.get(1L))
+            .itemOutputs(ItemList.BatteryHull_UMV.get(1L))
+            .duration(15 * SECONDS)
+            .eut(2)
+            .addTo(extractorRecipes);
+        GTValues.RA.stdBuilder()
+            .itemInputs(ItemList.BatteryHull_UxV_Full.get(1L))
+            .itemOutputs(ItemList.BatteryHull_UxV.get(1L))
+            .duration(15 * SECONDS)
+            .eut(2)
+            .addTo(extractorRecipes);
+    }
+
+    public void addExtractionRecipe(ItemStack input, ItemStack output) {
+        output = GTOreDictUnificator.get(true, output);
+        GTValues.RA.stdBuilder()
+            .itemInputs(input)
+            .itemOutputs(output)
+            .duration(15 * SECONDS)
+            .eut(2)
+            .addTo(extractorRecipes);
     }
 }

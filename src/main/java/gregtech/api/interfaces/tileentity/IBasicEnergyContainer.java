@@ -1,19 +1,21 @@
 package gregtech.api.interfaces.tileentity;
 
+import net.minecraftforge.common.util.ForgeDirection;
+
 /**
  * Interface for internal Code, which is mainly used for independent Energy conversion.
  */
-public interface IBasicEnergyContainer extends IEnergyConnected {
+public interface IBasicEnergyContainer extends IEnergyConnected, IHasWorldObjectAndCoords {
+
     /**
-     * Gets if that Amount of Energy is stored inside the Machine.
-     * It is used for checking the contained Energy before consuming it.
-     * If this returns false, it will also give a Message inside the Scanner, that this Machine doesn't have enough Energy.
+     * Gets if that Amount of Energy is stored inside the Machine. It is used for checking the contained Energy before
+     * consuming it. If this returns false, it will also give a Message inside the Scanner, that this Machine doesn't
+     * have enough Energy.
      */
     boolean isUniversalEnergyStored(long aEnergyAmount);
 
     /**
-     * Gets the stored electric, kinetic or steam Energy (with EU as reference Value)
-     * Always returns the largest one.
+     * Gets the stored electric, kinetic or steam Energy (with EU as reference Value) Always returns the largest one.
      */
     long getUniversalEnergyStored();
 
@@ -43,19 +45,21 @@ public interface IBasicEnergyContainer extends IEnergyConnected {
     long getInputVoltage();
 
     /**
-     * Decreases the Amount of stored universal Energy. If ignoring too less Energy, then it just sets the Energy to 0 and returns false.
+     * Decreases the Amount of stored universal Energy. If ignoring too less Energy, then it just sets the Energy to 0
+     * and returns false.
      */
     boolean decreaseStoredEnergyUnits(long aEnergy, boolean aIgnoreTooLessEnergy);
 
     /**
-     * Increases the Amount of stored electric Energy. If ignoring too much Energy, then the Energy Limit is just being ignored.
+     * Increases the Amount of stored electric Energy. If ignoring too much Energy, then the Energy Limit is just being
+     * ignored.
      */
     boolean increaseStoredEnergyUnits(long aEnergy, boolean aIgnoreTooMuchEnergy);
 
     /**
      * Drain Energy Call for Electricity.
      */
-    boolean drainEnergyUnits(byte aSide, long aVoltage, long aAmperage);
+    boolean drainEnergyUnits(ForgeDirection side, long aVoltage, long aAmperage);
 
     /**
      * returns the amount of Electricity, accepted by this Block the last 5 ticks as Average.
@@ -97,8 +101,8 @@ public interface IBasicEnergyContainer extends IEnergyConnected {
      * @param aEnergy              The Energy to add to the Machine.
      * @param aIgnoreTooMuchEnergy if it shall ignore if it has too much Energy.
      * @return if it was successful
-     * <p/>
-     * And yes, you can't directly decrease the Steam of a Machine. That is done by decreaseStoredEnergyUnits
+     *         <p/>
+     *         And yes, you can't directly decrease the Steam of a Machine. That is done by decreaseStoredEnergyUnits
      */
     default boolean increaseStoredSteam(long aEnergy, boolean aIgnoreTooMuchEnergy) {
         return false;

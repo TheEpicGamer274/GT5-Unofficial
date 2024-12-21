@@ -4,10 +4,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
+
 /**
  * This is some kind of Periodic Table, which I use to determine Properties of the Materials.
  */
 public enum Element {
+
     _NULL(0, 0, 0, -1, null, "", false),
     H(1, 0, 0, -1, null, "Hydrogen", false),
     D(1, 1, 0, -1, "H", "Deuterium", true),
@@ -276,7 +279,6 @@ public enum Element {
     $Nq(-130, -200, 0, -1, null, "Anti-Naquadah", false),
     $Nt(0, -10000, 0, -1, null, "Anti-Neutronium", false);
 
-    public static volatile int VERSION = 509;
     public final long mProtons, mNeutrons, mAdditionalMass, mHalfLifeSeconds;
     public final String mName, mDecayTo;
     public final boolean mIsIsotope;
@@ -284,23 +286,19 @@ public enum Element {
     /**
      * Links to every pure Material containing just this Element.
      */
+    // bartworks.system.material.werkstoff_loaders.registration.BridgeMaterialsLoader reassigns it, so no final here
     public ArrayList<Materials> mLinkedMaterials = new ArrayList<>();
 
     /**
      * @param aProtons         Amount of Protons. Antiprotons if negative.
-     * @param aNeutrons        Amount of Neutrons. Antineutrons if negative. (I could have made mistakes with the Neutron amount calculation, please tell me if I did something wrong)
+     * @param aNeutrons        Amount of Neutrons. Antineutrons if negative. (I could have made mistakes with the
+     *                         Neutron amount calculation, please tell me if I did something wrong)
      * @param aHalfLifeSeconds Amount of Half Life this Material has in Seconds. -1 for stable Materials.
      * @param aDecayTo         String representing the Elements it decays to. Separated by an '&' Character.
      * @param aName            Name of the Element
      */
-    Element(
-            long aProtons,
-            long aNeutrons,
-            long aAdditionalMass,
-            long aHalfLifeSeconds,
-            String aDecayTo,
-            String aName,
-            boolean aIsIsotope) {
+    Element(long aProtons, long aNeutrons, long aAdditionalMass, long aHalfLifeSeconds, String aDecayTo, String aName,
+        boolean aIsIsotope) {
         mProtons = aProtons;
         mNeutrons = aNeutrons;
         mAdditionalMass = aAdditionalMass;
@@ -311,6 +309,7 @@ public enum Element {
         Companion.VALUES.put(name(), this);
     }
 
+    @Nonnull
     public static Element get(String aMaterialName) {
         return Companion.VALUES.getOrDefault(aMaterialName, _NULL);
     }
@@ -331,6 +330,7 @@ public enum Element {
      * A companion object to workaround java limitations
      */
     private static final class Companion {
+
         /**
          * Why is this a separate map and populated by enum constructor instead of a Map prepoluated with values()?
          * Because apparently there are people hacking into this enum via EnumHelper.

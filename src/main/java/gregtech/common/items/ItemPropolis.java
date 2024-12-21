@@ -1,18 +1,14 @@
 package gregtech.common.items;
 
-import static gregtech.api.enums.GT_Values.MOD_ID;
-import static gregtech.api.enums.GT_Values.MOD_ID_DC;
+import static gregtech.api.enums.Mods.GregTech;
+import static gregtech.api.enums.Mods.HardcoreEnderExpansion;
+import static gregtech.api.enums.Mods.NewHorizonsCoreMod;
+import static gregtech.api.recipe.RecipeMaps.fluidExtractionRecipes;
+import static gregtech.api.util.GTRecipeBuilder.SECONDS;
+import static gregtech.api.util.GTRecipeBuilder.TICKS;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import forestry.api.core.Tabs;
-import gregtech.api.enums.GT_Values;
-import gregtech.api.enums.Materials;
-import gregtech.api.enums.OrePrefixes;
-import gregtech.api.util.GT_ModHandler;
-import gregtech.api.util.GT_OreDictUnificator;
 import java.util.List;
+
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
@@ -20,7 +16,19 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.fluids.FluidRegistry;
 
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import forestry.api.core.Tabs;
+import gregtech.api.enums.GTValues;
+import gregtech.api.enums.Materials;
+import gregtech.api.enums.OrePrefixes;
+import gregtech.api.enums.TierEU;
+import gregtech.api.util.GTModHandler;
+import gregtech.api.util.GTOreDictUnificator;
+
 public class ItemPropolis extends Item {
+
     @SideOnly(Side.CLIENT)
     private IIcon secondIcon;
 
@@ -29,7 +37,7 @@ public class ItemPropolis extends Item {
         this.setCreativeTab(Tabs.tabApiculture);
         this.setHasSubtypes(true);
         this.setUnlocalizedName("gt.propolis");
-        GameRegistry.registerItem(this, "gt.propolis", MOD_ID);
+        GameRegistry.registerItem(this, "gt.propolis", GregTech.ID);
     }
 
     public ItemStack getStackForType(PropolisType type) {
@@ -42,7 +50,7 @@ public class ItemPropolis extends Item {
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void getSubItems(Item item, CreativeTabs tabs, List list) {
+    public void getSubItems(Item item, CreativeTabs tabs, List<ItemStack> list) {
         for (PropolisType type : PropolisType.values()) {
             if (type.showInList) {
                 list.add(this.getStackForType(type));
@@ -77,39 +85,57 @@ public class ItemPropolis extends Item {
         ItemStack tPropolis;
 
         tPropolis = getStackForType(PropolisType.End);
-        addProcessHV(tPropolis, GT_ModHandler.getModItem("HardcoreEnderExpansion", "end_powder", 1, 0));
+        addProcessHV(tPropolis, GTModHandler.getModItem(HardcoreEnderExpansion.ID, "end_powder", 1, 0));
         tPropolis = getStackForType(PropolisType.Stardust);
-        addProcessHV(tPropolis, GT_ModHandler.getModItem("HardcoreEnderExpansion", "stardust", 1, 0));
+        addProcessHV(tPropolis, GTModHandler.getModItem(HardcoreEnderExpansion.ID, "stardust", 1, 0));
         tPropolis = getStackForType(PropolisType.Ectoplasma);
-        addProcessEV(tPropolis, GT_ModHandler.getModItem(MOD_ID_DC, "item.EctoplasmaChip", 1, 0));
+        addProcessEV(tPropolis, GTModHandler.getModItem(NewHorizonsCoreMod.ID, "item.EctoplasmaChip", 1, 0));
         tPropolis = getStackForType(PropolisType.Arcaneshard);
-        addProcessEV(tPropolis, GT_ModHandler.getModItem(MOD_ID_DC, "item.ArcaneShardChip", 1, 0));
+        addProcessEV(tPropolis, GTModHandler.getModItem(NewHorizonsCoreMod.ID, "item.ArcaneShardChip", 1, 0));
         tPropolis = getStackForType(PropolisType.Dragonessence);
-        addProcessIV(tPropolis, GT_ModHandler.getModItem("HardcoreEnderExpansion", "essence", 16, 0));
+        addProcessIV(tPropolis, GTModHandler.getModItem(HardcoreEnderExpansion.ID, "essence", 16, 0));
         tPropolis = getStackForType(PropolisType.Enderman);
-        addProcessIV(tPropolis, GT_ModHandler.getModItem("HardcoreEnderExpansion", "enderman_head", 1, 0));
+        addProcessIV(tPropolis, GTModHandler.getModItem(HardcoreEnderExpansion.ID, "enderman_head", 1, 0));
         tPropolis = getStackForType(PropolisType.Silverfish);
-        addProcessEV(tPropolis, GT_ModHandler.getModItem("HardcoreEnderExpansion", "silverfish_blood", 1, 0));
+        addProcessEV(tPropolis, GTModHandler.getModItem(HardcoreEnderExpansion.ID, "silverfish_blood", 1, 0));
         tPropolis = getStackForType(PropolisType.Endium);
-        addProcessHV(tPropolis, GT_OreDictUnificator.get(OrePrefixes.dustSmall, Materials.HeeEndium, 1));
+        addProcessHV(tPropolis, GTOreDictUnificator.get(OrePrefixes.dustSmall, Materials.HeeEndium, 1));
         tPropolis = getStackForType(PropolisType.Fireessence);
-        addProcessIV(tPropolis, GT_ModHandler.getModItem("HardcoreEnderExpansion", "essence", 16, 1));
+        addProcessIV(tPropolis, GTModHandler.getModItem(HardcoreEnderExpansion.ID, "essence", 16, 1));
 
         // addRecipe(tDrop, aOutput, aOutput2, aChance, aDuration, aEUt);
     }
 
     public void addProcessHV(ItemStack tPropolis, ItemStack aOutput2) {
-        GT_Values.RA.addFluidExtractionRecipe(
-                tPropolis, aOutput2, FluidRegistry.getFluidStack("endergoo", 100), 5000, 50, 480);
+        GTValues.RA.stdBuilder()
+            .itemInputs(tPropolis)
+            .itemOutputs(aOutput2)
+            .outputChances(5000)
+            .fluidOutputs(FluidRegistry.getFluidStack("endergoo", 100))
+            .duration(2 * SECONDS + 10 * TICKS)
+            .eut(TierEU.RECIPE_HV)
+            .addTo(fluidExtractionRecipes);
     }
 
     public void addProcessEV(ItemStack tPropolis, ItemStack aOutput2) {
-        GT_Values.RA.addFluidExtractionRecipe(
-                tPropolis, aOutput2, FluidRegistry.getFluidStack("endergoo", 200), 2500, 100, 1920);
+        GTValues.RA.stdBuilder()
+            .itemInputs(tPropolis)
+            .itemOutputs(aOutput2)
+            .outputChances(2500)
+            .fluidOutputs(FluidRegistry.getFluidStack("endergoo", 200))
+            .duration(5 * SECONDS)
+            .eut(TierEU.RECIPE_EV)
+            .addTo(fluidExtractionRecipes);
     }
 
     public void addProcessIV(ItemStack tPropolis, ItemStack aOutput2) {
-        GT_Values.RA.addFluidExtractionRecipe(
-                tPropolis, aOutput2, FluidRegistry.getFluidStack("endergoo", 300), 1500, 150, 7680);
+        GTValues.RA.stdBuilder()
+            .itemInputs(tPropolis)
+            .itemOutputs(aOutput2)
+            .outputChances(1500)
+            .fluidOutputs(FluidRegistry.getFluidStack("endergoo", 300))
+            .duration(7 * SECONDS + 10 * TICKS)
+            .eut(TierEU.RECIPE_IV)
+            .addTo(fluidExtractionRecipes);
     }
 }

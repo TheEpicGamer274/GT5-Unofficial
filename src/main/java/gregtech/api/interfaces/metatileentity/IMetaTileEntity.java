@@ -1,6 +1,30 @@
 package gregtech.api.interfaces.metatileentity;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Nullable;
+
+import net.minecraft.block.Block;
+import net.minecraft.client.renderer.RenderBlocks;
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.ISidedInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraftforge.fluids.IFluidHandler;
+import net.minecraftforge.fluids.IFluidTank;
+
 import com.gtnewhorizons.modularui.api.forge.ItemStackHandler;
+
+import appeng.api.crafting.ICraftingIconProvider;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import gregtech.api.enums.Dyes;
@@ -10,59 +34,28 @@ import gregtech.api.interfaces.tileentity.IGearEnergyTileEntity;
 import gregtech.api.interfaces.tileentity.IGregTechTileEntity;
 import gregtech.api.interfaces.tileentity.IGregtechWailaProvider;
 import gregtech.api.interfaces.tileentity.IMachineBlockUpdateable;
-import gregtech.api.objects.GT_ItemStack;
-import gregtech.api.util.GT_Config;
-import gregtech.api.util.GT_Util;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import net.minecraft.block.Block;
-import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
-import net.minecraftforge.fluids.IFluidHandler;
-import net.minecraftforge.fluids.IFluidTank;
+import gregtech.api.objects.GTItemStack;
+import gregtech.api.util.GTUtil;
 
 /**
- * Warning, this Interface has just been made to be able to add multiple kinds of MetaTileEntities (Cables, Pipes, Transformers, but not the regular Blocks)
+ * Warning, this Interface has just been made to be able to add multiple kinds of MetaTileEntities (Cables, Pipes,
+ * Transformers, but not the regular Blocks)
  * <p/>
  * Don't implement this yourself and expect it to work. Extend @MetaTileEntity itself.
  */
-public interface IMetaTileEntity
-        extends ISidedInventory,
-                IFluidTank,
-                IFluidHandler,
-                IGearEnergyTileEntity,
-                IMachineBlockUpdateable,
-                IGregtechWailaProvider,
-                IGetGUITextureSet {
+public interface IMetaTileEntity extends ISidedInventory, IFluidTank, IFluidHandler, IGearEnergyTileEntity,
+    IMachineBlockUpdateable, IGregtechWailaProvider, IGetGUITextureSet, ICraftingIconProvider {
+
     /**
      * This determines the BaseMetaTileEntity belonging to this MetaTileEntity by using the Meta ID of the Block itself.
      * <p/>
-     * 0 = BaseMetaTileEntity, Wrench lvl 0 to dismantle
-     * 1 = BaseMetaTileEntity, Wrench lvl 1 to dismantle
-     * 2 = BaseMetaTileEntity, Wrench lvl 2 to dismantle
-     * 3 = BaseMetaTileEntity, Wrench lvl 3 to dismantle
-     * 4 = BaseMetaPipeEntity, Wrench lvl 0 to dismantle
-     * 5 = BaseMetaPipeEntity, Wrench lvl 1 to dismantle
-     * 6 = BaseMetaPipeEntity, Wrench lvl 2 to dismantle
-     * 7 = BaseMetaPipeEntity, Wrench lvl 3 to dismantle
-     * 8 = BaseMetaPipeEntity, Cutter lvl 0 to dismantle
-     * 9 = BaseMetaPipeEntity, Cutter lvl 1 to dismantle
-     * 10 = BaseMetaPipeEntity, Cutter lvl 2 to dismantle
-     * 11 = BaseMetaPipeEntity, Cutter lvl 3 to dismantle
-     * 12 = GT++
-     * 13 = GT++
-     * 14 = GT++
-     * 15 = GT++
+     * 0 = BaseMetaTileEntity, Wrench lvl 0 to dismantle 1 = BaseMetaTileEntity, Wrench lvl 1 to dismantle 2 =
+     * BaseMetaTileEntity, Wrench lvl 2 to dismantle 3 = BaseMetaTileEntity, Wrench lvl 3 to dismantle 4 =
+     * BaseMetaPipeEntity, Wrench lvl 0 to dismantle 5 = BaseMetaPipeEntity, Wrench lvl 1 to dismantle 6 =
+     * BaseMetaPipeEntity, Wrench lvl 2 to dismantle 7 = BaseMetaPipeEntity, Wrench lvl 3 to dismantle 8 =
+     * BaseMetaPipeEntity, Cutter lvl 0 to dismantle 9 = BaseMetaPipeEntity, Cutter lvl 1 to dismantle 10 =
+     * BaseMetaPipeEntity, Cutter lvl 2 to dismantle 11 = BaseMetaPipeEntity, Cutter lvl 3 to dismantle 12 = GT++ 13 =
+     * GT++ 14 = GT++ 15 = GT++
      */
     byte getTileEntityBaseType();
 
@@ -103,8 +96,8 @@ public interface IMetaTileEntity
     void loadNBTData(NBTTagCompound aNBT);
 
     /**
-     * Adds the NBT-Information to the ItemStack, when being dismanteled properly
-     * Used to store Machine specific Upgrade Data.
+     * Adds the NBT-Information to the ItemStack, when being dismanteled properly Used to store Machine specific Upgrade
+     * Data.
      */
     void setItemNBT(NBTTagCompound aNBT);
 
@@ -114,7 +107,8 @@ public interface IMetaTileEntity
     void onServerStart();
 
     /**
-     * Called in the registered MetaTileEntity when the Server ticks a World the first time, to load things from the World Save
+     * Called in the registered MetaTileEntity when the Server ticks a World the first time, to load things from the
+     * World Save
      */
     void onWorldLoad(File aSaveDirectory);
 
@@ -124,37 +118,40 @@ public interface IMetaTileEntity
     void onWorldSave(File aSaveDirectory);
 
     /**
-     * Called to set Configuration values for this MetaTileEntity.
-     * Use aConfig.get(ConfigCategories.machineconfig, "MetaTileEntityName.Ability", DEFAULT_VALUE); to set the Values.
+     * Called to set Configuration values for this MetaTileEntity. Use aConfig.get(ConfigCategories.machineconfig,
+     * "MetaTileEntityName.Ability", DEFAULT_VALUE); to set the Values.
      */
-    void onConfigLoad(GT_Config aConfig);
+    void onConfigLoad();
 
     /**
-     * If a Cover of that Type can be placed on this Side.
-     * Also Called when the Facing of the Block Changes and a Cover is on said Side.
+     * If a Cover of that Type can be placed on this Side. Also Called when the Facing of the Block Changes and a Cover
+     * is on said Side.
      */
-    boolean allowCoverOnSide(byte aSide, GT_ItemStack aStack);
+    boolean allowCoverOnSide(ForgeDirection side, GTItemStack aStack);
 
     /**
-     * When a Player rightclicks the Facing with a Screwdriver.
+     * When a Player right-clicks the Facing with a Screwdriver.
      */
-    void onScrewdriverRightClick(byte aSide, EntityPlayer aPlayer, float aX, float aY, float aZ);
+    void onScrewdriverRightClick(ForgeDirection side, EntityPlayer aPlayer, float aX, float aY, float aZ,
+        ItemStack aTool);
 
     /**
-     * When a Player rightclicks the Facing with a Wrench.
+     * When a Player right-clicks the Facing with a Wrench.
      */
-    boolean onWrenchRightClick(byte aSide, byte aWrenchingSide, EntityPlayer aPlayer, float aX, float aY, float aZ);
+    boolean onWrenchRightClick(ForgeDirection side, ForgeDirection wrenchingSide, EntityPlayer entityPlayer, float aX,
+        float aY, float aZ, ItemStack aTool);
 
     /**
-     * When a Player rightclicks the Facing with a wire cutter.
+     * When a Player right-clicks the Facing with a wire cutter.
      */
-    boolean onWireCutterRightClick(byte aSide, byte aWrenchingSide, EntityPlayer aPlayer, float aX, float aY, float aZ);
+    boolean onWireCutterRightClick(ForgeDirection side, ForgeDirection wrenchingSide, EntityPlayer entityPlayer,
+        float aX, float aY, float aZ, ItemStack aTool);
 
     /**
-     * When a Player rightclicks the Facing with a soldering iron.
+     * When a Player right-clicks the Facing with a soldering iron.
      */
-    boolean onSolderingToolRightClick(
-            byte aSide, byte aWrenchingSide, EntityPlayer aPlayer, float aX, float aY, float aZ);
+    boolean onSolderingToolRightClick(ForgeDirection side, ForgeDirection wrenchingSide, EntityPlayer entityPlayer,
+        float aX, float aY, float aZ, ItemStack aTool);
 
     /**
      * Called right before this Machine explodes
@@ -167,21 +164,19 @@ public interface IMetaTileEntity
     void onFirstTick(IGregTechTileEntity aBaseMetaTileEntity);
 
     /**
-     * The Tick before all the generic handling happens, what gives a slightly faster reaction speed.
-     * Don't use this if you really don't need to. @onPostTick is better suited for ticks.
-     * This happens still after the Cover handling.
+     * The Tick before all the generic handling happens, what gives a slightly faster reaction speed. Don't use this if
+     * you really don't need to. @onPostTick is better suited for ticks. This happens still after the Cover handling.
      */
     void onPreTick(IGregTechTileEntity aBaseMetaTileEntity, long aTick);
 
     /**
-     * The Tick after all the generic handling happened.
-     * Recommended to use this like updateEntity.
+     * The Tick after all the generic handling happened. Recommended to use this like updateEntity.
      */
     void onPostTick(IGregTechTileEntity aBaseMetaTileEntity, long aTick);
 
     /**
-     * Called when this MetaTileEntity gets (intentionally) disconnected from the BaseMetaTileEntity.
-     * Doesn't get called when this thing is moved by Frames or similar hacks.
+     * Called when this MetaTileEntity gets (intentionally) disconnected from the BaseMetaTileEntity. Doesn't get called
+     * when this thing is moved by Frames or similar hacks.
      */
     void inValidate();
 
@@ -191,52 +186,34 @@ public interface IMetaTileEntity
     void onRemoval();
 
     /**
-     * @param aFacing
+     * Called when the BaseMetaTileEntity gets unloaded (chunk or world)
+     */
+    default void onUnload() {}
+
+    /**
+     * @param facing the facing direction to check
      * @return if aFacing would be a valid Facing for this Device. Used for wrenching.
      */
-    boolean isFacingValid(byte aFacing);
-
-    /**
-     * @return the Server Side Container
-     * @deprecated Use ModularUI
-     */
-    @Deprecated
-    default Object getServerGUI(int aID, InventoryPlayer aPlayerInventory, IGregTechTileEntity aBaseMetaTileEntity) {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * @return the Client Side GUI Container
-     * @deprecated Use ModularUI
-     */
-    @Deprecated
-    default Object getClientGUI(int aID, InventoryPlayer aPlayerInventory, IGregTechTileEntity aBaseMetaTileEntity) {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * For back compatibility, you need to override this if this MetaTileEntity uses ModularUI.
-     */
-    default boolean useModularUI() {
-        return false;
-    }
+    boolean isFacingValid(ForgeDirection facing);
 
     /**
      * From new ISidedInventory
      */
-    boolean allowPullStack(IGregTechTileEntity aBaseMetaTileEntity, int aIndex, byte aSide, ItemStack aStack);
+    boolean allowPullStack(IGregTechTileEntity aBaseMetaTileEntity, int aIndex, ForgeDirection side, ItemStack aStack);
 
     /**
      * From new ISidedInventory
      */
-    boolean allowPutStack(IGregTechTileEntity aBaseMetaTileEntity, int aIndex, byte aSide, ItemStack aStack);
+    boolean allowPutStack(IGregTechTileEntity aBaseMetaTileEntity, int aIndex, ForgeDirection side, ItemStack aStack);
 
     /**
-     * @return if aIndex is a valid Slot. false for things like HoloSlots. Is used for determining if an Item is dropped upon Block destruction and for Inventory Access Management
+     * @return if aIndex is a valid Slot. false for things like HoloSlots. Is used for determining if an Item is dropped
+     *         upon Block destruction and for Inventory Access Management
      */
     boolean isValidSlot(int aIndex);
 
-    /** Check if the item at the specified index should be dropped
+    /**
+     * Check if the item at the specified index should be dropped
      *
      * @param index Index that will be checked
      * @return True if the item at the index should be dropped, else false
@@ -251,12 +228,12 @@ public interface IMetaTileEntity
     /**
      * If this Side can connect to inputting pipes
      */
-    boolean isLiquidInput(byte aSide);
+    boolean isLiquidInput(ForgeDirection side);
 
     /**
      * If this Side can connect to outputting pipes
      */
-    boolean isLiquidOutput(byte aSide);
+    boolean isLiquidOutput(ForgeDirection side);
 
     /**
      * Just an Accessor for the Name variable.
@@ -269,17 +246,15 @@ public interface IMetaTileEntity
     boolean isAccessAllowed(EntityPlayer aPlayer);
 
     /**
-     * a Player rightclicks the Machine
-     * Sneaky rightclicks are not getting passed to this!
+     * a Player right-clicks the Machine Sneaky right clicks are not getting passed to this!
      *
-     * @return
+     * @return mostly {@code false}. Probably is left for compatibility.
      */
-    boolean onRightclick(
-            IGregTechTileEntity aBaseMetaTileEntity, EntityPlayer aPlayer, byte aSide, float aX, float aY, float aZ);
+    boolean onRightclick(IGregTechTileEntity aBaseMetaTileEntity, EntityPlayer aPlayer, ForgeDirection side, float aX,
+        float aY, float aZ);
 
     /**
-     * a Player leftclicks the Machine
-     * Sneaky leftclicks are getting passed to this unlike with the rightclicks.
+     * a Player leftclicks the Machine Sneaky leftclicks are getting passed to this unlike with the rightclicks.
      */
     void onLeftclick(IGregTechTileEntity aBaseMetaTileEntity, EntityPlayer aPlayer);
 
@@ -289,11 +264,12 @@ public interface IMetaTileEntity
     void onValueUpdate(byte aValue);
 
     /**
-     * return a small bit of Data, like a secondary Facing for example with this Function, for the Client.
-     * The BaseMetaTileEntity detects changes to this Value and will then send an Update.
-     * This is only for Information, which is visible as Texture to the outside.
+     * return a small bit of Data, like a secondary Facing for example with this Function, for the Client. The
+     * BaseMetaTileEntity detects changes to this Value and will then send an Update. This is only for Information,
+     * which is visible as Texture to the outside.
      * <p/>
-     * If you just want to have an Active/Redstone State then set the Active State inside the BaseMetaTileEntity instead.
+     * If you just want to have an Active/Redstone State then set the Active State inside the BaseMetaTileEntity
+     * instead.
      */
     byte getUpdateData();
 
@@ -303,9 +279,7 @@ public interface IMetaTileEntity
     void receiveClientEvent(byte aEventID, byte aValue);
 
     /**
-     * Called to actually play the Sound.
-     * Do not insert Client/Server checks. That is already done for you.
-     * Do not use @playSoundEffect, Minecraft doesn't like that at all. Use @playSound instead.
+     * Called to actually play the sound on client side. Client/Server check is already done.
      */
     void doSound(byte aIndex, double aX, double aY, double aZ);
 
@@ -329,9 +303,9 @@ public interface IMetaTileEntity
     void sendLoopEnd(byte aIndex);
 
     /**
-     * Called when the Machine explodes, override Explosion Code here.
+     * Called when the Machine explodes. Override the Explosion code here.
      *
-     * @param aExplosionPower
+     * @param aExplosionPower explosion power
      */
     void doExplosion(long aExplosionPower);
 
@@ -343,16 +317,16 @@ public interface IMetaTileEntity
     /**
      * If there should be a Lag Warning if something laggy happens during this Tick.
      * <p/>
-     * The Advanced Pump uses this to not cause the Lag Message, while it scans for all close Fluids.
-     * The Item Pipes and Retrievers neither send this Message, when scanning for Pipes.
+     * The Advanced Pump uses this to not cause the Lag Message, while it scans for all close Fluids. The Item Pipes and
+     * Retrievers neither send this Message, when scanning for Pipes.
      */
     boolean doTickProfilingMessageDuringThisTick();
 
     /**
      * returns the DebugLog
      */
-    ArrayList<String> getSpecialDebugInfo(
-            IGregTechTileEntity aBaseMetaTileEntity, EntityPlayer aPlayer, int aLogLevel, ArrayList<String> aList);
+    ArrayList<String> getSpecialDebugInfo(IGregTechTileEntity aBaseMetaTileEntity, EntityPlayer aPlayer, int aLogLevel,
+        ArrayList<String> aList);
 
     /**
      * get a small Description
@@ -367,28 +341,21 @@ public interface IMetaTileEntity
     /**
      * Icon of the Texture. If this returns null then it falls back to getTextureIndex.
      *
-     * @param aSide       is the Side of the Block
-     * @param aFacing     is the direction the Block is facing (or a Bitmask of all Connections in case of Pipes)
-     * @param aColorIndex The Minecraft Color the Block is having
-     * @param aActive     if the Machine is currently active (use this instead of calling mBaseMetaTileEntity.mActive!!!). Note: In case of Pipes this means if this Side is connected to something or not.
-     * @param aRedstone   if the Machine is currently outputting a RedstoneSignal (use this instead of calling mBaseMetaTileEntity.mRedstone!!!)
+     * @param side          is the Side of the Block
+     * @param facing        is the direction the Block is facing
+     * @param colorIndex    The Minecraft Color the Block is having
+     * @param active        if the Machine is currently active (use this instead of calling
+     *                      {@code mBaseMetaTileEntity.mActive)}. Note: In case of Pipes this means if this Side is
+     *                      connected to something or not.
+     * @param redstoneLevel if the Machine is currently outputting a RedstoneSignal (use this instead of calling
+     *                      {@code mBaseMetaTileEntity.mRedstone} !!!)
      */
-    ITexture[] getTexture(
-            IGregTechTileEntity aBaseMetaTileEntity,
-            byte aSide,
-            byte aFacing,
-            byte aColorIndex,
-            boolean aActive,
-            boolean aRedstone);
+    ITexture[] getTexture(IGregTechTileEntity baseMetaTileEntity, ForgeDirection side, ForgeDirection facing,
+        int colorIndex, boolean active, boolean redstoneLevel);
 
     /**
-     * The Textures used for the Item rendering. Return null if you want the regular 3D Block Rendering.
-     */
-    // public ITexture[] getItemTexture(ItemStack aStack);
-
-    /**
-     * Register Icons here. This gets called when the Icons get initialized by the Base Block
-     * Best is you put your Icons in a static Array for quick and easy access without relying on the MetaTileList.
+     * Register Icons here. This gets called when the Icons get initialized by the Base Block Best is you put your Icons
+     * in a static Array for quick and easy access without relying on the MetaTileList.
      *
      * @param aBlockIconRegister The Block Icon Register
      */
@@ -410,9 +377,9 @@ public interface IMetaTileEntity
     /**
      * Gets the Output for the comparator on the given Side
      */
-    byte getComparatorValue(byte aSide);
+    byte getComparatorValue(ForgeDirection side);
 
-    float getExplosionResistance(byte aSide);
+    float getExplosionResistance(ForgeDirection side);
 
     String[] getInfoData();
 
@@ -420,7 +387,7 @@ public interface IMetaTileEntity
 
     ItemStack[] getRealInventory();
 
-    boolean connectsToItemPipe(byte aSide);
+    boolean connectsToItemPipe(ForgeDirection side);
 
     void onColorChangeServer(byte aColor);
 
@@ -433,7 +400,7 @@ public interface IMetaTileEntity
         if (getBaseMetaTileEntity() != null) {
             return getBaseMetaTileEntity().getGUIColorization();
         } else {
-            return GT_Util.getRGBInt(Dyes.MACHINE_METAL.getRGBA());
+            return GTUtil.getRGBInt(Dyes.MACHINE_METAL.getRGBA());
         }
     }
 
@@ -441,14 +408,8 @@ public interface IMetaTileEntity
 
     boolean allowGeneralRedstoneOutput();
 
-    void addCollisionBoxesToList(
-            World aWorld,
-            int aX,
-            int aY,
-            int aZ,
-            AxisAlignedBB inputAABB,
-            List<AxisAlignedBB> outputAABB,
-            Entity collider);
+    void addCollisionBoxesToList(World aWorld, int aX, int aY, int aZ, AxisAlignedBB inputAABB,
+        List<AxisAlignedBB> outputAABB, Entity collider);
 
     AxisAlignedBB getCollisionBoundingBoxFromPool(World aWorld, int aX, int aY, int aZ);
 
@@ -466,10 +427,10 @@ public interface IMetaTileEntity
     boolean shouldJoinIc2Enet();
 
     /**
-     * The Machine Update, which is called when the Machine needs an Update of its Parts.
-     * I suggest to wait 1-5 seconds before actually checking the Machine Parts.
-     * RP-Frames could for example cause Problems when you instacheck the Machine Parts.
-     *
+     * The Machine Update, which is called when the Machine needs an Update of its Parts. I suggest to wait 1-5 seconds
+     * before actually checking the Machine Parts. RP-Frames could for example cause Problems when you instacheck the
+     * Machine Parts.
+     * <p>
      * just do stuff since we are already in meta tile...
      */
     @Override
@@ -524,4 +485,28 @@ public interface IMetaTileEntity
      * Called before block is destroyed. This is before inventory dropping code has executed.
      */
     default void onBlockDestroyed() {}
+
+    /**
+     * Allows to add additional data to the tooltip, which is specific to an instance of the machine
+     *
+     * @param stack   Item stack of this MTE
+     * @param tooltip Tooltip to which can be added
+     */
+    default void addAdditionalTooltipInformation(ItemStack stack, List<String> tooltip) {}
+
+    @Override
+    default ItemStack getMachineCraftingIcon() {
+        return null;
+    }
+
+    /**
+     * Gets items to be displayed for HoloInventory mod.
+     *
+     * @return null if default implementation should be used, i.e. {@link IInventory#getStackInSlot}.
+     *         Otherwise, a list of items to be displayed. Null element may be contained.
+     */
+    @Nullable
+    default List<ItemStack> getItemsForHoloGlasses() {
+        return null;
+    }
 }

@@ -1,6 +1,6 @@
 package gregtech.api.interfaces.covers;
 
-import static gregtech.api.enums.GT_Values.ALL_VALID_SIDES;
+import net.minecraftforge.common.util.ForgeDirection;
 
 import gregtech.api.interfaces.tileentity.ICoverable;
 import gregtech.api.interfaces.tileentity.IMachineProgress;
@@ -11,15 +11,16 @@ import gregtech.api.interfaces.tileentity.IMachineProgress;
 public interface IControlsWorkCover {
 
     /**
-     * Make sure there is only one GT_Cover_ControlsWork on the aTileEntity
-     * TODO this is a migration thing. Remove this after 2.3.0 is released.
+     * Make sure there is only one GT_Cover_ControlsWork on the aTileEntity TODO this is a migration thing. Remove this
+     * after 2.3.0 is released.
      *
      * @return true if the cover is the first (side) one
      **/
-    static boolean makeSureOnlyOne(byte aMySide, ICoverable aTileEntity) {
-        for (byte tSide : ALL_VALID_SIDES) {
-            if (aTileEntity.getCoverBehaviorAtSideNew(tSide) instanceof IControlsWorkCover && tSide < aMySide) {
-                aTileEntity.dropCover(tSide, tSide, true);
+    static boolean makeSureOnlyOne(ForgeDirection aMySide, ICoverable aTileEntity) {
+        for (final ForgeDirection side : ForgeDirection.VALID_DIRECTIONS) {
+            if (aTileEntity.getCoverBehaviorAtSideNew(side) instanceof IControlsWorkCover
+                && side.ordinal() < aMySide.ordinal()) {
+                aTileEntity.dropCover(side, side, true);
                 aTileEntity.markDirty();
                 return false;
             }

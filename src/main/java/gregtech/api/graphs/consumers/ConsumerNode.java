@@ -1,16 +1,23 @@
 package gregtech.api.graphs.consumers;
 
-import gregtech.api.graphs.Node;
 import java.util.ArrayList;
+
 import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.common.util.ForgeDirection;
 
-// node attached to a tile entity that can consume stuff from the network
+import gregtech.api.graphs.Node;
+
+/**
+ * A node attached to a {@code TileEntity} that can consume stuff from the network.
+ */
 public class ConsumerNode extends Node {
-    public byte mSide;
 
-    public ConsumerNode(int aNodeValue, TileEntity aTileEntity, byte aSide, ArrayList<ConsumerNode> aConsumers) {
+    public ForgeDirection mSide;
+
+    public ConsumerNode(int aNodeValue, TileEntity aTileEntity, ForgeDirection side,
+        ArrayList<ConsumerNode> aConsumers) {
         super(aNodeValue, aTileEntity, aConsumers);
-        this.mSide = aSide;
+        this.mSide = side;
     }
 
     public boolean needsEnergy() {

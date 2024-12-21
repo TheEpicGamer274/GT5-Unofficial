@@ -1,13 +1,17 @@
 package gregtech.api.graphs.paths;
 
+import net.minecraft.server.MinecraftServer;
+
+import gregtech.api.enums.TickTime;
 import gregtech.api.metatileentity.BaseMetaPipeEntity;
 import gregtech.api.metatileentity.MetaPipeEntity;
-import gregtech.api.metatileentity.implementations.GT_MetaPipeEntity_Cable;
-import net.minecraft.server.MinecraftServer;
+import gregtech.api.metatileentity.implementations.MTECable;
+import gregtech.api.util.AveragePerTickCounter;
 
 // path for cables
 // all calculations like amp and voltage happens here
 public class PowerNodePath extends NodePath {
+
     long mMaxAmps;
     long mAmps = 0;
     long mLoss;
@@ -15,6 +19,9 @@ public class PowerNodePath extends NodePath {
     long mMaxVoltage;
     int mTick = 0;
     boolean mCountUp = true;
+
+    private final AveragePerTickCounter avgAmperageCounter = new AveragePerTickCounter(TickTime.SECOND);
+    private final AveragePerTickCounter avgVoltageCounter = new AveragePerTickCounter(TickTime.SECOND);
 
     public PowerNodePath(MetaPipeEntity[] aCables) {
         super(aCables);
@@ -25,7 +32,11 @@ public class PowerNodePath extends NodePath {
     }
 
     public void applyVoltage(long aVoltage, boolean aCountUp) {
-        int tNewTime = MinecraftServer.getServer().getTickCounter();
+
+        avgVoltageCounter.addValue(Math.max(aVoltage - mLoss, 0));
+
+        int tNewTime = MinecraftServer.getServer()
+            .getTickCounter();
         if (mTick != tNewTime) {
             reset(tNewTime - mTick);
             mTick = tNewTime;
@@ -38,7 +49,7 @@ public class PowerNodePath extends NodePath {
         if (aVoltage > mMaxVoltage) {
             lock.addTileEntity(null);
             for (MetaPipeEntity tCable : mPipes) {
-                if (((GT_MetaPipeEntity_Cable) tCable).mVoltage < this.mVoltage) {
+                if (((MTECable) tCable).mVoltage < this.mVoltage) {
                     BaseMetaPipeEntity tBaseCable = (BaseMetaPipeEntity) tCable.getBaseMetaTileEntity();
                     if (tBaseCable != null) {
                         tBaseCable.setToFire();
@@ -57,11 +68,14 @@ public class PowerNodePath extends NodePath {
     }
 
     public void addAmps(long aAmps) {
+
+        avgAmperageCounter.addValue(aAmps);
+
         this.mAmps += aAmps;
         if (this.mAmps > mMaxAmps * 40) {
             lock.addTileEntity(null);
             for (MetaPipeEntity tCable : mPipes) {
-                if (((GT_MetaPipeEntity_Cable) tCable).mAmperage * 40 < this.mAmps) {
+                if (((MTECable) tCable).mAmperage * 40 < this.mAmps) {
                     BaseMetaPipeEntity tBaseCable = (BaseMetaPipeEntity) tCable.getBaseMetaTileEntity();
                     if (tBaseCable != null) {
                         tBaseCable.setToFire();
@@ -71,37 +85,20 @@ public class PowerNodePath extends NodePath {
         }
     }
 
-    // if no amps pass through for more than 0.5 second reduce them to minimize wrong results
-    // but still allow the player to see if activity is happening
-    public long getAmps() {
-        int tTime = MinecraftServer.getServer().getTickCounter() - 10;
-        if (mTick < tTime) {
-            reset(tTime - mTick);
-            mTick = tTime;
-        }
-        return mAmps;
+    public long getAmperage() {
+        return avgAmperageCounter.getLast();
     }
 
-    public long getVoltage(MetaPipeEntity aCable) {
-        int tLoss = 0;
-        if (mCountUp) {
-            for (int i = 0; i < mPipes.length; i++) {
-                GT_MetaPipeEntity_Cable tCable = (GT_MetaPipeEntity_Cable) mPipes[i];
-                tLoss += tCable.mCableLossPerMeter;
-                if (aCable == tCable) {
-                    return Math.max(mVoltage - tLoss, 0);
-                }
-            }
-        } else {
-            for (int i = mPipes.length - 1; i >= 0; i--) {
-                GT_MetaPipeEntity_Cable tCable = (GT_MetaPipeEntity_Cable) mPipes[i];
-                tLoss += tCable.mCableLossPerMeter;
-                if (aCable == tCable) {
-                    return Math.max(mVoltage - tLoss, 0);
-                }
-            }
-        }
-        return -1;
+    public double getAvgAmperage() {
+        return avgAmperageCounter.getAverage();
+    }
+
+    public long getVoltage() {
+        return avgVoltageCounter.getLast();
+    }
+
+    public double getAvgVoltage() {
+        return avgVoltageCounter.getAverage();
     }
 
     @Override
@@ -110,10 +107,10 @@ public class PowerNodePath extends NodePath {
         mMaxAmps = Integer.MAX_VALUE;
         mMaxVoltage = Integer.MAX_VALUE;
         for (MetaPipeEntity tCable : mPipes) {
-            if (tCable instanceof GT_MetaPipeEntity_Cable) {
-                mMaxAmps = Math.min(((GT_MetaPipeEntity_Cable) tCable).mAmperage, mMaxAmps);
-                mLoss += ((GT_MetaPipeEntity_Cable) tCable).mCableLossPerMeter;
-                mMaxVoltage = Math.min(((GT_MetaPipeEntity_Cable) tCable).mVoltage, mMaxVoltage);
+            if (tCable instanceof MTECable) {
+                mMaxAmps = Math.min(((MTECable) tCable).mAmperage, mMaxAmps);
+                mLoss += ((MTECable) tCable).mCableLossPerMeter;
+                mMaxVoltage = Math.min(((MTECable) tCable).mVoltage, mMaxVoltage);
             }
         }
     }

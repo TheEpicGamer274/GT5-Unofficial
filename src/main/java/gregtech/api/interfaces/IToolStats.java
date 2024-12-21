@@ -1,16 +1,22 @@
 package gregtech.api.interfaces;
 
-import gregtech.api.items.GT_MetaGenerated_Tool;
 import java.util.List;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import net.minecraft.block.Block;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.DamageSource;
 import net.minecraft.world.World;
 import net.minecraftforge.event.world.BlockEvent;
+
+import gregtech.api.items.MetaGeneratedTool;
 
 /**
  * The Stats for GT Tools. Not including any Material Modifiers.
@@ -18,6 +24,7 @@ import net.minecraftforge.event.world.BlockEvent;
  * And this is supposed to not have any ItemStack Parameters as these are generic Stats.
  */
 public interface IToolStats {
+
     /**
      * Called when aPlayer crafts this Tool
      */
@@ -26,7 +33,22 @@ public interface IToolStats {
     /**
      * Called when this gets added to a Tool Item
      */
-    void onStatsAddedToTool(GT_MetaGenerated_Tool aItem, int aID);
+    void onStatsAddedToTool(MetaGeneratedTool aItem, int aID);
+
+    /**
+     * @implNote if you are only modifying drops, override
+     *           {@link #convertBlockDrops(List, ItemStack, EntityPlayer, Block, int, int, int, byte, int, boolean, BlockEvent.HarvestDropsEvent)}
+     * @param player   The player
+     * @param x        Block pos
+     * @param y        Block pos
+     * @param z        Block pos
+     * @param block    the block
+     * @param metadata block metadata
+     * @param tile     TileEntity of the block if exist
+     * @param event    the event, cancel it to prevent the block from being broken
+     */
+    default void onBreakBlock(@Nonnull EntityPlayer player, int x, int y, int z, @Nonnull Block block, byte metadata,
+        @Nullable TileEntity tile, @Nonnull BlockEvent.BreakEvent event) {}
 
     /**
      * @return Damage the Tool receives when breaking a Block. 100 is one Damage Point (or 100 EU).
@@ -39,7 +61,8 @@ public interface IToolStats {
     int getToolDamagePerDropConversion();
 
     /**
-     * @return Damage the Tool receives when being used as Container Item. 100 is one use, however it is usually 8 times more than normal.
+     * @return Damage the Tool receives when being used as Container Item. 100 is one use, however it is usually 8 times
+     *         more than normal.
      */
     int getToolDamagePerContainerCraft();
 
@@ -49,7 +72,8 @@ public interface IToolStats {
     int getToolDamagePerEntityAttack();
 
     /**
-     * @return Basic Quality of the Tool, 0 is normal. If increased, it will increase the general quality of all Tools of this Type. Decreasing is also possible.
+     * @return Basic Quality of the Tool, 0 is normal. If increased, it will increase the general quality of all Tools
+     *         of this Type. Decreasing is also possible.
      */
     int getBaseQuality();
 
@@ -122,7 +146,8 @@ public interface IToolStats {
     boolean isWeapon();
 
     /**
-     * @return If this Tool is a Ranged Weapon. Return false at isWeapon unless you have a Blade attached to your Bow/Gun or something
+     * @return If this Tool is a Ranged Weapon. Return false at isWeapon unless you have a Blade attached to your
+     *         Bow/Gun or something
      */
     boolean isRangedWeapon();
 
@@ -132,30 +157,22 @@ public interface IToolStats {
     boolean isMiningTool();
 
     /**
-     * aBlock.getHarvestTool(aMetaData) can return the following Values for example.
-     * "axe", "pickaxe", "sword", "shovel", "hoe", "grafter", "saw", "wrench", "crowbar", "file", "hammer", "plow", "plunger", "scoop", "screwdriver", "sense", "scythe", "softhammer", "cutter", "plasmatorch"
+     * {@link Block#getHarvestTool(int)} can return the following Values for example. "axe", "pickaxe", "sword",
+     * "shovel", "hoe", "grafter", "saw", "wrench", "crowbar", "file", "hammer", "plow", "plunger", "scoop",
+     * "screwdriver", "sense", "scythe", "softhammer", "cutter", "plasmatorch"
      *
-     * @return If this is a minable Block. Tool Quality checks (like Diamond Tier or something) are separate from this check.
+     * @return If this is a minable Block. Tool Quality checks (like Diamond Tier or something) are separate from this
+     *         check.
      */
     boolean isMinableBlock(Block aBlock, byte aMetaData);
 
     /**
      * This lets you modify the Drop List, when this type of Tool has been used.
      *
-     * @return the Amount of modified Items.
+     * @return the Amount of modified Items, used to determine the extra durability cost
      */
-    int convertBlockDrops(
-            List<ItemStack> aDrops,
-            ItemStack aStack,
-            EntityPlayer aPlayer,
-            Block aBlock,
-            int aX,
-            int aY,
-            int aZ,
-            byte aMetaData,
-            int aFortune,
-            boolean aSilkTouch,
-            BlockEvent.HarvestDropsEvent aEvent);
+    int convertBlockDrops(List<ItemStack> aDrops, ItemStack aStack, EntityPlayer aPlayer, Block aBlock, int aX, int aY,
+        int aZ, byte aMetaData, int aFortune, boolean aSilkTouch, BlockEvent.HarvestDropsEvent aEvent);
 
     /**
      * @return Returns a broken Version of the Item.
@@ -176,6 +193,14 @@ public interface IToolStats {
 
     short[] getRGBa(boolean aIsToolHead, ItemStack aStack);
 
-    float getMiningSpeed(
-            Block aBlock, byte aMetaData, float aDefault, EntityPlayer aPlayer, World worldObj, int aX, int aY, int aZ);
+    float getMiningSpeed(Block aBlock, byte aMetaData, float aDefault, EntityPlayer aPlayer, World worldObj, int aX,
+        int aY, int aZ);
+
+    default String getToolTypeName() {
+        return null;
+    }
+
+    default byte getMaxMode() {
+        return 1;
+    }
 }

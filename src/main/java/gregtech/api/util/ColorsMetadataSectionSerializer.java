@@ -1,27 +1,30 @@
 package gregtech.api.util;
 
+import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.Map;
+
+import net.minecraft.client.resources.data.BaseMetadataSectionSerializer;
+import net.minecraft.util.JsonUtils;
+
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
+
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import gregtech.GT_Mod;
-import gregtech.api.GregTech_API;
+import gregtech.GTMod;
+import gregtech.api.GregTechAPI;
 import gregtech.api.enums.Dyes;
-import java.lang.reflect.Type;
-import java.util.HashMap;
-import java.util.Map;
-import net.minecraft.client.resources.data.BaseMetadataSectionSerializer;
-import net.minecraft.util.JsonUtils;
 
 @SideOnly(Side.CLIENT)
-public class ColorsMetadataSectionSerializer extends BaseMetadataSectionSerializer implements JsonSerializer {
-    public ColorsMetadataSection deserialize(
-            JsonElement metadataColors, Type type, JsonDeserializationContext context) {
+public class ColorsMetadataSectionSerializer extends BaseMetadataSectionSerializer {
+
+    public ColorsMetadataSection deserialize(JsonElement metadataColors, Type type,
+        JsonDeserializationContext context) {
         // Default values
-        boolean enableGuiTint = GregTech_API.sColoredGUI;
+        boolean enableGuiTint = GregTechAPI.sColoredGUI;
         Map<String, String> hexGuiTintMap = new HashMap<>();
         Map<String, String> hexTextColorMap = new HashMap<>();
 
@@ -29,30 +32,34 @@ public class ColorsMetadataSectionSerializer extends BaseMetadataSectionSerializ
         if (jsonObject.has("textColor")) {
             JsonObject textColors = JsonUtils.func_152754_s(jsonObject, "textColor");
             for (Map.Entry<String, JsonElement> entry : textColors.entrySet()) {
-                if (entry.getValue().isJsonPrimitive()) {
-                    hexTextColorMap.put(entry.getKey(), entry.getValue().getAsString());
+                if (entry.getValue()
+                    .isJsonPrimitive()) {
+                    hexTextColorMap.put(
+                        entry.getKey(),
+                        entry.getValue()
+                            .getAsString());
                 } else {
-                    GT_Mod.GT_FML_LOGGER.warn("ColorOverride expects primitive value for key `textColor`");
+                    GTMod.GT_FML_LOGGER.warn("ColorOverride expects primitive value for key `textColor`");
                 }
             }
         }
 
         if (jsonObject.has("guiTint")) {
             JsonObject guiTints = JsonUtils.func_152754_s(jsonObject, "guiTint");
-            enableGuiTint =
-                    JsonUtils.getJsonObjectBooleanFieldValueOrDefault(guiTints, "enableGuiTintWhenPainted", true);
+            enableGuiTint = JsonUtils
+                .getJsonObjectBooleanFieldValueOrDefault(guiTints, "enableGuiTintWhenPainted", true);
 
             for (Dyes dye : Dyes.values()) {
-                hexGuiTintMap.put(dye.mName, GT_Util.toHexString(dye.getRGBA()));
+                hexGuiTintMap.put(dye.mName, GTUtil.toHexString(dye.getRGBA()));
             }
 
             for (String key : hexGuiTintMap.keySet()) {
                 if (enableGuiTint) {
                     hexGuiTintMap.replace(
-                            key,
-                            JsonUtils.getJsonObjectStringFieldValueOrDefault(guiTints, key, hexGuiTintMap.get(key)));
+                        key,
+                        JsonUtils.getJsonObjectStringFieldValueOrDefault(guiTints, key, hexGuiTintMap.get(key)));
                 } else {
-                    hexGuiTintMap.replace(key, GT_Util.toHexString(Dyes.dyeWhite.getRGBA()));
+                    hexGuiTintMap.replace(key, GTUtil.toHexString(Dyes.dyeWhite.getRGBA()));
                 }
             }
         }
@@ -61,8 +68,7 @@ public class ColorsMetadataSectionSerializer extends BaseMetadataSectionSerializ
     }
 
     public JsonElement serialize(ColorsMetadataSection colorsMetaSection, Type type, JsonSerializationContext context) {
-        JsonObject jsonObject = new JsonObject();
-        return jsonObject;
+        return new JsonObject();
     }
 
     public String getSectionName() {
