@@ -14,6 +14,7 @@ import static gregtech.api.enums.Textures.BlockIcons.OVERLAY_FRONT_LARGE_CHEMICA
 import static gregtech.api.enums.Textures.BlockIcons.OVERLAY_FRONT_LARGE_CHEMICAL_REACTOR_ACTIVE_GLOW;
 import static gregtech.api.enums.Textures.BlockIcons.OVERLAY_FRONT_LARGE_CHEMICAL_REACTOR_GLOW;
 import static gregtech.api.enums.Textures.BlockIcons.casingTexturePages;
+import static gregtech.api.util.GTStructureUtility.activeCoils;
 import static gregtech.api.util.GTStructureUtility.buildHatchAdder;
 
 import java.util.function.Consumer;
@@ -80,7 +81,7 @@ public class MTELargeChemicalReactor extends MTEEnhancedMultiBlockBase<MTELargeC
                 .casingIndex(CASING_INDEX)
                 .dot(1)
                 .buildAndChain(
-                    CoilStructureElement.INSTANCE,
+                    activeCoils(CoilStructureElement.INSTANCE),
                     onElementPass(MTELargeChemicalReactor::onCasingAdded, ofBlock(GregTechAPI.sBlockCasings8, 0))))
         .build();
 
@@ -104,20 +105,23 @@ public class MTELargeChemicalReactor extends MTEEnhancedMultiBlockBase<MTELargeC
     public MultiblockTooltipBuilder createTooltip() {
         final MultiblockTooltipBuilder tt = new MultiblockTooltipBuilder();
         tt.addMachineType("Chemical Reactor, LCR")
-            .addInfo("Does not lose efficiency when overclocked")
             .addInfo("Accepts fluids instead of fluid cells")
+            .addPerfectOCInfo()
             .beginStructureBlock(3, 3, 3, false)
             .addController("Front center")
             .addCasingInfoRange("Chemically Inert Machine Casing", 8, 22, false)
             .addOtherStructurePart("PTFE Pipe Machine Casing", "Center")
-            .addOtherStructurePart("Heating Coil", "Adjacent to the PTFE Pipe Machine Casing", 1)
+            .addOtherStructurePart(
+                StatCollector.translateToLocal("GT5U.tooltip.structure.heating_coil"),
+                "Adjacent to the PTFE Pipe Machine Casing",
+                1)
             .addEnergyHatch("Any casing", 1, 2)
             .addMaintenanceHatch("Any casing", 1, 2)
             .addInputBus("Any casing", 1, 2)
             .addInputHatch("Any casing", 1, 2)
             .addOutputBus("Any casing", 1, 2)
             .addOutputHatch("Any casing", 1, 2)
-            .addStructureInfo("You can have multiple hatches/busses")
+            .addStructureInfo("You can have multiple hatches/buses")
             .toolTipFinisher();
         return tt;
     }
@@ -146,11 +150,6 @@ public class MTELargeChemicalReactor extends MTEEnhancedMultiBlockBase<MTELargeC
                     .build() };
         }
         return new ITexture[] { casingTexturePages[1][48] };
-    }
-
-    @Override
-    public boolean isCorrectMachinePart(ItemStack aStack) {
-        return true;
     }
 
     @Override
@@ -188,21 +187,6 @@ public class MTELargeChemicalReactor extends MTEEnhancedMultiBlockBase<MTELargeC
     }
 
     @Override
-    public int getMaxEfficiency(ItemStack aStack) {
-        return 10000;
-    }
-
-    @Override
-    public int getDamageToComponent(ItemStack aStack) {
-        return 0;
-    }
-
-    @Override
-    public boolean explodesOnComponentBreak(ItemStack aStack) {
-        return false;
-    }
-
-    @Override
     public void construct(ItemStack stackSize, boolean hintsOnly) {
         mCoilAmount = 0;
         buildPiece(STRUCTURE_PIECE_MAIN, stackSize, hintsOnly, 1, 1, 0);
@@ -212,7 +196,7 @@ public class MTELargeChemicalReactor extends MTEEnhancedMultiBlockBase<MTELargeC
     public int survivalConstruct(ItemStack stackSize, int elementBudget, ISurvivalBuildEnvironment env) {
         if (mMachine) return -1;
         mCoilAmount = 0;
-        return survivialBuildPiece(STRUCTURE_PIECE_MAIN, stackSize, 1, 1, 0, elementBudget, env, false, true);
+        return survivalBuildPiece(STRUCTURE_PIECE_MAIN, stackSize, 1, 1, 0, elementBudget, env, false, true);
     }
 
     @Override
@@ -236,6 +220,13 @@ public class MTELargeChemicalReactor extends MTEEnhancedMultiBlockBase<MTELargeC
         }
 
         @Override
+        public boolean couldBeValid(MTELargeChemicalReactor t, World world, int x, int y, int z, ItemStack trigger) {
+            Block block = world.getBlock(x, y, z);
+            return block instanceof IHeatingCoil
+                && ((IHeatingCoil) block).getCoilHeat(world.getBlockMetadata(x, y, z)) != HeatingCoilLevel.None;
+        }
+
+        @Override
         public boolean spawnHint(MTELargeChemicalReactor t, World world, int x, int y, int z, ItemStack trigger) {
             StructureLibAPI.hintParticle(world, x, y, z, GregTechAPI.sBlockCasings5, 0);
             return true;
@@ -256,8 +247,8 @@ public class MTELargeChemicalReactor extends MTEEnhancedMultiBlockBase<MTELargeC
         }
 
         @Override
-        public BlocksToPlace getBlocksToPlace(MTELargeChemicalReactor gt_metaTileEntity_largeChemicalReactor,
-            World world, int x, int y, int z, ItemStack trigger, AutoPlaceEnvironment env) {
+        public BlocksToPlace getBlocksToPlace(MTELargeChemicalReactor largeChemicalReactor, World world, int x, int y,
+            int z, ItemStack trigger, AutoPlaceEnvironment env) {
             return BlocksToPlace.create(
                 IntStream.range(0, 8)
                     .mapToObj(i -> new ItemStack(GregTechAPI.sBlockCasings5, 1, i))
@@ -297,13 +288,16 @@ public class MTELargeChemicalReactor extends MTEEnhancedMultiBlockBase<MTELargeC
 
     @Override
     public boolean onWireCutterRightClick(ForgeDirection side, ForgeDirection wrenchingSide, EntityPlayer aPlayer,
-        float aX, float aY, float aZ) {
-        batchMode = !batchMode;
-        if (batchMode) {
-            GTUtility.sendChatToPlayer(aPlayer, StatCollector.translateToLocal("misc.BatchModeTextOn"));
-        } else {
-            GTUtility.sendChatToPlayer(aPlayer, StatCollector.translateToLocal("misc.BatchModeTextOff"));
+        float aX, float aY, float aZ, ItemStack aTool) {
+        if (aPlayer.isSneaking()) {
+            batchMode = !batchMode;
+            if (batchMode) {
+                GTUtility.sendChatToPlayer(aPlayer, StatCollector.translateToLocal("misc.BatchModeTextOn"));
+            } else {
+                GTUtility.sendChatToPlayer(aPlayer, StatCollector.translateToLocal("misc.BatchModeTextOff"));
+            }
+            return true;
         }
-        return true;
+        return false;
     }
 }

@@ -367,7 +367,7 @@ public class MTEScanner extends MTEBasicMachine {
                         // Use Assline Utils
                         if (AssemblyLineUtils.setAssemblyLineRecipeOnDataStick(this.mOutputItems[0], tRecipe)) {
                             aStack.stackSize -= matchingRecipe.mInputs[0].stackSize;
-                            calculateOverclockedNess(30, tRecipe.mResearchTime);
+                            calculateOverclockedNess(tRecipe.mResearchVoltage, tRecipe.mResearchTime);
                             // In case recipe is too OP for that machine
                             if (mMaxProgresstime == Integer.MAX_VALUE - 1 && mEUt == Integer.MAX_VALUE - 1)
                                 return FOUND_RECIPE_BUT_DID_NOT_MEET_REQUIREMENTS;
@@ -416,7 +416,7 @@ public class MTEScanner extends MTEBasicMachine {
     public void startSoundLoop(byte aIndex, double aX, double aY, double aZ) {
         super.startSoundLoop(aIndex, aX, aY, aZ);
         if (aIndex == 1) {
-            GTUtility.doSoundAtClient(SoundResource.IC2_MACHINES_MAGNETIZER_LOOP, 10, 1.0F, aX, aY, aZ);
+            GTUtility.doSoundAtClient(SoundResource.GTCEU_OP_PORTABLE_SCANNER, 10, 1.0F, aX, aY, aZ);
         }
     }
 

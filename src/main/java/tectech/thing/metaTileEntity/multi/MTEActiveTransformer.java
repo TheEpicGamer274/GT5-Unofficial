@@ -132,9 +132,6 @@ public class MTEActiveTransformer extends TTMultiblockBase implements ISurvivalC
                                                                                               // voltage
             .addInfo(translateToLocal("gt.blockmachines.multimachine.em.transformer.desc.2")) // Only 0.004% power
                                                                                               // loss, HAYO!
-            .addInfo(translateToLocal("gt.blockmachines.multimachine.em.transformer.desc.3")) // Will explode if
-                                                                                              // broken while
-                                                                                              // running
             .addTecTechHatchInfo()
             .beginStructureBlock(3, 3, 3, false)
             .addController(translateToLocal("tt.keyword.Structure.FrontCenter")) // Controller: Front center
@@ -191,7 +188,7 @@ public class MTEActiveTransformer extends TTMultiblockBase implements ISurvivalC
     @Override
     public int survivalConstruct(ItemStack stackSize, int elementBudget, IItemSource source, EntityPlayerMP actor) {
         if (mMachine) return -1;
-        return survivialBuildPiece("main", stackSize, 1, 1, 0, elementBudget, source, actor, false, true);
+        return survivalBuildPiece("main", stackSize, 1, 1, 0, elementBudget, source, actor, false, true);
     }
 
     @Override
@@ -200,22 +197,17 @@ public class MTEActiveTransformer extends TTMultiblockBase implements ISurvivalC
     }
 
     @Override
-    public boolean isPowerPassButtonEnabled() {
-        return true;
-    }
-
-    @Override
     public boolean isSafeVoidButtonEnabled() {
         return false;
     }
 
     @Override
-    public boolean isAllowedToWorkButtonEnabled() {
-        return true;
+    public boolean getDefaultHasMaintenanceChecks() {
+        return false;
     }
 
     @Override
-    public boolean getDefaultHasMaintenanceChecks() {
+    public boolean showRecipeTextInGUI() {
         return false;
     }
 }

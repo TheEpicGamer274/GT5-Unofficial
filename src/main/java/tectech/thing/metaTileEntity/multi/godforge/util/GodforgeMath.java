@@ -4,6 +4,7 @@ import static tectech.thing.metaTileEntity.multi.godforge.upgrade.ForgeOfGodsUpg
 
 import java.math.BigInteger;
 
+import gregtech.api.util.GTUtility;
 import tectech.thing.metaTileEntity.multi.godforge.MTEBaseModule;
 import tectech.thing.metaTileEntity.multi.godforge.MTEExoticModule;
 import tectech.thing.metaTileEntity.multi.godforge.MTEForgeOfGods;
@@ -23,15 +24,15 @@ public class GodforgeMath {
             upgradeFactor = 0.8;
         }
         if (godforge.getFuelType() == 0) {
-            return godforge.getFuelFactor() * 300 * Math.pow(1.15, godforge.getFuelFactor()) * upgradeFactor;
+            return godforge.getFuelFactor() * 300 * GTUtility.powInt(1.15, godforge.getFuelFactor()) * upgradeFactor;
         }
         if (godforge.getFuelType() == 1) {
-            return godforge.getFuelFactor() * 2 * Math.pow(1.08, godforge.getFuelFactor()) * upgradeFactor;
+            return godforge.getFuelFactor() * 2 * GTUtility.powInt(1.08, godforge.getFuelFactor()) * upgradeFactor;
         } else return godforge.getFuelFactor() / 25f * upgradeFactor;
     }
 
     public static int calculateStartupFuelConsumption(MTEForgeOfGods godforge) {
-        return (int) Math.max(godforge.getFuelFactor() * 25 * Math.pow(1.2, godforge.getFuelFactor()), 1);
+        return (int) Math.max(godforge.getFuelFactor() * 25 * GTUtility.powInt(1.2, godforge.getFuelFactor()), 1);
     }
 
     public static int calculateMaxFuelFactor(MTEForgeOfGods godforge) {
@@ -49,8 +50,7 @@ public class GodforgeMath {
         return Math.max(fuelCap, 1);
     }
 
-    public static int calculateEffectiveFuelFactor(MTEForgeOfGods godforge) {
-        int fuelFactor = godforge.getFuelFactor();
+    public static int calculateEffectiveFuelFactor(int fuelFactor) {
         if (fuelFactor <= 43) {
             return fuelFactor;
         } else {
@@ -59,6 +59,10 @@ public class GodforgeMath {
     }
 
     public static void calculateMaxHeatForModules(MTEBaseModule module, MTEForgeOfGods godforge) {
+        calculateMaxHeatForModules(module, godforge, godforge.getFuelFactor());
+    }
+
+    public static void calculateMaxHeatForModules(MTEBaseModule module, MTEForgeOfGods godforge, int fuelFactor) {
         double logBase = 1.5;
         int baseHeat = 12601;
         if (godforge.isUpgradeActive(SEFCP)) {
@@ -68,7 +72,7 @@ public class GodforgeMath {
                 logBase = 1.18;
             }
         }
-        int recipeHeat = baseHeat + (int) (Math.log(godforge.getFuelFactor()) / Math.log(logBase) * 1000);
+        int recipeHeat = baseHeat + (int) (Math.log(fuelFactor) / Math.log(logBase) * 1000);
         module.setHeatForOC(calculateOverclockHeat(module, godforge, recipeHeat));
         module.setHeat(recipeHeat);
     }
@@ -122,6 +126,10 @@ public class GodforgeMath {
     }
 
     public static void calculateMaxParallelForModules(MTEBaseModule module, MTEForgeOfGods godforge) {
+        calculateMaxParallelForModules(module, godforge, godforge.getFuelFactor());
+    }
+
+    public static void calculateMaxParallelForModules(MTEBaseModule module, MTEForgeOfGods godforge, int fuelFactor) {
         int baseParallel = 0;
         float fuelFactorMultiplier = 1;
         float heatMultiplier = 1;
@@ -152,7 +160,7 @@ public class GodforgeMath {
         }
 
         if (godforge.isUpgradeActive(SA)) {
-            fuelFactorMultiplier = 1 + calculateEffectiveFuelFactor(godforge) / 15f;
+            fuelFactorMultiplier = 1 + calculateEffectiveFuelFactor(fuelFactor) / 15f;
             if (godforge.isUpgradeActive(TCT)) {
                 if (isMoltenOrSmeltingWithUpgrade) {
                     fuelFactorMultiplier *= 3;
@@ -205,9 +213,10 @@ public class GodforgeMath {
             double fillRatioMinusZeroPointFive = (double) godforge.getBatteryCharge() / godforge.getMaxBatteryCharge()
                 - 0.5;
             if (module instanceof MTEPlasmaModule) {
-                fillRatioDiscount = 1 - (Math.pow(fillRatioMinusZeroPointFive, 2) * (-0.6) + 0.15);
+                fillRatioDiscount = 1 - (fillRatioMinusZeroPointFive * fillRatioMinusZeroPointFive * (-0.6) + 0.15);
             } else {
-                fillRatioDiscount = 1 - (Math.pow(fillRatioMinusZeroPointFive, 2) * (-0.6) + 0.15) * 2 / 3;
+                fillRatioDiscount = 1
+                    - (fillRatioMinusZeroPointFive * fillRatioMinusZeroPointFive * (-0.6) + 0.15) * 2 / 3;
             }
         }
 
@@ -225,14 +234,19 @@ public class GodforgeMath {
     }
 
     public static void calculateProcessingVoltageForModules(MTEBaseModule module, MTEForgeOfGods godforge) {
+        calculateProcessingVoltageForModules(module, godforge, godforge.getFuelFactor());
+    }
+
+    public static void calculateProcessingVoltageForModules(MTEBaseModule module, MTEForgeOfGods godforge,
+        int fuelFactor) {
         long voltage = 2_000_000_000;
 
         if (godforge.isUpgradeActive(GISS)) {
-            voltage += calculateEffectiveFuelFactor(godforge) * 100_000_000L;
+            voltage += calculateEffectiveFuelFactor(fuelFactor) * 100_000_000L;
         }
 
         if (godforge.isUpgradeActive(NGMS)) {
-            voltage *= Math.pow(4, godforge.getRingAmount());
+            voltage *= GTUtility.powInt(4, godforge.getRingAmount());
         }
 
         module.setProcessingVoltage(voltage);
@@ -256,7 +270,7 @@ public class GodforgeMath {
             }
             if (module instanceof MTEExoticModule) {
                 if (godforge.isUpgradeActive(PA)) {
-                    overclockTimeFactor = 2 + Math.pow(overclockTimeFactor - 2, 2);
+                    overclockTimeFactor = 2 + (overclockTimeFactor - 2) * (overclockTimeFactor - 2);
                 } else {
                     overclockTimeFactor = 2;
                 }
@@ -281,11 +295,24 @@ public class GodforgeMath {
             return true;
         }
 
-        if (module instanceof MTEExoticModule && godforge.isUpgradeActive(QGPIU)) {
-            return true;
+        if (module instanceof MTEExoticModule exoticizer) {
+            if (godforge.isUpgradeActive(QGPIU) && !exoticizer.isMagmatterModeOn()) {
+                return true;
+            }
+            if (godforge.isUpgradeActive(END) && exoticizer.isMagmatterModeOn()) {
+                return true;
+            }
         }
 
         return module instanceof MTESmeltingModule;
+    }
+
+    public static boolean factorChangeDuringRecipeAntiCheese(MTEBaseModule module) {
+        if (module instanceof MTESmeltingModule || module instanceof MTEMoltenModule) {
+            return module.getCurrentRecipeHeat() > module.getHeat();
+        } else {
+            return false;
+        }
     }
 
     public static void queryMilestoneStats(MTEBaseModule module, MTEForgeOfGods godforge) {

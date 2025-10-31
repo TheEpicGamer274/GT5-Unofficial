@@ -118,11 +118,11 @@ public abstract class MTEOilDrillBase extends MTEDrillerBase implements IMetrics
 
         final MultiblockTooltipBuilder tt = new MultiblockTooltipBuilder();
         final int baseCycleTime = calculateMaxProgressTime(getMinTier(), true);
-        tt.addMachineType("Pump, FDP")
+        tt.addMachineType("Pump, FDR")
             .addInfo("Works on " + getRangeInChunks() + "x" + getRangeInChunks() + " chunks")
             .addInfo("Use a Screwdriver to configure range")
             .addInfo("Use Programmed Circuits to ignore near exhausted oil field")
-            .addInfo("If total circuit # is greater than output amount it will halt. If it worked right.") // doesn't
+            .addInfo("If total circuit # is greater than output per operation, the machine will halt.") // doesn't
             // work
             .addInfo("Minimum energy hatch tier: " + GTUtility.getColoredTierNameFromTier((byte) getMinTier()))
             .addInfo(
@@ -144,8 +144,9 @@ public abstract class MTEOilDrillBase extends MTEDrillerBase implements IMetrics
     protected abstract int getRangeInChunks();
 
     @Override
-    public void onScrewdriverRightClick(ForgeDirection side, EntityPlayer aPlayer, float aX, float aY, float aZ) {
-        super.onScrewdriverRightClick(side, aPlayer, aX, aY, aZ);
+    public void onScrewdriverRightClick(ForgeDirection side, EntityPlayer aPlayer, float aX, float aY, float aZ,
+        ItemStack aTool) {
+        super.onScrewdriverRightClick(side, aPlayer, aX, aY, aZ, aTool);
         int oldChunkRange = chunkRangeConfig;
         if (aPlayer.isSneaking()) {
             if (chunkRangeConfig > 0) {
@@ -193,7 +194,7 @@ public abstract class MTEOilDrillBase extends MTEDrillerBase implements IMetrics
             1,
             (workState == STATE_AT_BOTTOM || simulateWorking
                 ? (64 * (chunkRangeConfig * chunkRangeConfig)) >> (getMinTier() - 1)
-                : 120) / Math.pow(2, tier));
+                : 120) / GTUtility.powInt(2, tier));
     }
 
     protected float computeSpeed() {
@@ -258,9 +259,8 @@ public abstract class MTEOilDrillBase extends MTEDrillerBase implements IMetrics
             Chunk tChunk = getBaseMetaTileEntity().getWorld()
                 .getChunkFromBlockCoords(getBaseMetaTileEntity().getXCoord(), getBaseMetaTileEntity().getZCoord());
             int range = chunkRangeConfig;
-            int xChunk = Math.floorDiv(tChunk.xPosition, range) * range; // Java was written by idiots. For negative
-                                                                         // values, / returns rounded towards zero.
-            // Fucking morons.
+            int xChunk = Math.floorDiv(tChunk.xPosition, range) * range; // For negative values, / returns rounded
+                                                                         // towards zero.
             int zChunk = Math.floorDiv(tChunk.zPosition, range) * range;
             if (debugDriller) {
                 GTLog.out.println(
@@ -369,7 +369,7 @@ public abstract class MTEOilDrillBase extends MTEDrillerBase implements IMetrics
 
     @Override
     protected SoundResource getProcessStartSound() {
-        return SoundResource.IC2_MACHINES_PUMP_OP;
+        return SoundResource.GTCEU_LOOP_PUMP;
     }
 
     @Override
@@ -386,11 +386,13 @@ public abstract class MTEOilDrillBase extends MTEDrillerBase implements IMetrics
                     + EnumChatFormatting.RESET
                     + " "
                     + StatCollector.translateToLocal("GT5U.machines.chunks"),
-                "Drilling fluid: " + EnumChatFormatting.GREEN + getFluidName() + EnumChatFormatting.RESET,
-                "Drilling flow: " + EnumChatFormatting.GREEN
-                    + getFlowRatePerTick()
-                    + EnumChatFormatting.RESET
-                    + " L/t"));
+                StatCollector.translateToLocalFormatted(
+                    "GT5U.infodata.oil_drill.drilling_fluid",
+                    EnumChatFormatting.GREEN + getFluidName() + EnumChatFormatting.RESET),
+                StatCollector.translateToLocalFormatted(
+                    "GT5U.infodata.oil_drill.drilling_flow",
+                    EnumChatFormatting.GREEN + GTUtility.formatNumbers(getFlowRatePerTick())
+                        + EnumChatFormatting.RESET)));
         l.addAll(Arrays.asList(super.getInfoData()));
         return l.toArray(new String[0]);
     }

@@ -45,7 +45,7 @@ public class MTELargeFusionComputer3 extends MTELargeFusionComputer {
     protected MultiblockTooltipBuilder createTooltip() {
         final MultiblockTooltipBuilder tt = new MultiblockTooltipBuilder();
         tt.addMachineType("Fusion Reactor")
-            .addInfo("Millions of nuclear.")
+            .addInfo("Critical Power!!!")
             .addInfo(
                 EnumChatFormatting.AQUA + GTUtility.formatNumbers(getSingleHatchPower())
                     + EnumChatFormatting.GRAY
@@ -61,9 +61,7 @@ public class MTELargeFusionComputer3 extends MTELargeFusionComputer {
                 "If the recipe requires a voltage tier over " + GTUtility.getColoredTierNameFromTier((byte) tier())
                     + EnumChatFormatting.GRAY
                     + " , you can't do it either")
-            .addInfo("Startup < 160,000,000 EU: 192x Parallel")
-            .addInfo("Startup < 320,000,000 EU: 128x Parallel")
-            .addInfo("Startup >= 320,000,000 EU: 64x Parallel")
+            .addInfo(createParallelText())
             .addTecTechHatchInfo()
             .addCasingInfoMin("Fusion Machine Casing MK II", 1664, false)
             .addCasingInfoMin("Advanced Compact Fusion Coil", 560, false)
@@ -74,7 +72,7 @@ public class MTELargeFusionComputer3 extends MTELargeFusionComputer {
             .addOutputHatch("1-16, Hint block with dot 1", 1)
             .addStructureInfo("Supports Crafting Input Buffer")
             .addStructureInfo(
-                "ALL Hatches must be " + GTUtility.getColoredTierNameFromTier((byte) hatchTier())
+                "Energy Hatches must be " + GTUtility.getColoredTierNameFromTier((byte) energyHatchTier())
                     + EnumChatFormatting.GRAY
                     + " or better")
             .toolTipFinisher();
@@ -122,7 +120,7 @@ public class MTELargeFusionComputer3 extends MTELargeFusionComputer {
     }
 
     @Override
-    public int hatchTier() {
+    public int energyHatchTier() {
         return 8;
     }
 
@@ -137,8 +135,8 @@ public class MTELargeFusionComputer3 extends MTELargeFusionComputer {
     }
 
     @Override
-    public int extraPara(int startEnergy) {
-        return (startEnergy < 160000000 ? 3 : (startEnergy < 320000000 ? 2 : 1));
+    public int extraPara(long startEnergy) {
+        return (startEnergy < 160000000L ? 3 : (startEnergy < 320000000L ? 2 : 1));
     }
 
     @Override

@@ -24,12 +24,16 @@ import static gregtech.api.recipe.RecipeMaps.oreWasherRecipes;
 import static gregtech.api.recipe.RecipeMaps.sifterRecipes;
 import static gregtech.api.recipe.RecipeMaps.thermalCentrifugeRecipes;
 import static gregtech.api.recipe.RecipeMaps.vacuumFreezerRecipes;
+import static gregtech.api.util.GTRecipeBuilder.INGOTS;
 import static gregtech.api.util.GTRecipeBuilder.MINUTES;
 import static gregtech.api.util.GTRecipeBuilder.SECONDS;
 import static gregtech.api.util.GTRecipeBuilder.TICKS;
+import static gregtech.api.util.GTRecipeConstants.ADDITIVE_AMOUNT;
 import static gregtech.api.util.GTRecipeConstants.AssemblyLine;
+import static gregtech.api.util.GTRecipeConstants.BlastFurnaceWithGas;
 import static gregtech.api.util.GTRecipeConstants.COIL_HEAT;
 import static gregtech.api.util.GTRecipeConstants.DISSOLUTION_TANK_RATIO;
+import static gregtech.api.util.GTRecipeConstants.SCANNING;
 import static gregtech.api.util.GTRecipeConstants.UniversalChemical;
 import static gregtech.api.util.GTRecipeConstants.WaferEngravingRecipes;
 import static gregtech.common.items.MetaGeneratedItem01.registerCauldronCleaningFor;
@@ -68,7 +72,6 @@ import static gtnhlanth.common.register.WerkstoffMaterialPool.FilledLanthanumExt
 import static gtnhlanth.common.register.WerkstoffMaterialPool.FilledLutetiumExtractingNanoResin;
 import static gtnhlanth.common.register.WerkstoffMaterialPool.FilledNeodymiumExtractingNanoResin;
 import static gtnhlanth.common.register.WerkstoffMaterialPool.FilledPraseodymiumExtractingNanoResin;
-import static gtnhlanth.common.register.WerkstoffMaterialPool.FilledPromethiumExtractingNanoResin;
 import static gtnhlanth.common.register.WerkstoffMaterialPool.FilledSamariumExtractingNanoResin;
 import static gtnhlanth.common.register.WerkstoffMaterialPool.FilledTerbiumExtractingNanoResin;
 import static gtnhlanth.common.register.WerkstoffMaterialPool.FilledThuliumExtractingNanoResin;
@@ -97,7 +100,6 @@ import static gtnhlanth.common.register.WerkstoffMaterialPool.PraseodymiumChlori
 import static gtnhlanth.common.register.WerkstoffMaterialPool.PraseodymiumExtractingNanoResin;
 import static gtnhlanth.common.register.WerkstoffMaterialPool.PraseodymiumOreConcentrate;
 import static gtnhlanth.common.register.WerkstoffMaterialPool.PromethiumChlorideConcentrate;
-import static gtnhlanth.common.register.WerkstoffMaterialPool.PromethiumExtractingNanoResin;
 import static gtnhlanth.common.register.WerkstoffMaterialPool.PromethiumOreConcentrate;
 import static gtnhlanth.common.register.WerkstoffMaterialPool.RarestEarthResidue;
 import static gtnhlanth.common.register.WerkstoffMaterialPool.SamariumChloride;
@@ -146,6 +148,7 @@ import gregtech.api.util.GTRecipe;
 import gregtech.api.util.GTRecipeBuilder;
 import gregtech.api.util.GTRecipeConstants;
 import gregtech.api.util.GTUtility;
+import gregtech.api.util.recipe.Scanning;
 import gregtech.mixin.interfaces.accessors.IRecipeMutableAccess;
 import gtPlusPlus.core.item.ModItems;
 import gtnhlanth.Tags;
@@ -163,7 +166,7 @@ public class RecipeLoader {
 
         // SC
         GTValues.RA.stdBuilder()
-            .fluidInputs(Materials.SolderingAlloy.getMolten(288))
+            .fluidInputs(Materials.SolderingAlloy.getMolten(2 * INGOTS))
             .itemInputs(
                 ItemList.Hull_LuV.get(1),
                 WerkstoffMaterialPool.MuMetal.get(OrePrefixes.plateDense, 8),
@@ -181,7 +184,7 @@ public class RecipeLoader {
 
         // LINAC
         GTValues.RA.stdBuilder()
-            .fluidInputs(Materials.SolderingAlloy.getMolten(288))
+            .fluidInputs(Materials.SolderingAlloy.getMolten(2 * INGOTS))
             .itemInputs(
                 ItemList.Hull_LuV.get(1),
                 WerkstoffMaterialPool.MuMetal.get(OrePrefixes.plateDense, 8),
@@ -200,7 +203,7 @@ public class RecipeLoader {
 
         // TC
         GTValues.RA.stdBuilder()
-            .fluidInputs(Materials.SolderingAlloy.getMolten(288))
+            .fluidInputs(Materials.SolderingAlloy.getMolten(2 * INGOTS))
             .itemInputs(
                 ItemList.Hull_LuV.get(1),
                 WerkstoffMaterialPool.MuMetal.get(OrePrefixes.plateDense, 8),
@@ -219,7 +222,7 @@ public class RecipeLoader {
 
         // Synchrotron
         GTValues.RA.stdBuilder()
-            .fluidInputs(Materials.SolderingAlloy.getMolten(6000))
+            .fluidInputs(Materials.SolderingAlloy.getMolten(48 * INGOTS))
             .itemInputs(
                 ItemList.Hull_LuV.get(1),
                 WerkstoffMaterialPool.MuMetal.get(OrePrefixes.plateDense, 8),
@@ -258,7 +261,7 @@ public class RecipeLoader {
                 ItemList.Casing_RadiationProof.get(1L),
                 WerkstoffMaterialPool.MuMetal.get(OrePrefixes.plateDense, 6),
                 GTUtility.getIntegratedCircuit(6))
-            .fluidInputs(Materials.SolderingAlloy.getMolten(144))
+            .fluidInputs(Materials.SolderingAlloy.getMolten(1 * INGOTS))
             .itemOutputs(new ItemStack(LanthItemList.SHIELDED_ACCELERATOR_CASING, 1))
             .duration(40 * SECONDS)
             .eut(TierEU.RECIPE_IV)
@@ -271,7 +274,7 @@ public class RecipeLoader {
                 GTOreDictUnificator.get(OrePrefixes.wireGt02, Materials.Silver, 12),
                 GTOreDictUnificator.get(OrePrefixes.plateDense, Materials.Gold, 6),
                 GTUtility.getIntegratedCircuit(6))
-            .fluidInputs(Materials.SolderingAlloy.getMolten(288))
+            .fluidInputs(Materials.SolderingAlloy.getMolten(2 * INGOTS))
             .itemOutputs(new ItemStack(LanthItemList.ELECTRODE_CASING, 1))
             .duration(40 * SECONDS)
             .eut(TierEU.RECIPE_IV)
@@ -290,10 +293,10 @@ public class RecipeLoader {
                 new ItemStack(LanthItemList.CAPILLARY_EXCHANGE, 3),
                 GTUtility.copyAmount(6, insulator),
                 GTOreDictUnificator.get(OrePrefixes.wireGt01, Materials.Tungsten, 1))
-            .fluidInputs(Materials.SolderingAlloy.getMolten(288), Materials.Lubricant.getFluid(1152))
+            .fluidInputs(Materials.SolderingAlloy.getMolten(2 * INGOTS), Materials.Lubricant.getFluid(8 * INGOTS))
             .itemOutputs(new ItemStack(LanthItemList.COOLANT_DELIVERY_CASING))
             .metadata(GTRecipeConstants.RESEARCH_ITEM, ItemList.Casing_Pipe_TungstenSteel.get(1L))
-            .metadata(GTRecipeConstants.RESEARCH_TIME, 72000)
+            .metadata(SCANNING, new Scanning(30 * SECONDS, TierEU.RECIPE_IV))
             .duration(50 * SECONDS)
             .eut(TierEU.RECIPE_LuV)
             .addTo(AssemblyLine);
@@ -301,9 +304,9 @@ public class RecipeLoader {
         // T1 Antenna Casing
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                Materials.SolderingAlloy.getMolten(6000),
-                Materials.Gold.getMolten(4000),
-                WerkstoffLoader.Xenon.getFluidOrGas(2000))
+                Materials.SolderingAlloy.getMolten(48 * INGOTS),
+                Materials.Gold.getMolten(32 * INGOTS),
+                WerkstoffLoader.Xenon.getFluidOrGas(2_000))
             .itemInputs(
                 GTOreDictUnificator.get(OrePrefixes.frameGt, Materials.Tungsten, 1),
                 Materials.Copper.getPlates(4),
@@ -314,10 +317,8 @@ public class RecipeLoader {
                 GTOreDictUnificator.get(OrePrefixes.wireFine, Materials.Gold, 32),
                 GTOreDictUnificator.get(OrePrefixes.plateDense, Materials.Electrum, 6))
             .itemOutputs(new ItemStack(LanthItemList.ANTENNA_CASING_T1))
-
             .metadata(GTRecipeConstants.RESEARCH_ITEM, Materials.Niobium.getBlocks(1))
-            .metadata(GTRecipeConstants.RESEARCH_TIME, 30 * GTRecipeBuilder.MINUTES)
-
+            .metadata(SCANNING, new Scanning(1 * MINUTES, TierEU.RECIPE_IV))
             .duration(30 * GTRecipeBuilder.SECONDS)
             .eut(TierEU.RECIPE_LuV)
             .addTo(AssemblyLine);
@@ -325,9 +326,9 @@ public class RecipeLoader {
         // T2 Antenna Casing
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                Materials.SolderingAlloy.getMolten(12000),
-                Materials.Gold.getMolten(6000),
-                WerkstoffLoader.Xenon.getFluidOrGas(2000))
+                Materials.SolderingAlloy.getMolten(96 * INGOTS),
+                Materials.Gold.getMolten(48 * INGOTS),
+                WerkstoffLoader.Xenon.getFluidOrGas(2_000))
             .itemInputs(
                 GTOreDictUnificator.get(OrePrefixes.frameGt, Materials.TungstenCarbide, 1),
                 Materials.Copper.getPlates(4),
@@ -339,7 +340,7 @@ public class RecipeLoader {
                 GTOreDictUnificator.get(OrePrefixes.plateDense, Materials.Electrum, 6))
             .itemOutputs(new ItemStack(LanthItemList.ANTENNA_CASING_T2))
             .metadata(GTRecipeConstants.RESEARCH_ITEM, new ItemStack(LanthItemList.ANTENNA_CASING_T1))
-            .metadata(GTRecipeConstants.RESEARCH_TIME, 40 * GTRecipeBuilder.MINUTES)
+            .metadata(SCANNING, new Scanning(1 * MINUTES + 10 * SECONDS, TierEU.RECIPE_LuV))
             .duration(60 * GTRecipeBuilder.SECONDS)
             .eut(TierEU.RECIPE_ZPM)
             .addTo(AssemblyLine);
@@ -349,7 +350,7 @@ public class RecipeLoader {
             .itemInputs(
                 GTOreDictUnificator.get(OrePrefixes.frameGt, Materials.Niobium, 1),
                 Materials.Niobium.getPlates(6))
-            .fluidInputs(Materials.Helium.getGas(2000))
+            .fluidInputs(Materials.Helium.getGas(2_000))
             .itemOutputs(new ItemStack(LanthItemList.NIOBIUM_CAVITY_CASING, 1))
             .duration(12 * GTRecipeBuilder.SECONDS)
             .eut(7680)
@@ -358,9 +359,9 @@ public class RecipeLoader {
         // Focus Manipulator
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                Materials.SolderingAlloy.getMolten(8000),
-                Materials.Gold.getMolten(2000),
-                Materials.Argon.getGas(1000))
+                Materials.SolderingAlloy.getMolten(64 * INGOTS),
+                Materials.Gold.getMolten(16 * INGOTS),
+                Materials.Argon.getGas(1_000))
             .itemInputs(
                 GTOreDictUnificator.get(OrePrefixes.frameGt, Materials.Aluminium, 1),
 
@@ -371,7 +372,7 @@ public class RecipeLoader {
                 GTOreDictUnificator.get(OrePrefixes.wireGt01, Materials.Tungsten, 2))
             .itemOutputs(new ItemStack(LanthItemList.FOCUS_MANIPULATION_CASING))
             .metadata(GTRecipeConstants.RESEARCH_ITEM, new ItemStack(LanthItemList.maskMap.get(MaskList.BLANK1)))
-            .metadata(GTRecipeConstants.RESEARCH_TIME, 20 * GTRecipeBuilder.MINUTES)
+            .metadata(SCANNING, new Scanning(1 * MINUTES, TierEU.RECIPE_IV))
             .duration(60 * GTRecipeBuilder.SECONDS)
             .eut(TierEU.RECIPE_LuV)
             .addTo(AssemblyLine);
@@ -422,9 +423,9 @@ public class RecipeLoader {
         // Target Receptacle, same thing as Focus Manipulator basically
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                Materials.SolderingAlloy.getMolten(8000),
-                Materials.Gold.getMolten(2000),
-                Materials.Argon.getGas(1000))
+                Materials.SolderingAlloy.getMolten(64 * INGOTS),
+                Materials.Gold.getMolten(16 * INGOTS),
+                Materials.Argon.getGas(1_000))
             .itemInputs(
                 GTOreDictUnificator.get(OrePrefixes.frameGt, Materials.Aluminium, 1),
                 new Object[] { OrePrefixes.circuit.get(Materials.IV), 4 },
@@ -433,7 +434,7 @@ public class RecipeLoader {
                 GTOreDictUnificator.get(OrePrefixes.wireGt01, Materials.Tungsten, 2))
             .itemOutputs(new ItemStack(LanthItemList.TARGET_RECEPTACLE_CASING))
             .metadata(GTRecipeConstants.RESEARCH_ITEM, ItemList.Circuit_Silicon_Wafer.get(1))
-            .metadata(GTRecipeConstants.RESEARCH_TIME, 20 * GTRecipeBuilder.MINUTES)
+            .metadata(SCANNING, new Scanning(1 * MINUTES, TierEU.RECIPE_IV))
             .duration(60 * GTRecipeBuilder.SECONDS)
             .eut(TierEU.RECIPE_LuV)
             .addTo(AssemblyLine);
@@ -447,7 +448,7 @@ public class RecipeLoader {
                 GTUtility.copyAmount(4, insulator),
                 ItemList.Electric_Pump_LuV.get(1),
                 Materials.Silver.getDust(2))
-            .fluidInputs(Materials.Silicone.getMolten(288L))
+            .fluidInputs(Materials.RubberSilicone.getMolten(2 * INGOTS))
             .itemOutputs(new ItemStack(LanthItemList.CAPILLARY_EXCHANGE, 1))
             .duration(20 * SECONDS)
             .eut(TierEU.RECIPE_IV)
@@ -458,7 +459,7 @@ public class RecipeLoader {
             .itemInputs(
                 WerkstoffMaterialPool.MuMetal.get(OrePrefixes.wireFine, 12),
                 GTOreDictUnificator.get(OrePrefixes.stick, Materials.TungstenSteel, 4))
-            .fluidInputs(Materials.SolderingAlloy.getMolten(144))
+            .fluidInputs(Materials.SolderingAlloy.getMolten(1 * INGOTS))
             .itemOutputs(new ItemStack(LanthItemList.MM_LATTICE, 1))
             .duration(15 * SECONDS)
             .eut(TierEU.RECIPE_EV)
@@ -467,7 +468,7 @@ public class RecipeLoader {
         // Shielded Accelerator Glass
         GTValues.RA.stdBuilder()
             .itemInputs(new ItemStack(LanthItemList.MM_LATTICE, 4))
-            .fluidInputs(Materials.BorosilicateGlass.getMolten(144))
+            .fluidInputs(Materials.BorosilicateGlass.getMolten(1 * INGOTS))
             .itemOutputs(new ItemStack(LanthItemList.SHIELDED_ACCELERATOR_GLASS, 1))
             .duration(25 * SECONDS)
             .eut(TierEU.RECIPE_IV)
@@ -481,7 +482,7 @@ public class RecipeLoader {
                 GTOreDictUnificator.get(OrePrefixes.stick, Materials.TungstenCarbide, 8),
                 GTOreDictUnificator.get(OrePrefixes.foil, Materials.Osmiridium, 4),
                 GTUtility.getIntegratedCircuit(7))
-            .fluidInputs(Materials.SolderingAlloy.getMolten(144))
+            .fluidInputs(Materials.SolderingAlloy.getMolten(1 * INGOTS))
             .itemOutputs(LanthItemList.BEAMLINE_PIPE)
             .duration(20 * SECONDS)
             .eut(TierEU.RECIPE_LuV)
@@ -490,23 +491,19 @@ public class RecipeLoader {
         // Beamline Input Hatch
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                Materials.SolderingAlloy.getMolten(6000),
-                Materials.Argon.getGas(1000),
-                Materials.Helium.getGas(2000)
-
-            )
+                Materials.SolderingAlloy.getMolten(64 * INGOTS),
+                Materials.Argon.getGas(1_000),
+                Materials.Helium.getGas(2_000))
             .itemInputs(
                 ItemList.Hull_LuV.get(1),
                 new Object[] { OrePrefixes.circuit.get(Materials.LuV), 2 },
                 new ItemStack(LanthItemList.CAPILLARY_EXCHANGE, 2),
                 ItemList.Electric_Pump_LuV.get(1),
                 LanthItemList.BEAMLINE_PIPE,
-                WerkstoffMaterialPool.MuMetal.get(OrePrefixes.plate, 4)
-
-            )
+                WerkstoffMaterialPool.MuMetal.get(OrePrefixes.plate, 4))
             .itemOutputs(LanthItemList.LUV_BEAMLINE_INPUT_HATCH)
             .metadata(GTRecipeConstants.RESEARCH_ITEM, ItemList.Hatch_Input_LuV.get(1))
-            .metadata(GTRecipeConstants.RESEARCH_TIME, 30 * GTRecipeBuilder.MINUTES)
+            .metadata(SCANNING, new Scanning(1 * MINUTES + 20 * SECONDS, TierEU.RECIPE_IV))
             .duration(2 * GTRecipeBuilder.MINUTES)
             .eut(TierEU.RECIPE_LuV)
             .addTo(AssemblyLine);
@@ -514,11 +511,9 @@ public class RecipeLoader {
         // Beamline Output Hatch
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                Materials.SolderingAlloy.getMolten(8000),
-                Materials.Argon.getGas(1000),
-                Materials.Helium.getGas(6000)
-
-            )
+                Materials.SolderingAlloy.getMolten(64 * INGOTS),
+                Materials.Argon.getGas(1_000),
+                Materials.Helium.getGas(6_000))
             .itemInputs(
                 ItemList.Hull_LuV.get(1),
                 new Object[] { OrePrefixes.circuit.get(Materials.LuV), 6 },
@@ -532,45 +527,44 @@ public class RecipeLoader {
             )
             .itemOutputs(LanthItemList.LUV_BEAMLINE_OUTPUT_HATCH)
             .metadata(GTRecipeConstants.RESEARCH_ITEM, ItemList.Hatch_Output_LuV.get(1))
-            .metadata(GTRecipeConstants.RESEARCH_TIME, 40 * GTRecipeBuilder.MINUTES)
+            .metadata(SCANNING, new Scanning(1 * MINUTES + 20 * SECONDS, TierEU.RECIPE_IV))
             .duration(4 * GTRecipeBuilder.MINUTES)
             .eut(TierEU.RECIPE_LuV)
             .addTo(AssemblyLine);
 
         GTValues.RA.stdBuilder()
-            .fluidInputs(Materials.Chloroform.getFluid(1000), Materials.HydrofluoricAcid.getFluid(3000))
+            .fluidInputs(Materials.Chloroform.getFluid(1_000), Materials.HydrofluoricAcid.getFluid(3_000))
             .fluidOutputs(
-                WerkstoffMaterialPool.Fluoroform.getFluidOrGas(1000),
-                Materials.HydrochloricAcid.getFluid(3000))
+                WerkstoffMaterialPool.Fluoroform.getFluidOrGas(1_000),
+                Materials.HydrochloricAcid.getFluid(3_000))
             .duration(15 * GTRecipeBuilder.SECONDS)
             .eut(TierEU.RECIPE_EV)
             .addTo(multiblockChemicalReactorRecipes);
 
         GTValues.RA.stdBuilder()
-            .fluidInputs(Materials.Nitrogen.getPlasma(4000))
+            .fluidInputs(Materials.Nitrogen.getPlasma(4_000))
             .itemInputs(Materials.Silane.getCells(2))
-            .fluidOutputs(WerkstoffMaterialPool.NitrogenPlasmaSilaneMix.getFluidOrGas(6000))
+            .fluidOutputs(WerkstoffMaterialPool.NitrogenPlasmaSilaneMix.getFluidOrGas(6_000))
             .itemOutputs(Materials.Empty.getCells(2))
             .duration(20 * GTRecipeBuilder.SECONDS)
             .eut(7680)
-            .noOptimize()
             .addTo(mixerRecipes);
 
         // NB: http://www.smfl.rit.edu/pdf/process/process_nitride_etch_paper.pdf
         // Reactive Ion Etchant
         GTValues.RA.stdBuilder()
-            .fluidInputs(WerkstoffMaterialPool.Fluoroform.getFluidOrGas(3000))
+            .fluidInputs(WerkstoffMaterialPool.Fluoroform.getFluidOrGas(3_000))
             .itemInputs(Materials.Oxygen.getCells(4))
-            .fluidOutputs(WerkstoffMaterialPool.FluoroformOxygenMix.getFluidOrGas(5000))
+            .fluidOutputs(WerkstoffMaterialPool.FluoroformOxygenMix.getFluidOrGas(5_000))
             .itemOutputs(Materials.Empty.getCells(4))
             .duration(15 * GTRecipeBuilder.SECONDS)
             .eut(TierEU.RECIPE_EV)
             .addTo(mixerRecipes);
 
         GTValues.RA.stdBuilder()
-            .fluidInputs(WerkstoffMaterialPool.FluoroformOxygenMix.getFluidOrGas(5000))
+            .fluidInputs(WerkstoffMaterialPool.FluoroformOxygenMix.getFluidOrGas(5_000))
             .itemInputs(Materials.Empty.getCells(4))
-            .fluidOutputs(WerkstoffMaterialPool.Fluoroform.getFluidOrGas(3000))
+            .fluidOutputs(WerkstoffMaterialPool.Fluoroform.getFluidOrGas(3_000))
             .itemOutputs(Materials.Oxygen.getCells(4))
             .duration(5 * GTRecipeBuilder.SECONDS)
             .eut(TierEU.RECIPE_HV)
@@ -589,7 +583,7 @@ public class RecipeLoader {
         //
         GTValues.RA.stdBuilder()
             .itemInputs(new ItemStack(LanthItemList.IRON_COATED_QUARTZ))
-            .fluidInputs(Materials.Oxygen.getGas(1000))
+            .fluidInputs(Materials.Oxygen.getGas(1_000))
             .itemOutputs(new ItemStack(LanthItemList.maskMap.get(MaskList.BLANK1)))
             .outputChances(10000)
             .requiresCleanRoom()
@@ -598,18 +592,17 @@ public class RecipeLoader {
             .addTo(autoclaveRecipes);
 
         /*
-         * Unsure what was intended with this recipe?
-         * GT_Values.RA.stdBuilder()
-         * .itemInputs(new ItemStack(LanthItemList.IRON_COATED_QUARTZ), Materials.Chrome.getDust(1))
-         * .fluidInputs(Materials.Oxygen.getGas(1000))
-         * .itemOutputs(new ItemStack(LanthItemList.maskMap.get(MaskList.BLANK2)))
-         * .outputChances(10000).requiresCleanRoom().duration(12 * SECONDS).eut(7980).addTo(autoclaveRecipes);
+         * Unsure what was intended with this recipe? GT_Values.RA.stdBuilder() .itemInputs(new
+         * ItemStack(LanthItemList.IRON_COATED_QUARTZ), Materials.Chrome.getDust(1))
+         * .fluidInputs(Materials.Oxygen.getGas(1_000)) .itemOutputs(new
+         * ItemStack(LanthItemList.maskMap.get(MaskList.BLANK2))) .outputChances(10000).requiresCleanRoom().duration(12
+         * * SECONDS).eut(7980).addTo(autoclaveRecipes);
          */
 
         // Grow the first silicon
         GTValues.RA.stdBuilder()
             .itemInputs(Materials.Glass.getPlates(1))
-            .fluidInputs(Materials.Silane.getGas(4000))
+            .fluidInputs(Materials.Silane.getGas(4_000))
             .itemOutputs(new ItemStack(LanthItemList.SUBSTRATE_PRECURSOR))
             .duration(60 * GTRecipeBuilder.SECONDS)
             .eut(TierEU.RECIPE_LuV)
@@ -619,8 +612,8 @@ public class RecipeLoader {
         // Now to deposit nitride
         GTValues.RA.stdBuilder()
             .itemInputs(new ItemStack(LanthItemList.SUBSTRATE_PRECURSOR))
-            .fluidInputs(WerkstoffMaterialPool.NitrogenPlasmaSilaneMix.getFluidOrGas(4000))
-            .fluidOutputs(Materials.Nitrogen.getGas(3000))
+            .fluidInputs(WerkstoffMaterialPool.NitrogenPlasmaSilaneMix.getFluidOrGas(4_000))
+            .fluidOutputs(Materials.Nitrogen.getGas(3_000))
             .itemOutputs(new ItemStack(LanthItemList.MASK_SUBSTRATE))
             .duration(30 * GTRecipeBuilder.SECONDS)
             .eut(TierEU.RECIPE_LuV)
@@ -630,10 +623,10 @@ public class RecipeLoader {
 
         /*
          * GT_Values.RA.stdBuilder().itemInputs(GTOreDictUnificator.get(OrePrefixes.foil, Materials.Silicon, 1))
-         * .fluidInputs(Materials.SiliconTetrachloride.getFluid(3000), Materials.Ammonia.getFluid(4000))
-         * .fluidOutputs(Materials.HydrochloricAcid.getFluid(12000))
-         * .itemOutputs(WerkstoffMaterialPool.SiliconNitride.get(OrePrefixes.plate)) .duration(GTRecipeBuilder.SECONDS
-         * * 30) .eut(TierEU.EV) .addTo(GTRecipe.GTRecipe_Map.sPlasmaArcFurnaceRecipes);
+         * .fluidInputs(Materials.SiliconTetrachloride.getFluid(3_000), Materials.Ammonia.getFluid(4_000))
+         * .fluidOutputs(Materials.HydrochloricAcid.getFluid(12_000))
+         * .itemOutputs(WerkstoffMaterialPool.SiliconNitride.get(OrePrefixes.plate)) .duration(GTRecipeBuilder.SECONDS *
+         * 30) .eut(TierEU.EV) .addTo(GTRecipe.GTRecipe_Map.sPlasmaArcFurnaceRecipes);
          */
 
         for (ItemStack lens : OreDictionary.getOres("craftingLensYellow")) {
@@ -650,7 +643,7 @@ public class RecipeLoader {
 
         GTValues.RA.stdBuilder()
             .itemInputs(new ItemStack(LanthItemList.MASKED_MASK))
-            .fluidInputs(WerkstoffMaterialPool.FluoroformOxygenMix.getFluidOrGas(4000))
+            .fluidInputs(WerkstoffMaterialPool.FluoroformOxygenMix.getFluidOrGas(4_000))
             .itemOutputs(new ItemStack(LanthItemList.ETCHED_MASK_1))
             .duration(60 * GTRecipeBuilder.SECONDS)
             .eut(TierEU.RECIPE_LuV)
@@ -659,7 +652,6 @@ public class RecipeLoader {
 
         // Etch pt. 2 with LiCl
         GTValues.RA.stdBuilder()
-            .fluidInputs(Materials.Argon.getGas(1000))
             .itemInputs(
                 new ItemStack(LanthItemList.MASKED_MASK),
                 GGMaterial.lithiumChloride.get(OrePrefixes.dust, 2),
@@ -667,8 +659,9 @@ public class RecipeLoader {
             .itemOutputs(new ItemStack(LanthItemList.maskMap.get(MaskList.BLANK2)))
             .duration(80 * GTRecipeBuilder.SECONDS)
             .eut(TierEU.RECIPE_ZPM)
-            .specialValue(2400)
-            .addTo(blastFurnaceRecipes);
+            .metadata(COIL_HEAT, 2400)
+            .metadata(ADDITIVE_AMOUNT, 1000)
+            .addTo(BlastFurnaceWithGas);
 
         GTValues.RA.stdBuilder()
             .itemInputs(
@@ -676,7 +669,7 @@ public class RecipeLoader {
                 Materials.Sodium.getDust(1),
                 Materials.Chrome.getPlates(1),
                 Materials.Gold.getPlates(2))
-            .fluidInputs(Materials.Hydrogen.getGas(1000))
+            .fluidInputs(Materials.Hydrogen.getGas(1_000))
             .itemOutputs(new ItemStack(LanthItemList.maskMap.get(MaskList.BLANK3)))
             .duration(2 * GTRecipeBuilder.MINUTES)
             .eut(TierEU.RECIPE_ZPM)
@@ -689,7 +682,7 @@ public class RecipeLoader {
                 Materials.Glass.getPlates(2),
                 new ItemStack(ModItems.dustLithiumHydroxide, 2),
                 Materials.Epoxid.getDust(4))
-            .fluidInputs(Materials.Hydrogen.getGas(2000))
+            .fluidInputs(Materials.Hydrogen.getGas(2_000))
             .itemOutputs(new ItemStack(LanthItemList.maskMap.get(MaskList.CBLANK)))
             .duration(4 * GTRecipeBuilder.MINUTES)
             .eut(TierEU.RECIPE_ZPM)
@@ -711,7 +704,7 @@ public class RecipeLoader {
                         .itemInputs(
                             new ItemStack(LanthItemList.maskMap.get(MaskList.PIC)),
                             Materials.IndiumGalliumPhosphide.getDust(2))
-                        .fluidInputs(Materials.VanadiumGallium.getMolten(288L))
+                        .fluidInputs(Materials.VanadiumGallium.getMolten(2 * INGOTS))
                         .itemOutputs(new ItemStack(LanthItemList.maskMap.get(MaskList.PrPIC)))
                         .duration(60 * GTRecipeBuilder.SECONDS)
                         .eut(mask.getEngraverEUt())
@@ -723,7 +716,7 @@ public class RecipeLoader {
                         .itemInputs(
                             new ItemStack(LanthItemList.maskMap.get(MaskList.HPIC)),
                             Materials.IndiumGalliumPhosphide.getDust(8))
-                        .fluidInputs(Materials.Naquadah.getMolten(576))
+                        .fluidInputs(Materials.Naquadah.getMolten(4 * INGOTS))
                         .itemOutputs(new ItemStack(LanthItemList.maskMap.get(MaskList.PrHPIC)))
                         .duration(60 * GTRecipeBuilder.SECONDS)
                         .eut(mask.getEngraverEUt())
@@ -736,7 +729,7 @@ public class RecipeLoader {
                         .itemInputs(
                             new ItemStack(LanthItemList.maskMap.get(MaskList.NPIC)),
                             Materials.IndiumGalliumPhosphide.getDust(64))
-                        .fluidInputs(Materials.Sunnarium.getMolten(1440L))
+                        .fluidInputs(Materials.Sunnarium.getMolten(10 * INGOTS))
                         .itemOutputs(new ItemStack(LanthItemList.maskMap.get(MaskList.PrNPIC)))
                         .duration(60 * GTRecipeBuilder.SECONDS)
                         .eut(mask.getEngraverEUt())
@@ -749,7 +742,7 @@ public class RecipeLoader {
                         .itemInputs(
                             new ItemStack(LanthItemList.maskMap.get(MaskList.CPU)),
                             GTUtility.copyAmount(16, Ic2Items.carbonFiber))
-                        .fluidInputs(Materials.Glowstone.getMolten(576L))
+                        .fluidInputs(Materials.Glowstone.getMolten(4 * INGOTS))
                         .itemOutputs(new ItemStack(LanthItemList.maskMap.get(MaskList.PrCPU)))
                         .duration(60 * GTRecipeBuilder.SECONDS)
                         .eut(mask.getEngraverEUt())
@@ -762,7 +755,7 @@ public class RecipeLoader {
                         .itemInputs(
                             new ItemStack(LanthItemList.maskMap.get(MaskList.NCPU)),
                             Materials.IndiumGalliumPhosphide.getDust(1))
-                        .fluidInputs(Materials.Radon.getGas(50L))
+                        .fluidInputs(Materials.Radon.getGas(50))
                         .itemOutputs(new ItemStack(LanthItemList.maskMap.get(MaskList.PrNCPU)))
                         .duration(60 * GTRecipeBuilder.SECONDS)
                         .eut(mask.getEngraverEUt())
@@ -771,7 +764,7 @@ public class RecipeLoader {
 
                     GTValues.RA.stdBuilder()
                         .itemInputs(new ItemStack(LanthItemList.maskMap.get(MaskList.NCPU)), ItemList.QuantumEye.get(2))
-                        .fluidInputs(Materials.GalliumArsenide.getMolten(288L))
+                        .fluidInputs(Materials.GalliumArsenide.getMolten(2 * INGOTS))
                         .itemOutputs(new ItemStack(LanthItemList.maskMap.get(MaskList.PrNCPU)))
                         .duration(45 * GTRecipeBuilder.SECONDS)
                         .eut(mask.getEngraverEUt())
@@ -824,7 +817,8 @@ public class RecipeLoader {
                                 new ItemStack(LanthItemList.maskMap.get(maskIngredient)),
                                 GTUtility.copyAmount(0, lens))
                             .fluidInputs(
-                                // damage * 4 (chips per recipe) * 50 (L per chip normally) * 3 / 4 (75% of the cost)
+                                // damage * 4 (chips per recipe) * 50 (L per chip normally) * 3 / 4 (75% of the
+                                // cost)
                                 Materials.BioMediumSterilized.getFluid((mask.getDamage() + 1) * 4L * 50 * 3 / 4))
                             .itemOutputs(new ItemStack(LanthItemList.maskMap.get(mask)))
                             .requiresCleanRoom()
@@ -859,8 +853,8 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(GTUtility.getIntegratedCircuit(1), WerkstoffMaterialPool.Zirconia.get(OrePrefixes.dust, 3))
             .itemOutputs(WerkstoffMaterialPool.ZirconiumTetrachloride.get(OrePrefixes.dust, 5))
-            .fluidInputs(Materials.HydrochloricAcid.getFluid(4000))
-            .fluidOutputs(Materials.Water.getFluid(2000))
+            .fluidInputs(Materials.HydrochloricAcid.getFluid(4_000))
+            .fluidOutputs(Materials.Water.getFluid(2_000))
             .duration(15 * SECONDS)
             .eut(TierEU.RECIPE_LV)
             .addTo(UniversalChemical);
@@ -870,8 +864,8 @@ public class RecipeLoader {
             .itemInputs(
                 GTUtility.getIntegratedCircuit(1),
                 WerkstoffMaterialPool.ZirconiumTetrachloride.get(OrePrefixes.dust, 5))
-            .fluidInputs(Materials.Water.getFluid(1000))
-            .fluidOutputs(WerkstoffMaterialPool.ZirconiumTetrachlorideSolution.getFluidOrGas(1000))
+            .fluidInputs(Materials.Water.getFluid(1_000))
+            .fluidOutputs(WerkstoffMaterialPool.ZirconiumTetrachlorideSolution.getFluidOrGas(1_000))
             .duration(10 * SECONDS)
             .eut(TierEU.RECIPE_LV)
             .addTo(UniversalChemical);
@@ -885,7 +879,7 @@ public class RecipeLoader {
             .itemOutputs(
                 WerkstoffLoader.Zirconium.get(OrePrefixes.ingotHot, 1),
                 GTOreDictUnificator.get(OrePrefixes.dust, Materials.Magnesiumchloride, 6))
-            .fluidInputs(WerkstoffMaterialPool.ZirconiumTetrachlorideSolution.getFluidOrGas(1000))
+            .fluidInputs(WerkstoffMaterialPool.ZirconiumTetrachlorideSolution.getFluidOrGas(1_000))
             .duration(30 * SECONDS)
             .eut(TierEU.RECIPE_EV)
             .metadata(COIL_HEAT, 4500)
@@ -897,8 +891,8 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(GTUtility.getIntegratedCircuit(1), WerkstoffMaterialPool.Hafnia.get(OrePrefixes.dust, 3))
             .itemOutputs(WerkstoffMaterialPool.HafniumTetrachloride.get(OrePrefixes.dust, 5))
-            .fluidInputs(Materials.HydrochloricAcid.getFluid(4000))
-            .fluidOutputs(Materials.Water.getFluid(2000))
+            .fluidInputs(Materials.HydrochloricAcid.getFluid(4_000))
+            .fluidOutputs(Materials.Water.getFluid(2_000))
             .duration(15 * SECONDS)
             .eut(TierEU.RECIPE_LV)
             .addTo(UniversalChemical);
@@ -908,8 +902,8 @@ public class RecipeLoader {
             .itemInputs(
                 GTUtility.getIntegratedCircuit(1),
                 WerkstoffMaterialPool.HafniumTetrachloride.get(OrePrefixes.dust, 5))
-            .fluidInputs(Materials.Water.getFluid(1000))
-            .fluidOutputs(WerkstoffMaterialPool.HafniumTetrachlorideSolution.getFluidOrGas(1000))
+            .fluidInputs(Materials.Water.getFluid(1_000))
+            .fluidOutputs(WerkstoffMaterialPool.HafniumTetrachlorideSolution.getFluidOrGas(1_000))
             .duration(10 * SECONDS)
             .eut(TierEU.RECIPE_LV)
             .addTo(UniversalChemical);
@@ -923,7 +917,7 @@ public class RecipeLoader {
             .itemOutputs(
                 WerkstoffMaterialPool.LowPurityHafnium.get(OrePrefixes.dust, 1),
                 GTOreDictUnificator.get(OrePrefixes.dust, Materials.Magnesiumchloride, 6))
-            .fluidInputs(WerkstoffMaterialPool.HafniumTetrachlorideSolution.getFluidOrGas(1000))
+            .fluidInputs(WerkstoffMaterialPool.HafniumTetrachlorideSolution.getFluidOrGas(1_000))
             .duration(30 * SECONDS)
             .eut(TierEU.RECIPE_EV)
             .metadata(COIL_HEAT, 2700)
@@ -936,7 +930,7 @@ public class RecipeLoader {
                 GTUtility.getIntegratedCircuit(1),
                 WerkstoffMaterialPool.LowPurityHafnium.get(OrePrefixes.dust, 1))
             .itemOutputs(WerkstoffMaterialPool.HafniumIodide.get(OrePrefixes.dust, 5))
-            .fluidInputs(WerkstoffMaterialPool.Iodine.getFluidOrGas(4000))
+            .fluidInputs(WerkstoffMaterialPool.Iodine.getFluidOrGas(4_000))
             .duration(15 * SECONDS)
             .eut(TierEU.RECIPE_LV)
             .addTo(UniversalChemical);
@@ -959,7 +953,7 @@ public class RecipeLoader {
             .itemOutputs(
                 WerkstoffMaterialPool.Hafnium.get(OrePrefixes.ingotHot, 1),
                 WerkstoffMaterialPool.HafniumRunoff.get(OrePrefixes.dustTiny, 1))
-            .fluidOutputs(WerkstoffMaterialPool.Iodine.getFluidOrGas(4000))
+            .fluidOutputs(WerkstoffMaterialPool.Iodine.getFluidOrGas(4_000))
             .duration(30 * SECONDS)
             .eut(TierEU.RECIPE_HV)
             .metadata(COIL_HEAT, 3400)
@@ -973,7 +967,7 @@ public class RecipeLoader {
             .itemOutputs(
                 WerkstoffMaterialPool.Hafnium.get(OrePrefixes.ingotHot, 9),
                 WerkstoffMaterialPool.HafniumRunoff.get(OrePrefixes.dust, 1))
-            .fluidOutputs(WerkstoffMaterialPool.Iodine.getFluidOrGas(36000))
+            .fluidOutputs(WerkstoffMaterialPool.Iodine.getFluidOrGas(36_000))
             .duration(4 * MINUTES + 30 * TICKS)
             .eut(TierEU.RECIPE_HV)
             .metadata(COIL_HEAT, 3400)
@@ -1002,16 +996,16 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(GTUtility.getIntegratedCircuit(12), Materials.NitricAcid.getCells(1))
             .itemOutputs(Materials.Empty.getCells(1))
-            .fluidInputs(Materials.Ammonia.getGas(1000))
-            .fluidOutputs(WerkstoffMaterialPool.AmmoniumNitrate.getFluidOrGas(1000))
+            .fluidInputs(Materials.Ammonia.getGas(1_000))
+            .fluidOutputs(WerkstoffMaterialPool.AmmoniumNitrate.getFluidOrGas(1_000))
             .duration(1 * SECONDS + 10 * TICKS)
             .eut(400)
             .addTo(chemicalReactorRecipes);
 
         GTValues.RA.stdBuilder()
             .itemInputs(GTUtility.getIntegratedCircuit(12))
-            .fluidInputs(Materials.NitricAcid.getFluid(1000), Materials.Ammonia.getGas(1000))
-            .fluidOutputs(WerkstoffMaterialPool.AmmoniumNitrate.getFluidOrGas(1000))
+            .fluidInputs(Materials.NitricAcid.getFluid(1_000), Materials.Ammonia.getGas(1_000))
+            .fluidOutputs(WerkstoffMaterialPool.AmmoniumNitrate.getFluidOrGas(1_000))
             .duration(1 * SECONDS + 10 * TICKS)
             .eut(400)
             .addTo(multiblockChemicalReactorRecipes);
@@ -1026,8 +1020,8 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(WerkstoffMaterialPool.SeaweedAsh.get(OrePrefixes.dust, 2))
             .itemOutputs(Materials.Calcite.getDust(1))
-            .fluidInputs(Materials.DilutedSulfuricAcid.getFluid(1200))
-            .fluidOutputs(WerkstoffMaterialPool.SeaweedConcentrate.getFluidOrGas(1200))
+            .fluidInputs(Materials.DilutedSulfuricAcid.getFluid(1_200))
+            .fluidOutputs(WerkstoffMaterialPool.SeaweedConcentrate.getFluidOrGas(1_200))
             .duration(30 * SECONDS)
             .eut(240)
             .addTo(mixerRecipes);
@@ -1036,7 +1030,7 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(Materials.Benzene.getCells(1))
             .itemOutputs(WerkstoffMaterialPool.Iodine.get(OrePrefixes.dust, 1))
-            .fluidInputs(WerkstoffMaterialPool.SeaweedConcentrate.getFluidOrGas(2000))
+            .fluidInputs(WerkstoffMaterialPool.SeaweedConcentrate.getFluidOrGas(2_000))
             .fluidOutputs(WerkstoffMaterialPool.SeaweedByproducts.getFluidOrGas(200))
             .eut(TierEU.RECIPE_HV)
             .duration(38 * SECONDS)
@@ -1053,7 +1047,7 @@ public class RecipeLoader {
             .itemOutputs(
                 WerkstoffMaterialPool.PotassiumPermanganate.get(OrePrefixes.dust, 12),
                 Materials.RockSalt.getDust(2))
-            .fluidOutputs(Materials.Water.getFluid(1000))
+            .fluidOutputs(Materials.Water.getFluid(1_000))
             .duration(7 * SECONDS + 10 * TICKS)
             .eut(TierEU.RECIPE_HV)
             .metadata(COIL_HEAT, 1200)
@@ -1063,7 +1057,7 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(Materials.Manganese.getDust(1), GTUtility.getIntegratedCircuit(1))
             .itemOutputs(Materials.Pyrolusite.getDust(3))
-            .fluidInputs(Materials.Oxygen.getGas(2000))
+            .fluidInputs(Materials.Oxygen.getGas(2_000))
             .duration(2 * SECONDS)
             .eut(TierEU.RECIPE_LV)
             .addTo(UniversalChemical);
@@ -1076,8 +1070,8 @@ public class RecipeLoader {
             .itemOutputs(
                 Materials.RockSalt.getDust(10),
                 WerkstoffMaterialPool.PotassiumChlorate.get(OrePrefixes.dust, 5))
-            .fluidInputs(Materials.Chlorine.getGas(6000))
-            .fluidOutputs(Materials.Water.getFluid(3000))
+            .fluidInputs(Materials.Chlorine.getGas(6_000))
+            .fluidOutputs(Materials.Water.getFluid(3_000))
             .duration(2 * SECONDS)
             .eut(TierEU.RECIPE_LV)
             .addTo(UniversalChemical);
@@ -1087,8 +1081,8 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(Materials.Empty.getCells(2), Materials.Salt.getDust(4))
             .itemOutputs(Materials.HydrochloricAcid.getCells(2))
-            .fluidInputs(WerkstoffLoader.HexafluorosilicicAcid.getFluidOrGas(1000))
-            .fluidOutputs(WerkstoffMaterialPool.SodiumFluorosilicate.getFluidOrGas(1000))
+            .fluidInputs(WerkstoffLoader.HexafluorosilicicAcid.getFluidOrGas(1_000))
+            .fluidOutputs(WerkstoffMaterialPool.SodiumFluorosilicate.getFluidOrGas(1_000))
             .duration(30 * SECONDS)
             .eut(450)
             .addTo(UniversalChemical);
@@ -1096,17 +1090,17 @@ public class RecipeLoader {
         // La + 6HCl = LaCl3 + 3H
         GTValues.RA.stdBuilder()
             .itemInputs(Materials.Lanthanum.getDust(1), GTUtility.getIntegratedCircuit(1))
-            .fluidInputs(Materials.HydrochloricAcid.getFluid(3000))
+            .fluidInputs(Materials.HydrochloricAcid.getFluid(3_000))
             .itemOutputs(WerkstoffMaterialPool.LanthaniumChloride.get(OrePrefixes.dust, 4))
-            .fluidOutputs(Materials.Hydrogen.getGas(3000))
+            .fluidOutputs(Materials.Hydrogen.getGas(3_000))
             .duration(10 * SECONDS)
             .eut(480)
             .addTo(UniversalChemical);
 
         // Lanthanum Oxide
         GTValues.RA.stdBuilder()
-            .fluidInputs(Materials.Water.getFluid(3000))
-            .fluidOutputs(Materials.HydrochloricAcid.getFluid(6000))
+            .fluidInputs(Materials.Water.getFluid(3_000))
+            .fluidOutputs(Materials.HydrochloricAcid.getFluid(6_000))
             .itemInputs(WerkstoffMaterialPool.LanthaniumChloride.get(OrePrefixes.dust, 8))
             .itemOutputs(WerkstoffMaterialPool.LanthanumOxide.get(OrePrefixes.dust, 1))
             .duration(10 * GTRecipeBuilder.SECONDS)
@@ -1116,17 +1110,27 @@ public class RecipeLoader {
         // Boron Trioxide
         GTValues.RA.stdBuilder()
             .itemInputs(GTUtility.getIntegratedCircuit(2))
-            .fluidInputs(FluidRegistry.getFluidStack("boricacid", 2000))
-            .fluidOutputs(new FluidStack(FluidRegistry.WATER, 3000))
+            .fluidInputs(FluidRegistry.getFluidStack("boricacid", 2_000))
+            .fluidOutputs(new FluidStack(FluidRegistry.WATER, 3_000))
             .itemOutputs(WerkstoffMaterialPool.BoronTrioxide.get(OrePrefixes.dust, 1))
             .duration(15 * GTRecipeBuilder.SECONDS)
             .eut(TierEU.RECIPE_EV)
             .addTo(UniversalChemical);
 
+        GTValues.RA.stdBuilder()
+            .itemInputs(
+                GTUtility.getIntegratedCircuit(2),
+                GTOreDictUnificator.get(OrePrefixes.dust, Materials.Boron, 2))
+            .fluidInputs(Materials.Oxygen.getGas(3_000))
+            .itemOutputs(WerkstoffMaterialPool.BoronTrioxide.get(OrePrefixes.dust, 1))
+            .duration(30 * GTRecipeBuilder.SECONDS)
+            .eut(TierEU.RECIPE_IV)
+            .addTo(UniversalChemical);
+
         // Boron Trichloride
         GTValues.RA.stdBuilder()
-            .fluidInputs(BotWerkstoffMaterialPool.Phosgene.getFluidOrGas(3000))
-            .fluidOutputs(WerkstoffMaterialPool.BoronTrichloride.getFluidOrGas(2000))
+            .fluidInputs(BotWerkstoffMaterialPool.Phosgene.getFluidOrGas(3_000))
+            .fluidOutputs(WerkstoffMaterialPool.BoronTrichloride.getFluidOrGas(2_000))
             .itemInputs(WerkstoffMaterialPool.BoronTrioxide.get(OrePrefixes.dust, 1), Materials.Empty.getCells(3))
             .itemOutputs(Materials.CarbonMonoxide.getCells(3))
             .duration(10 * GTRecipeBuilder.SECONDS)
@@ -1135,8 +1139,8 @@ public class RecipeLoader {
 
         // Lanthanum Hexaboride
         GTValues.RA.stdBuilder()
-            .fluidInputs(WerkstoffMaterialPool.BoronTrichloride.getFluidOrGas(8000))
-            .fluidOutputs(FluidRegistry.getFluidStack("boricacid", 1000))
+            .fluidInputs(WerkstoffMaterialPool.BoronTrichloride.getFluidOrGas(8_000))
+            .fluidOutputs(FluidRegistry.getFluidStack("boricacid", 1_000))
             .itemInputs(WerkstoffMaterialPool.LanthanumOxide.get(OrePrefixes.dust, 1))
             .itemOutputs(WerkstoffMaterialPool.LanthanumHexaboride.get(OrePrefixes.gemFlawless))
             .duration(60 * GTRecipeBuilder.SECONDS)
@@ -1150,10 +1154,10 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(GGMaterial.vanadiumPentoxide.get(OrePrefixes.dustTiny, 1))
             .fluidInputs(
-                Materials.Methanol.getFluid(1000),
-                Materials.CarbonMonoxide.getGas(1000),
-                Materials.Oxygen.getGas(3000))
-            .fluidOutputs(GGMaterial.oxalate.getFluidOrGas(1000), Materials.Water.getFluid(1000))
+                Materials.Methanol.getFluid(1_000),
+                Materials.CarbonMonoxide.getGas(1_000),
+                Materials.Oxygen.getGas(3_000))
+            .fluidOutputs(GGMaterial.oxalate.getFluidOrGas(1_000), Materials.Water.getFluid(1_000))
             .duration(22 * SECONDS + 10 * TICKS)
             .eut(240)
             .addTo(multiblockChemicalReactorRecipes);
@@ -1161,10 +1165,10 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(GTUtility.getIntegratedCircuit(9), GGMaterial.vanadiumPentoxide.get(OrePrefixes.dust, 1))
             .fluidInputs(
-                Materials.Methanol.getFluid(9000),
-                Materials.CarbonMonoxide.getGas(9000),
-                Materials.Oxygen.getGas(27000))
-            .fluidOutputs(GGMaterial.oxalate.getFluidOrGas(9000), Materials.Water.getFluid(9000))
+                Materials.Methanol.getFluid(9_000),
+                Materials.CarbonMonoxide.getGas(9_000),
+                Materials.Oxygen.getGas(27_000))
+            .fluidOutputs(GGMaterial.oxalate.getFluidOrGas(9_000), Materials.Water.getFluid(9_000))
             .duration(3 * MINUTES + 22 * SECONDS + 10 * TICKS)
             .eut(240)
             .addTo(multiblockChemicalReactorRecipes);
@@ -1174,16 +1178,16 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(GGMaterial.vanadiumPentoxide.get(OrePrefixes.dustTiny, 1))
             .itemOutputs()
-            .fluidInputs(Materials.Ethanol.getFluid(1000), Materials.Oxygen.getGas(5000))
-            .fluidOutputs(GGMaterial.oxalate.getFluidOrGas(1000), Materials.Water.getFluid(2000))
+            .fluidInputs(Materials.Ethanol.getFluid(1_000), Materials.Oxygen.getGas(5_000))
+            .fluidOutputs(GGMaterial.oxalate.getFluidOrGas(1_000), Materials.Water.getFluid(2_000))
             .duration(22 * SECONDS + 10 * TICKS)
             .eut(240)
             .addTo(multiblockChemicalReactorRecipes);
 
         GTValues.RA.stdBuilder()
             .itemInputs(GTUtility.getIntegratedCircuit(9), GGMaterial.vanadiumPentoxide.get(OrePrefixes.dust, 1))
-            .fluidInputs(Materials.Ethanol.getFluid(9000), Materials.Oxygen.getGas(45000))
-            .fluidOutputs(GGMaterial.oxalate.getFluidOrGas(9000), Materials.Water.getFluid(18000))
+            .fluidInputs(Materials.Ethanol.getFluid(9_000), Materials.Oxygen.getGas(45_000))
+            .fluidOutputs(GGMaterial.oxalate.getFluidOrGas(9_000), Materials.Water.getFluid(18_000))
             .duration(3 * MINUTES + 22 * SECONDS + 10 * TICKS)
             .eut(240)
             .addTo(multiblockChemicalReactorRecipes);
@@ -1195,8 +1199,8 @@ public class RecipeLoader {
                 GTUtility.getIntegratedCircuit(1),
                 WerkstoffMaterialPool.CeriumChloride.get(OrePrefixes.dust, 8))
             .itemOutputs(WerkstoffMaterialPool.CeriumOxalate.get(OrePrefixes.dust, 5))
-            .fluidInputs(GGMaterial.oxalate.getFluidOrGas(3000))
-            .fluidOutputs(Materials.HydrochloricAcid.getFluid(6000))
+            .fluidInputs(GGMaterial.oxalate.getFluidOrGas(3_000))
+            .fluidOutputs(Materials.HydrochloricAcid.getFluid(6_000))
             .duration(15 * SECONDS)
             .eut(450)
             .addTo(UniversalChemical);
@@ -1215,10 +1219,10 @@ public class RecipeLoader {
 
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                Materials.Water.getFluid(10000),
-                WerkstoffMaterialPool.MuddyRareEarthMonaziteSolution.getFluidOrGas(1000))
+                Materials.Water.getFluid(10_000),
+                WerkstoffMaterialPool.MuddyRareEarthMonaziteSolution.getFluidOrGas(1_000))
             .itemInputs(GTUtility.getIntegratedCircuit(1), Materials.Saltpeter.getDust(1))
-            .fluidOutputs(WerkstoffMaterialPool.DilutedRareEarthMonaziteMud.getFluidOrGas(11000))
+            .fluidOutputs(WerkstoffMaterialPool.DilutedRareEarthMonaziteMud.getFluidOrGas(11_000))
             .itemOutputs(
                 WerkstoffMaterialPool.HafniaZirconiaBlend.get(OrePrefixes.dustTiny, 4),
                 WerkstoffLoader.Thorianit.get(OrePrefixes.dust, 1),
@@ -1226,15 +1230,14 @@ public class RecipeLoader {
             .eut(TierEU.RECIPE_HV)
             .duration(900)
             .metadata(DISSOLUTION_TANK_RATIO, 10)
-            .noOptimize()
             .addTo(dissolutionTankRecipes);
 
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                Materials.Water.getFluid(90000),
-                WerkstoffMaterialPool.MuddyRareEarthMonaziteSolution.getFluidOrGas(9000))
+                Materials.Water.getFluid(90_000),
+                WerkstoffMaterialPool.MuddyRareEarthMonaziteSolution.getFluidOrGas(9_000))
             .itemInputs(GTUtility.getIntegratedCircuit(9), Materials.Saltpeter.getDust(9))
-            .fluidOutputs(WerkstoffMaterialPool.DilutedRareEarthMonaziteMud.getFluidOrGas(99000))
+            .fluidOutputs(WerkstoffMaterialPool.DilutedRareEarthMonaziteMud.getFluidOrGas(99_000))
             .itemOutputs(
                 WerkstoffMaterialPool.HafniaZirconiaBlend.get(OrePrefixes.dust, 4),
                 WerkstoffLoader.Thorianit.get(OrePrefixes.dust, 9),
@@ -1242,11 +1245,10 @@ public class RecipeLoader {
             .eut(TierEU.RECIPE_HV)
             .duration(8100)
             .metadata(DISSOLUTION_TANK_RATIO, 10)
-            .noOptimize()
             .addTo(dissolutionTankRecipes);
 
         GTValues.RA.stdBuilder()
-            .fluidInputs(WerkstoffMaterialPool.DilutedRareEarthMonaziteMud.getFluidOrGas(1000))
+            .fluidInputs(WerkstoffMaterialPool.DilutedRareEarthMonaziteMud.getFluidOrGas(1_000))
             .itemOutputs(
                 WerkstoffMaterialPool.MonaziteSulfate.get(OrePrefixes.dust, 1),
                 Materials.SiliconDioxide.getDust(1),
@@ -1256,13 +1258,12 @@ public class RecipeLoader {
             .outputChances(90_00, 75_00, 20_00, 5_00, 20_00)
             .duration(20 * SECONDS)
             .eut(240)
-            .noOptimize()
             .addTo(sifterRecipes);
 
         GTValues.RA.stdBuilder()
             .itemInputs(WerkstoffMaterialPool.MonaziteSulfate.get(OrePrefixes.dust, 1))
-            .fluidInputs(Materials.Water.getFluid(6000))
-            .fluidOutputs(WerkstoffMaterialPool.DilutedMonaziteSulfate.getFluidOrGas(7000))
+            .fluidInputs(Materials.Water.getFluid(6_000))
+            .fluidOutputs(WerkstoffMaterialPool.DilutedMonaziteSulfate.getFluidOrGas(7_000))
             .duration(24 * SECONDS)
             .eut(400)
             .addTo(mixerRecipes);
@@ -1271,7 +1272,7 @@ public class RecipeLoader {
             .itemInputs(GTUtility.getIntegratedCircuit(13))
             .itemOutputs(WerkstoffMaterialPool.AcidicMonazitePowder.get(OrePrefixes.dustTiny, 3))
             .fluidInputs(
-                WerkstoffMaterialPool.DilutedMonaziteSulfate.getFluidOrGas(1000),
+                WerkstoffMaterialPool.DilutedMonaziteSulfate.getFluidOrGas(1_000),
                 WerkstoffMaterialPool.AmmoniumNitrate.getFluidOrGas(200))
             .duration(24 * SECONDS)
             .eut(TierEU.RECIPE_HV)
@@ -1281,8 +1282,8 @@ public class RecipeLoader {
             .itemInputs(GTUtility.getIntegratedCircuit(14))
             .itemOutputs(WerkstoffMaterialPool.AcidicMonazitePowder.get(OrePrefixes.dust, 3))
             .fluidInputs(
-                WerkstoffMaterialPool.DilutedMonaziteSulfate.getFluidOrGas(9000),
-                WerkstoffMaterialPool.AmmoniumNitrate.getFluidOrGas(1800))
+                WerkstoffMaterialPool.DilutedMonaziteSulfate.getFluidOrGas(9_000),
+                WerkstoffMaterialPool.AmmoniumNitrate.getFluidOrGas(1_800))
             .duration(3 * MINUTES + 36 * SECONDS)
             .eut(TierEU.RECIPE_HV)
             .addTo(multiblockChemicalReactorRecipes);
@@ -1363,7 +1364,7 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(WerkstoffMaterialPool.DriedMonaziteRareEarthConcentrate.get(OrePrefixes.dust, 1))
             .fluidInputs(Materials.NitricAcid.getFluid(500))
-            .fluidOutputs(WerkstoffMaterialPool.NitratedRareEarthMonaziteConcentrate.getFluidOrGas(1000))
+            .fluidOutputs(WerkstoffMaterialPool.NitratedRareEarthMonaziteConcentrate.getFluidOrGas(1_000))
             .duration(25 * SECONDS)
             .eut(TierEU.RECIPE_HV)
             .addTo(UniversalChemical);
@@ -1371,27 +1372,26 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(Materials.Water.getCells(1))
             .itemOutputs(Materials.Empty.getCells(1))
-            .fluidInputs(WerkstoffMaterialPool.NitratedRareEarthMonaziteConcentrate.getFluidOrGas(1000))
-            .fluidOutputs(WerkstoffMaterialPool.NitricLeachedMonaziteMixture.getFluidOrGas(1000))
+            .fluidInputs(WerkstoffMaterialPool.NitratedRareEarthMonaziteConcentrate.getFluidOrGas(1_000))
+            .fluidOutputs(WerkstoffMaterialPool.NitricLeachedMonaziteMixture.getFluidOrGas(1_000))
             .duration(10 * SECONDS)
             .eut(TierEU.RECIPE_MV)
             .addTo(mixerRecipes);
         GTValues.RA.stdBuilder()
             .itemInputs(WerkstoffMaterialPool.CeriumRichMixture.get(OrePrefixes.dust, 3))
-            .fluidInputs(WerkstoffMaterialPool.NitratedRareEarthMonaziteConcentrate.getFluidOrGas(1000))
-            .fluidOutputs(WerkstoffMaterialPool.NitricLeachedMonaziteMixture.getFluidOrGas(2000))
+            .fluidInputs(WerkstoffMaterialPool.NitratedRareEarthMonaziteConcentrate.getFluidOrGas(1_000))
+            .fluidOutputs(WerkstoffMaterialPool.NitricLeachedMonaziteMixture.getFluidOrGas(2_000))
             .duration(11 * SECONDS)
             .eut(TierEU.RECIPE_MV)
             .addTo(mixerRecipes);
 
         GTValues.RA.stdBuilder()
-            .fluidInputs(WerkstoffMaterialPool.NitricLeachedMonaziteMixture.getFluidOrGas(1000))
+            .fluidInputs(WerkstoffMaterialPool.NitricLeachedMonaziteMixture.getFluidOrGas(1_000))
             .itemOutputs(WerkstoffMaterialPool.CeriumDioxide.get(OrePrefixes.dust, 1))
             .outputChances(11_11)
-            .fluidOutputs(WerkstoffMaterialPool.NitricMonaziteLeachedConcentrate.getFluidOrGas(1000))
+            .fluidOutputs(WerkstoffMaterialPool.NitricMonaziteLeachedConcentrate.getFluidOrGas(1_000))
             .duration(20 * SECONDS)
             .eut(240)
-            .noOptimize()
             .addTo(sifterRecipes);
 
         // BEGIN Cerium
@@ -1411,8 +1411,8 @@ public class RecipeLoader {
                 WerkstoffMaterialPool.CeriumDioxide.get(OrePrefixes.dust, 3),
                 WerkstoffLoader.AmmoniumChloride.get(OrePrefixes.cell, 3))
             .itemOutputs(WerkstoffMaterialPool.CeriumChloride.get(OrePrefixes.dust, 4), Materials.Ammonia.getCells(3))
-            .fluidInputs(Materials.Hydrogen.getGas(1000))
-            .fluidOutputs(Materials.Water.getGas(2000))
+            .fluidInputs(Materials.Hydrogen.getGas(1_000))
+            .fluidOutputs(Materials.Steam.getGas(2_000))
             .duration(15 * SECONDS)
             .eut(450)
             .addTo(UniversalChemical);
@@ -1421,7 +1421,7 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(WerkstoffMaterialPool.CeriumOxalate.get(OrePrefixes.dust, 5), Materials.Carbon.getDust(3))
             .itemOutputs(WerkstoffMaterialPool.CeriumIIIOxide.get(OrePrefixes.dust, 5))
-            .fluidOutputs(Materials.CarbonMonoxide.getGas(9000))
+            .fluidOutputs(Materials.CarbonMonoxide.getGas(9_000))
             .duration(10 * SECONDS)
             .eut(TierEU.RECIPE_HV)
             .metadata(COIL_HEAT, 800)
@@ -1431,10 +1431,9 @@ public class RecipeLoader {
 
         GTValues.RA.stdBuilder()
             .itemOutputs(WerkstoffMaterialPool.CooledMonaziteRareEarthConcentrate.get(OrePrefixes.dust, 1))
-            .fluidInputs(WerkstoffMaterialPool.NitricMonaziteLeachedConcentrate.getFluidOrGas(1000))
+            .fluidInputs(WerkstoffMaterialPool.NitricMonaziteLeachedConcentrate.getFluidOrGas(1_000))
             .duration(5 * SECONDS)
             .eut(240)
-            .noOptimize()
             .addTo(vacuumFreezerRecipes);
 
         GTValues.RA.stdBuilder()
@@ -1459,7 +1458,7 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(WerkstoffMaterialPool.EuropiumOxide.get(OrePrefixes.dust, 2))
             .itemOutputs(Materials.Europium.getDust(1))
-            .fluidOutputs(Materials.Oxygen.getGas(1000L))
+            .fluidOutputs(Materials.Oxygen.getGas(1_000))
             .duration(15 * SECONDS)
             .eut(33_000)
             .addTo(electrolyzerRecipes);
@@ -1476,7 +1475,7 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(WerkstoffMaterialPool.MonaziteRarerEarthSediment.get(OrePrefixes.dust, 1))
             .itemOutputs(WerkstoffMaterialPool.MonaziteHeterogenousHalogenicRareEarthMixture.get(OrePrefixes.dust, 1))
-            .fluidInputs(Materials.Chlorine.getGas(1000))
+            .fluidInputs(Materials.Chlorine.getGas(1_000))
             .duration(25 * SECONDS)
             .eut(TierEU.RECIPE_HV)
             .metadata(COIL_HEAT, 1200)
@@ -1487,7 +1486,7 @@ public class RecipeLoader {
                 Materials.Salt.getDust(1),
                 WerkstoffMaterialPool.MonaziteHeterogenousHalogenicRareEarthMixture.get(OrePrefixes.dust, 1))
             .itemOutputs(WerkstoffMaterialPool.SaturatedMonaziteRareEarthMixture.get(OrePrefixes.dust, 1))
-            .fluidInputs(Materials.Acetone.getFluid(1000))
+            .fluidInputs(Materials.Acetone.getFluid(1_000))
             .duration(10 * SECONDS)
             .eut(240)
             .addTo(mixerRecipes);
@@ -1496,26 +1495,24 @@ public class RecipeLoader {
                 WerkstoffMaterialPool.MonaziteHeterogenousHalogenicRareEarthMixture.get(OrePrefixes.dust, 1),
                 WerkstoffMaterialPool.SamariumOreConcentrate.get(OrePrefixes.dust, 2))
             .itemOutputs(WerkstoffMaterialPool.SaturatedMonaziteRareEarthMixture.get(OrePrefixes.dust, 3))
-            .fluidInputs(Materials.Acetone.getFluid(1000))
+            .fluidInputs(Materials.Acetone.getFluid(1_000))
             .duration(20 * SECONDS)
             .eut(240)
             .addTo(mixerRecipes);
 
         GTValues.RA.stdBuilder()
-            .itemInputs(
-                GTUtility.getIntegratedCircuit(4),
-                WerkstoffMaterialPool.SaturatedMonaziteRareEarthMixture.get(OrePrefixes.dust, 8))
-            .itemOutputs(WerkstoffMaterialPool.SamaricResidue.get(OrePrefixes.dust, 6))
-            .fluidOutputs(Materials.Chloromethane.getGas(800))
+            .itemInputs(WerkstoffMaterialPool.SaturatedMonaziteRareEarthMixture.get(OrePrefixes.dust, 4))
+            .itemOutputs(WerkstoffMaterialPool.SamaricResidue.get(OrePrefixes.dust, 3))
+            .fluidOutputs(Materials.Chloromethane.getGas(400))
             .eut(TierEU.RECIPE_EV)
-            .duration(5 * MINUTES + 15 * SECONDS)
+            .duration(2 * MINUTES + 37 * SECONDS + 10 * TICKS)
             .addTo(centrifugeRecipes);
 
         GTValues.RA.stdBuilder()
-            .itemInputs(WerkstoffMaterialPool.SamaricResidue.get(OrePrefixes.dust, 9))
-            .itemOutputs(Materials.Samarium.getDust(6), Materials.Gadolinium.getDust(3))
+            .itemInputs(WerkstoffMaterialPool.SamaricResidue.get(OrePrefixes.dust, 3))
+            .itemOutputs(Materials.Samarium.getDust(2), Materials.Gadolinium.getDust(1))
             .outputChances(10000, 10000)
-            .duration(20 * SECONDS)
+            .duration(6 * SECONDS + 13 * TICKS)
             .eut(TierEU.RECIPE_EV)
             .addTo(sifterRecipes);
 
@@ -1533,9 +1530,9 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(GTUtility.getIntegratedCircuit(1))
             .fluidInputs(
-                WerkstoffMaterialPool.MuddyRareEarthBastnasiteSolution.getFluidOrGas(1000),
-                GTModHandler.getSteam(1000))
-            .fluidOutputs(WerkstoffMaterialPool.SteamCrackedBasnasiteSolution.getFluidOrGas(2000))
+                WerkstoffMaterialPool.MuddyRareEarthBastnasiteSolution.getFluidOrGas(1_000),
+                Materials.Steam.getGas(1_000))
+            .fluidOutputs(WerkstoffMaterialPool.SteamCrackedBasnasiteSolution.getFluidOrGas(2_000))
             .duration(30 * SECONDS)
             .eut(TierEU.RECIPE_HV)
             .addTo(crackingRecipes);
@@ -1546,22 +1543,21 @@ public class RecipeLoader {
                 WerkstoffMaterialPool.SteamCrackedBasnasiteSolution.get(OrePrefixes.cell, 1))
             .itemOutputs(Materials.Empty.getCells(1))
             .fluidInputs(WerkstoffMaterialPool.SodiumFluorosilicate.getFluidOrGas(320))
-            .fluidOutputs(WerkstoffMaterialPool.ConditionedBastnasiteMud.getFluidOrGas(1320))
+            .fluidOutputs(WerkstoffMaterialPool.ConditionedBastnasiteMud.getFluidOrGas(1_320))
             .duration(40 * SECONDS)
             .eut(TierEU.RECIPE_MV)
             .addTo(mixerRecipes);
 
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                Materials.Water.getFluid(10000),
-                WerkstoffMaterialPool.ConditionedBastnasiteMud.getFluidOrGas(1000))
+                Materials.Water.getFluid(10_000),
+                WerkstoffMaterialPool.ConditionedBastnasiteMud.getFluidOrGas(1_000))
             .itemInputs(Materials.Saltpeter.getDust(1))
-            .fluidOutputs(WerkstoffMaterialPool.DiltedRareEarthBastnasiteMud.getFluidOrGas(11000))
+            .fluidOutputs(WerkstoffMaterialPool.DiltedRareEarthBastnasiteMud.getFluidOrGas(11_000))
             .itemOutputs(Gangue.get(OrePrefixes.dust, 1))
             .eut(TierEU.RECIPE_EV)
             .duration(1000)
             .metadata(DISSOLUTION_TANK_RATIO, 10)
-            .noOptimize()
             .addTo(dissolutionTankRecipes);
 
         GTValues.RA.stdBuilder()
@@ -1571,17 +1567,16 @@ public class RecipeLoader {
                 WerkstoffLoader.RedZircon.get(OrePrefixes.dust, 1),
                 Materials.Ilmenite.getDust(1))
             .outputChances(90_00, 75_00, 10_00, 5_00)
-            .fluidInputs(WerkstoffMaterialPool.DiltedRareEarthBastnasiteMud.getFluidOrGas(1000))
+            .fluidInputs(WerkstoffMaterialPool.DiltedRareEarthBastnasiteMud.getFluidOrGas(1_000))
             .fluidOutputs(WerkstoffMaterialPool.FilteredBastnasiteMud.getFluidOrGas(400))
             .eut(240)
             .duration(20 * SECONDS)
-            .noOptimize()
             .addTo(sifterRecipes);
 
         GTValues.RA.stdBuilder()
             .itemInputs(GTUtility.getIntegratedCircuit(1))
             .itemOutputs(WerkstoffMaterialPool.BastnasiteRareEarthOxidePowder.get(OrePrefixes.dust, 1))
-            .fluidInputs(WerkstoffMaterialPool.FilteredBastnasiteMud.getFluidOrGas(1000))
+            .fluidInputs(WerkstoffMaterialPool.FilteredBastnasiteMud.getFluidOrGas(1_000))
             .duration(25 * SECONDS)
             .eut(600)
             .metadata(COIL_HEAT, 1400)
@@ -1600,7 +1595,7 @@ public class RecipeLoader {
                 GTUtility.getIntegratedCircuit(1),
                 WerkstoffMaterialPool.LeachedBastnasiteRareEarthOxides.get(OrePrefixes.dust, 1))
             .itemOutputs(WerkstoffMaterialPool.RoastedRareEarthOxides.get(OrePrefixes.dust, 1))
-            .fluidInputs(Materials.Oxygen.getGas(1000))
+            .fluidInputs(Materials.Oxygen.getGas(1_000))
             .fluidOutputs(Materials.Fluorine.getGas(13))
             .duration(30 * SECONDS)
             .eut(TierEU.RECIPE_MV)
@@ -1620,8 +1615,8 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(WerkstoffMaterialPool.WetRareEarthOxides.get(OrePrefixes.dust, 1))
             .itemOutputs(WerkstoffMaterialPool.CeriumOxidisedRareEarthOxides.get(OrePrefixes.dust, 1))
-            .fluidInputs(Materials.Fluorine.getGas(4000))
-            .fluidOutputs(Materials.HydrofluoricAcid.getFluid(4000))
+            .fluidInputs(Materials.Fluorine.getGas(4_000))
+            .fluidOutputs(Materials.HydrofluoricAcid.getFluid(4_000))
             .duration(15 * SECONDS)
             .eut(TierEU.RECIPE_HV)
             .addTo(UniversalChemical);
@@ -1639,7 +1634,7 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(WerkstoffMaterialPool.BastnasiteRarerEarthOxides.get(OrePrefixes.dust, 1))
             .fluidInputs(Materials.NitricAcid.getFluid(400))
-            .fluidOutputs(WerkstoffMaterialPool.NitratedBastnasiteRarerEarthOxides.getFluidOrGas(1000))
+            .fluidOutputs(WerkstoffMaterialPool.NitratedBastnasiteRarerEarthOxides.getFluidOrGas(1_000))
             .duration(15 * SECONDS)
             .eut(TierEU.RECIPE_HV)
             .addTo(mixerRecipes);
@@ -1647,8 +1642,8 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(WerkstoffMaterialPool.NitratedBastnasiteRarerEarthOxides.get(OrePrefixes.cell, 1))
             .itemOutputs(Materials.Empty.getCells(1))
-            .fluidInputs(Materials.Acetone.getFluid(1000))
-            .fluidOutputs(WerkstoffMaterialPool.SaturatedBastnasiteRarerEarthOxides.getFluidOrGas(1000))
+            .fluidInputs(Materials.Acetone.getFluid(1_000))
+            .fluidOutputs(WerkstoffMaterialPool.SaturatedBastnasiteRarerEarthOxides.getFluidOrGas(1_000))
             .duration(35 * SECONDS)
             .eut(TierEU.RECIPE_HV)
             .addTo(UniversalChemical);
@@ -1658,7 +1653,7 @@ public class RecipeLoader {
                 WerkstoffMaterialPool.NeodymicRareEarthConcentrate.get(OrePrefixes.dust, 1),
                 WerkstoffMaterialPool.SamaricRareEarthConcentrate.get(OrePrefixes.dust, 1))
             .outputChances(80_00, 50_00)
-            .fluidInputs(WerkstoffMaterialPool.SaturatedBastnasiteRarerEarthOxides.getFluidOrGas(1000))
+            .fluidInputs(WerkstoffMaterialPool.SaturatedBastnasiteRarerEarthOxides.getFluidOrGas(1_000))
             .fluidOutputs(WerkstoffMaterialPool.DilutedAcetone.getFluidOrGas(750))
             .eut(TierEU.RECIPE_HV)
             .duration(45 * SECONDS)
@@ -1670,7 +1665,7 @@ public class RecipeLoader {
             .itemOutputs(
                 WerkstoffMaterialPool.LanthaniumChloride.get(OrePrefixes.dust, 1),
                 WerkstoffMaterialPool.NeodymiumOxide.get(OrePrefixes.dust, 1))
-            .fluidInputs(Materials.HydrochloricAcid.getFluid(2000))
+            .fluidInputs(Materials.HydrochloricAcid.getFluid(2_000))
             .duration(45 * SECONDS)
             .eut(800)
             .addTo(UniversalChemical);
@@ -1681,7 +1676,7 @@ public class RecipeLoader {
                 WerkstoffMaterialPool.SamaricRareEarthConcentrate.get(OrePrefixes.dust, 1),
                 GTUtility.getIntegratedCircuit(1))
             .itemOutputs(WerkstoffMaterialPool.FluorinatedSamaricConcentrate.get(OrePrefixes.dust, 1))
-            .fluidInputs(Materials.HydrofluoricAcid.getFluid(2000))
+            .fluidInputs(Materials.HydrofluoricAcid.getFluid(2_000))
             .duration(15 * SECONDS)
             .eut(TierEU.RECIPE_HV)
             .addTo(UniversalChemical);
@@ -1691,7 +1686,7 @@ public class RecipeLoader {
                 WerkstoffMaterialPool.SamaricRareEarthConcentrate.get(OrePrefixes.dust, 1),
                 WerkstoffMaterialPool.SamariumOreConcentrate.get(OrePrefixes.dust, 1))
             .itemOutputs(WerkstoffMaterialPool.FluorinatedSamaricConcentrate.get(OrePrefixes.dust, 2))
-            .fluidInputs(Materials.HydrofluoricAcid.getFluid(2000))
+            .fluidInputs(Materials.HydrofluoricAcid.getFluid(2_000))
             .duration(17 * SECONDS + 10 * TICKS)
             .eut(TierEU.RECIPE_HV)
             .addTo(UniversalChemical);
@@ -1703,7 +1698,7 @@ public class RecipeLoader {
             .itemOutputs(
                 Materials.Holmium.getDust(1),
                 WerkstoffMaterialPool.SamariumTerbiumMixture.get(OrePrefixes.dust, 4))
-            .fluidOutputs(WerkstoffMaterialPool.CalciumFluoride.getFluidOrGas(12000))
+            .fluidOutputs(WerkstoffMaterialPool.CalciumFluoride.getFluidOrGas(12_000))
             .duration(1 * MINUTES + 20 * TICKS)
             .eut(TierEU.RECIPE_EV)
             .metadata(COIL_HEAT, 1200)
@@ -1756,8 +1751,8 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(GTOreDictUnificator.get(OrePrefixes.crushed, Materials.Lanthanum, 1))
             .itemOutputs(Materials.SiliconDioxide.getDust(3))
-            .fluidInputs(Materials.Chlorine.getGas(36000))
-            .fluidOutputs(LanthanumChlorideConcentrate.getFluidOrGas(3000))
+            .fluidInputs(Materials.Chlorine.getGas(36_000))
+            .fluidOutputs(LanthanumChlorideConcentrate.getFluidOrGas(3_000))
             .metadata(COIL_HEAT, 800)
             .eut(TierEU.RECIPE_ZPM)
             .duration(2 * SECONDS)
@@ -1765,8 +1760,8 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(LanthanumOreConcentrate.get(OrePrefixes.dust, 1))
             .itemOutputs(Materials.SiliconDioxide.getDust(1))
-            .fluidInputs(Materials.Chlorine.getGas(12000))
-            .fluidOutputs(LanthanumChlorideConcentrate.getFluidOrGas(1000))
+            .fluidInputs(Materials.Chlorine.getGas(12_000))
+            .fluidOutputs(LanthanumChlorideConcentrate.getFluidOrGas(1_000))
             .metadata(COIL_HEAT, 800)
             .eut(TierEU.RECIPE_ZPM)
             .duration(2 * SECONDS)
@@ -1774,11 +1769,11 @@ public class RecipeLoader {
         // 1B oreChlorideConcentrate = 1 ore's rare earth metal + 3 any rare earth metal
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                LanthanumExtractingNanoResin.getFluidOrGas(1000),
-                LanthanumChlorideConcentrate.getFluidOrGas(1000))
+                LanthanumExtractingNanoResin.getFluidOrGas(1_000),
+                LanthanumChlorideConcentrate.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledLanthanumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthConcentrate.getFluidOrGas(1000))
+                FilledLanthanumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthConcentrate.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
@@ -1788,8 +1783,8 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(GTOreDictUnificator.get(OrePrefixes.crushed, Materials.Praseodymium, 1))
             .itemOutputs(Materials.SiliconDioxide.getDust(3))
-            .fluidInputs(Materials.Chlorine.getGas(36000))
-            .fluidOutputs(PraseodymiumChlorideConcentrate.getFluidOrGas(3000))
+            .fluidInputs(Materials.Chlorine.getGas(36_000))
+            .fluidOutputs(PraseodymiumChlorideConcentrate.getFluidOrGas(3_000))
             .metadata(COIL_HEAT, 800)
             .eut(TierEU.RECIPE_ZPM)
             .duration(2 * SECONDS)
@@ -1797,8 +1792,8 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(PraseodymiumOreConcentrate.get(OrePrefixes.dust, 1))
             .itemOutputs(Materials.SiliconDioxide.getDust(1))
-            .fluidInputs(Materials.Chlorine.getGas(12000))
-            .fluidOutputs(PraseodymiumChlorideConcentrate.getFluidOrGas(1000))
+            .fluidInputs(Materials.Chlorine.getGas(12_000))
+            .fluidOutputs(PraseodymiumChlorideConcentrate.getFluidOrGas(1_000))
             .metadata(COIL_HEAT, 800)
             .eut(TierEU.RECIPE_ZPM)
             .duration(2 * SECONDS)
@@ -1806,11 +1801,11 @@ public class RecipeLoader {
         // 1B oreChlorideConcentrate = 1 ore's rare earth metal + 3 any rare earth metal
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                PraseodymiumExtractingNanoResin.getFluidOrGas(1000),
-                PraseodymiumChlorideConcentrate.getFluidOrGas(1000))
+                PraseodymiumExtractingNanoResin.getFluidOrGas(1_000),
+                PraseodymiumChlorideConcentrate.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledPraseodymiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthConcentrate.getFluidOrGas(1000))
+                FilledPraseodymiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthConcentrate.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
@@ -1820,8 +1815,8 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(GTOreDictUnificator.get(OrePrefixes.crushed, Materials.Cerium, 1))
             .itemOutputs(Materials.SiliconDioxide.getDust(3))
-            .fluidInputs(Materials.Chlorine.getGas(36000))
-            .fluidOutputs(CeriumChlorideConcentrate.getFluidOrGas(3000))
+            .fluidInputs(Materials.Chlorine.getGas(36_000))
+            .fluidOutputs(CeriumChlorideConcentrate.getFluidOrGas(3_000))
             .metadata(COIL_HEAT, 800)
             .eut(TierEU.RECIPE_ZPM)
             .duration(2 * SECONDS)
@@ -1829,18 +1824,18 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(CeriumOreConcentrate.get(OrePrefixes.dust, 1))
             .itemOutputs(Materials.SiliconDioxide.getDust(1))
-            .fluidInputs(Materials.Chlorine.getGas(12000))
-            .fluidOutputs(CeriumChlorideConcentrate.getFluidOrGas(1000))
+            .fluidInputs(Materials.Chlorine.getGas(12_000))
+            .fluidOutputs(CeriumChlorideConcentrate.getFluidOrGas(1_000))
             .metadata(COIL_HEAT, 800)
             .eut(TierEU.RECIPE_ZPM)
             .duration(2 * SECONDS)
             .addTo(digesterRecipes);
         // 1B oreChlorideConcentrate = 1 ore's rare earth metal + 3 any rare earth metal
         GTValues.RA.stdBuilder()
-            .fluidInputs(CeriumExtractingNanoResin.getFluidOrGas(1000), CeriumChlorideConcentrate.getFluidOrGas(1000))
+            .fluidInputs(CeriumExtractingNanoResin.getFluidOrGas(1_000), CeriumChlorideConcentrate.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledCeriumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthConcentrate.getFluidOrGas(1000))
+                FilledCeriumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthConcentrate.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
@@ -1850,8 +1845,8 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(GTOreDictUnificator.get(OrePrefixes.crushed, Materials.Neodymium, 1))
             .itemOutputs(Materials.SiliconDioxide.getDust(3))
-            .fluidInputs(Materials.Chlorine.getGas(36000))
-            .fluidOutputs(NeodymiumChlorideConcentrate.getFluidOrGas(3000))
+            .fluidInputs(Materials.Chlorine.getGas(36_000))
+            .fluidOutputs(NeodymiumChlorideConcentrate.getFluidOrGas(3_000))
             .metadata(COIL_HEAT, 800)
             .eut(TierEU.RECIPE_ZPM)
             .duration(2 * SECONDS)
@@ -1859,8 +1854,8 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(NeodymiumOreConcentrate.get(OrePrefixes.dust, 1))
             .itemOutputs(Materials.SiliconDioxide.getDust(1))
-            .fluidInputs(Materials.Chlorine.getGas(12000))
-            .fluidOutputs(NeodymiumChlorideConcentrate.getFluidOrGas(1000))
+            .fluidInputs(Materials.Chlorine.getGas(12_000))
+            .fluidOutputs(NeodymiumChlorideConcentrate.getFluidOrGas(1_000))
             .metadata(COIL_HEAT, 800)
             .eut(TierEU.RECIPE_ZPM)
             .duration(2 * SECONDS)
@@ -1868,11 +1863,11 @@ public class RecipeLoader {
         // 1B oreChlorideConcentrate = 1 ore's rare earth metal + 3 any rare earth metal
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                NeodymiumExtractingNanoResin.getFluidOrGas(1000),
-                NeodymiumChlorideConcentrate.getFluidOrGas(1000))
+                NeodymiumExtractingNanoResin.getFluidOrGas(1_000),
+                NeodymiumChlorideConcentrate.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledNeodymiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthConcentrate.getFluidOrGas(1000))
+                FilledNeodymiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthConcentrate.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
@@ -1882,8 +1877,8 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(GTOreDictUnificator.get(OrePrefixes.crushed, Materials.Promethium, 1))
             .itemOutputs(Materials.SiliconDioxide.getDust(3))
-            .fluidInputs(Materials.Chlorine.getGas(36000))
-            .fluidOutputs(PromethiumChlorideConcentrate.getFluidOrGas(3000))
+            .fluidInputs(Materials.Chlorine.getGas(36_000))
+            .fluidOutputs(PromethiumChlorideConcentrate.getFluidOrGas(3_000))
             .metadata(COIL_HEAT, 800)
             .eut(TierEU.RECIPE_ZPM)
             .duration(2 * SECONDS)
@@ -1891,32 +1886,22 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(PromethiumOreConcentrate.get(OrePrefixes.dust, 1))
             .itemOutputs(Materials.SiliconDioxide.getDust(1))
-            .fluidInputs(Materials.Chlorine.getGas(12000))
-            .fluidOutputs(PromethiumChlorideConcentrate.getFluidOrGas(1000))
+            .fluidInputs(Materials.Chlorine.getGas(12_000))
+            .fluidOutputs(PromethiumChlorideConcentrate.getFluidOrGas(1_000))
             .metadata(COIL_HEAT, 800)
             .eut(TierEU.RECIPE_ZPM)
             .duration(2 * SECONDS)
             .addTo(digesterRecipes);
 
         // 1B oreChlorideConcentrate = 1 ore's rare earth metal + 3 any rare earth metal
-        GTValues.RA.stdBuilder()
-            .fluidInputs(
-                PromethiumExtractingNanoResin.getFluidOrGas(1000),
-                PromethiumChlorideConcentrate.getFluidOrGas(1000))
-            .fluidOutputs(
-                FilledPromethiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthConcentrate.getFluidOrGas(1000))
-            .eut(TierEU.RECIPE_UV)
-            .duration(1 * SECONDS)
-            .addTo(multiblockChemicalReactorRecipes);
 
         // Samarium Part
         // Digester to produce Samarium Chloride Concentrate
         GTValues.RA.stdBuilder()
             .itemInputs(GTOreDictUnificator.get(OrePrefixes.crushed, Materials.Samarium, 1))
             .itemOutputs(Materials.SiliconDioxide.getDust(3))
-            .fluidInputs(Materials.Chlorine.getGas(36000))
-            .fluidOutputs(SamariumChlorideConcentrate.getFluidOrGas(3000))
+            .fluidInputs(Materials.Chlorine.getGas(36_000))
+            .fluidOutputs(SamariumChlorideConcentrate.getFluidOrGas(3_000))
             .metadata(COIL_HEAT, 800)
             .eut(TierEU.RECIPE_ZPM)
             .duration(2 * SECONDS)
@@ -1924,8 +1909,8 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(SamariumOreConcentrate.get(OrePrefixes.dust, 1))
             .itemOutputs(Materials.SiliconDioxide.getDust(1))
-            .fluidInputs(Materials.Chlorine.getGas(12000))
-            .fluidOutputs(SamariumChlorideConcentrate.getFluidOrGas(1000))
+            .fluidInputs(Materials.Chlorine.getGas(12_000))
+            .fluidOutputs(SamariumChlorideConcentrate.getFluidOrGas(1_000))
             .metadata(COIL_HEAT, 800)
             .eut(TierEU.RECIPE_ZPM)
             .duration(2 * SECONDS)
@@ -1933,11 +1918,11 @@ public class RecipeLoader {
         // 1B oreChlorideConcentrate = 1 ore's rare earth metal + 3 any rare earth metal
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                SamariumExtractingNanoResin.getFluidOrGas(1000),
-                SamariumChlorideConcentrate.getFluidOrGas(1000))
+                SamariumExtractingNanoResin.getFluidOrGas(1_000),
+                SamariumChlorideConcentrate.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledSamariumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthConcentrate.getFluidOrGas(1000))
+                FilledSamariumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthConcentrate.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
@@ -1947,8 +1932,8 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(GTOreDictUnificator.get(OrePrefixes.crushed, Materials.Europium, 1))
             .itemOutputs(Materials.SiliconDioxide.getDust(3))
-            .fluidInputs(Materials.Chlorine.getGas(36000))
-            .fluidOutputs(EuropiumChlorideConcentrate.getFluidOrGas(3000))
+            .fluidInputs(Materials.Chlorine.getGas(36_000))
+            .fluidOutputs(EuropiumChlorideConcentrate.getFluidOrGas(3_000))
             .metadata(COIL_HEAT, 800)
             .eut(TierEU.RECIPE_ZPM)
             .duration(2 * SECONDS)
@@ -1956,8 +1941,8 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(EuropiumOreConcentrate.get(OrePrefixes.dust, 1))
             .itemOutputs(Materials.SiliconDioxide.getDust(1))
-            .fluidInputs(Materials.Chlorine.getGas(12000))
-            .fluidOutputs(EuropiumChlorideConcentrate.getFluidOrGas(1000))
+            .fluidInputs(Materials.Chlorine.getGas(12_000))
+            .fluidOutputs(EuropiumChlorideConcentrate.getFluidOrGas(1_000))
             .metadata(COIL_HEAT, 800)
             .eut(TierEU.RECIPE_ZPM)
             .duration(2 * SECONDS)
@@ -1965,11 +1950,11 @@ public class RecipeLoader {
         // 1B oreChlorideConcentrate = 1 ore's rare earth metal + 3 any rare earth metal
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                EuropiumExtractingNanoResin.getFluidOrGas(1000),
-                EuropiumChlorideConcentrate.getFluidOrGas(1000))
+                EuropiumExtractingNanoResin.getFluidOrGas(1_000),
+                EuropiumChlorideConcentrate.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledEuropiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthConcentrate.getFluidOrGas(1000))
+                FilledEuropiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthConcentrate.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
@@ -1979,8 +1964,8 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(GTOreDictUnificator.get(OrePrefixes.crushed, Materials.Gadolinium, 1))
             .itemOutputs(Materials.SiliconDioxide.getDust(3))
-            .fluidInputs(Materials.Chlorine.getGas(36000))
-            .fluidOutputs(GadoliniumChlorideConcentrate.getFluidOrGas(3000))
+            .fluidInputs(Materials.Chlorine.getGas(36_000))
+            .fluidOutputs(GadoliniumChlorideConcentrate.getFluidOrGas(3_000))
             .metadata(COIL_HEAT, 800)
             .eut(TierEU.RECIPE_ZPM)
             .duration(2 * SECONDS)
@@ -1988,8 +1973,8 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(GadoliniumOreConcentrate.get(OrePrefixes.dust, 1))
             .itemOutputs(Materials.SiliconDioxide.getDust(1))
-            .fluidInputs(Materials.Chlorine.getGas(12000))
-            .fluidOutputs(GadoliniumChlorideConcentrate.getFluidOrGas(1000))
+            .fluidInputs(Materials.Chlorine.getGas(12_000))
+            .fluidOutputs(GadoliniumChlorideConcentrate.getFluidOrGas(1_000))
             .metadata(COIL_HEAT, 800)
             .eut(TierEU.RECIPE_ZPM)
             .duration(2 * SECONDS)
@@ -1997,11 +1982,11 @@ public class RecipeLoader {
         // 1B oreChlorideConcentrate = 1 ore's rare earth metal + 3 any rare earth metal
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                GadoliniumExtractingNanoResin.getFluidOrGas(1000),
-                GadoliniumChlorideConcentrate.getFluidOrGas(1000))
+                GadoliniumExtractingNanoResin.getFluidOrGas(1_000),
+                GadoliniumChlorideConcentrate.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledGadoliniumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthConcentrate.getFluidOrGas(1000))
+                FilledGadoliniumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthConcentrate.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
@@ -2011,8 +1996,8 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(GTOreDictUnificator.get(OrePrefixes.crushed, Materials.Terbium, 1))
             .itemOutputs(Materials.SiliconDioxide.getDust(3))
-            .fluidInputs(Materials.Chlorine.getGas(36000))
-            .fluidOutputs(TerbiumChlorideConcentrate.getFluidOrGas(3000))
+            .fluidInputs(Materials.Chlorine.getGas(36_000))
+            .fluidOutputs(TerbiumChlorideConcentrate.getFluidOrGas(3_000))
             .metadata(COIL_HEAT, 800)
             .eut(TierEU.RECIPE_ZPM)
             .duration(2 * SECONDS)
@@ -2020,18 +2005,20 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(TerbiumOreConcentrate.get(OrePrefixes.dust, 1))
             .itemOutputs(Materials.SiliconDioxide.getDust(1))
-            .fluidInputs(Materials.Chlorine.getGas(12000))
-            .fluidOutputs(TerbiumChlorideConcentrate.getFluidOrGas(1000))
+            .fluidInputs(Materials.Chlorine.getGas(12_000))
+            .fluidOutputs(TerbiumChlorideConcentrate.getFluidOrGas(1_000))
             .metadata(COIL_HEAT, 800)
             .eut(TierEU.RECIPE_ZPM)
             .duration(2 * SECONDS)
             .addTo(digesterRecipes);
         // 1B oreChlorideConcentrate = 1 ore's rare earth metal + 3 any rare earth metal
         GTValues.RA.stdBuilder()
-            .fluidInputs(TerbiumExtractingNanoResin.getFluidOrGas(1000), TerbiumChlorideConcentrate.getFluidOrGas(1000))
+            .fluidInputs(
+                TerbiumExtractingNanoResin.getFluidOrGas(1_000),
+                TerbiumChlorideConcentrate.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledTerbiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthConcentrate.getFluidOrGas(1000))
+                FilledTerbiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthConcentrate.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
@@ -2041,8 +2028,8 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(GTOreDictUnificator.get(OrePrefixes.crushed, Materials.Dysprosium, 1))
             .itemOutputs(Materials.SiliconDioxide.getDust(3))
-            .fluidInputs(Materials.Chlorine.getGas(36000))
-            .fluidOutputs(DysprosiumChlorideConcentrate.getFluidOrGas(3000))
+            .fluidInputs(Materials.Chlorine.getGas(36_000))
+            .fluidOutputs(DysprosiumChlorideConcentrate.getFluidOrGas(3_000))
             .metadata(COIL_HEAT, 800)
             .eut(TierEU.RECIPE_ZPM)
             .duration(2 * SECONDS)
@@ -2050,8 +2037,8 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(DysprosiumOreConcentrate.get(OrePrefixes.dust, 1))
             .itemOutputs(Materials.SiliconDioxide.getDust(1))
-            .fluidInputs(Materials.Chlorine.getGas(12000))
-            .fluidOutputs(DysprosiumChlorideConcentrate.getFluidOrGas(1000))
+            .fluidInputs(Materials.Chlorine.getGas(12_000))
+            .fluidOutputs(DysprosiumChlorideConcentrate.getFluidOrGas(1_000))
             .metadata(COIL_HEAT, 800)
             .eut(TierEU.RECIPE_ZPM)
             .duration(2 * SECONDS)
@@ -2059,11 +2046,11 @@ public class RecipeLoader {
         // 1B oreChlorideConcentrate = 1 ore's rare earth metal + 3 any rare earth metal
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                DysprosiumExtractingNanoResin.getFluidOrGas(1000),
-                DysprosiumChlorideConcentrate.getFluidOrGas(1000))
+                DysprosiumExtractingNanoResin.getFluidOrGas(1_000),
+                DysprosiumChlorideConcentrate.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledDysprosiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthConcentrate.getFluidOrGas(1000))
+                FilledDysprosiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthConcentrate.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
@@ -2073,8 +2060,8 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(GTOreDictUnificator.get(OrePrefixes.crushed, Materials.Holmium, 1))
             .itemOutputs(Materials.SiliconDioxide.getDust(3))
-            .fluidInputs(Materials.Chlorine.getGas(36000))
-            .fluidOutputs(HolmiumChlorideConcentrate.getFluidOrGas(3000))
+            .fluidInputs(Materials.Chlorine.getGas(36_000))
+            .fluidOutputs(HolmiumChlorideConcentrate.getFluidOrGas(3_000))
             .metadata(COIL_HEAT, 800)
             .eut(TierEU.RECIPE_ZPM)
             .duration(2 * SECONDS)
@@ -2082,18 +2069,20 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(HolmiumOreConcentrate.get(OrePrefixes.dust, 1))
             .itemOutputs(Materials.SiliconDioxide.getDust(1))
-            .fluidInputs(Materials.Chlorine.getGas(12000))
-            .fluidOutputs(HolmiumChlorideConcentrate.getFluidOrGas(1000))
+            .fluidInputs(Materials.Chlorine.getGas(12_000))
+            .fluidOutputs(HolmiumChlorideConcentrate.getFluidOrGas(1_000))
             .metadata(COIL_HEAT, 800)
             .eut(TierEU.RECIPE_ZPM)
             .duration(2 * SECONDS)
             .addTo(digesterRecipes);
         // 1B oreChlorideConcentrate = 1 ore's rare earth metal + 3 any rare earth metal
         GTValues.RA.stdBuilder()
-            .fluidInputs(HolmiumExtractingNanoResin.getFluidOrGas(1000), HolmiumChlorideConcentrate.getFluidOrGas(1000))
+            .fluidInputs(
+                HolmiumExtractingNanoResin.getFluidOrGas(1_000),
+                HolmiumChlorideConcentrate.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledHolmiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthConcentrate.getFluidOrGas(1000))
+                FilledHolmiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthConcentrate.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
@@ -2103,8 +2092,8 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(GTOreDictUnificator.get(OrePrefixes.crushed, Materials.Erbium, 1))
             .itemOutputs(Materials.SiliconDioxide.getDust(3))
-            .fluidInputs(Materials.Chlorine.getGas(36000))
-            .fluidOutputs(ErbiumChlorideConcentrate.getFluidOrGas(3000))
+            .fluidInputs(Materials.Chlorine.getGas(36_000))
+            .fluidOutputs(ErbiumChlorideConcentrate.getFluidOrGas(3_000))
             .metadata(COIL_HEAT, 800)
             .eut(TierEU.RECIPE_ZPM)
             .duration(2 * SECONDS)
@@ -2112,18 +2101,18 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(ErbiumOreConcentrate.get(OrePrefixes.dust, 1))
             .itemOutputs(Materials.SiliconDioxide.getDust(1))
-            .fluidInputs(Materials.Chlorine.getGas(12000))
-            .fluidOutputs(ErbiumChlorideConcentrate.getFluidOrGas(1000))
+            .fluidInputs(Materials.Chlorine.getGas(12_000))
+            .fluidOutputs(ErbiumChlorideConcentrate.getFluidOrGas(1_000))
             .metadata(COIL_HEAT, 800)
             .eut(TierEU.RECIPE_ZPM)
             .duration(2 * SECONDS)
             .addTo(digesterRecipes);
         // 1B oreChlorideConcentrate = 1 ore's rare earth metal + 3 any rare earth metal
         GTValues.RA.stdBuilder()
-            .fluidInputs(ErbiumExtractingNanoResin.getFluidOrGas(1000), ErbiumChlorideConcentrate.getFluidOrGas(1000))
+            .fluidInputs(ErbiumExtractingNanoResin.getFluidOrGas(1_000), ErbiumChlorideConcentrate.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledErbiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthConcentrate.getFluidOrGas(1000))
+                FilledErbiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthConcentrate.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
@@ -2133,8 +2122,8 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(GTOreDictUnificator.get(OrePrefixes.crushed, Materials.Thulium, 1))
             .itemOutputs(Materials.SiliconDioxide.getDust(3))
-            .fluidInputs(Materials.Chlorine.getGas(36000))
-            .fluidOutputs(ThuliumChlorideConcentrate.getFluidOrGas(3000))
+            .fluidInputs(Materials.Chlorine.getGas(36_000))
+            .fluidOutputs(ThuliumChlorideConcentrate.getFluidOrGas(3_000))
             .metadata(COIL_HEAT, 800)
             .eut(TierEU.RECIPE_ZPM)
             .duration(2 * SECONDS)
@@ -2142,18 +2131,20 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(ThuliumOreConcentrate.get(OrePrefixes.dust, 1))
             .itemOutputs(Materials.SiliconDioxide.getDust(1))
-            .fluidInputs(Materials.Chlorine.getGas(12000))
-            .fluidOutputs(ThuliumChlorideConcentrate.getFluidOrGas(1000))
+            .fluidInputs(Materials.Chlorine.getGas(12_000))
+            .fluidOutputs(ThuliumChlorideConcentrate.getFluidOrGas(1_000))
             .metadata(COIL_HEAT, 800)
             .eut(TierEU.RECIPE_ZPM)
             .duration(2 * SECONDS)
             .addTo(digesterRecipes);
         // 1B oreChlorideConcentrate = 1 ore's rare earth metal + 3 any rare earth metal
         GTValues.RA.stdBuilder()
-            .fluidInputs(ThuliumExtractingNanoResin.getFluidOrGas(1000), ThuliumChlorideConcentrate.getFluidOrGas(1000))
+            .fluidInputs(
+                ThuliumExtractingNanoResin.getFluidOrGas(1_000),
+                ThuliumChlorideConcentrate.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledThuliumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthConcentrate.getFluidOrGas(1000))
+                FilledThuliumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthConcentrate.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
@@ -2163,8 +2154,8 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(GTOreDictUnificator.get(OrePrefixes.crushed, Materials.Ytterbium, 1))
             .itemOutputs(Materials.SiliconDioxide.getDust(3))
-            .fluidInputs(Materials.Chlorine.getGas(36000))
-            .fluidOutputs(YtterbiumChlorideConcentrate.getFluidOrGas(3000))
+            .fluidInputs(Materials.Chlorine.getGas(36_000))
+            .fluidOutputs(YtterbiumChlorideConcentrate.getFluidOrGas(3_000))
             .metadata(COIL_HEAT, 800)
             .eut(TierEU.RECIPE_ZPM)
             .duration(2 * SECONDS)
@@ -2172,8 +2163,8 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(YtterbiumOreConcentrate.get(OrePrefixes.dust, 1))
             .itemOutputs(Materials.SiliconDioxide.getDust(1))
-            .fluidInputs(Materials.Chlorine.getGas(12000))
-            .fluidOutputs(YtterbiumChlorideConcentrate.getFluidOrGas(1000))
+            .fluidInputs(Materials.Chlorine.getGas(12_000))
+            .fluidOutputs(YtterbiumChlorideConcentrate.getFluidOrGas(1_000))
             .metadata(COIL_HEAT, 800)
             .eut(TierEU.RECIPE_ZPM)
             .duration(2 * SECONDS)
@@ -2181,11 +2172,11 @@ public class RecipeLoader {
         // 1B oreChlorideConcentrate = 1 ore's rare earth metal + 3 any rare earth metal
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                YtterbiumExtractingNanoResin.getFluidOrGas(1000),
-                YtterbiumChlorideConcentrate.getFluidOrGas(1000))
+                YtterbiumExtractingNanoResin.getFluidOrGas(1_000),
+                YtterbiumChlorideConcentrate.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledYtterbiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthConcentrate.getFluidOrGas(1000))
+                FilledYtterbiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthConcentrate.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
@@ -2195,8 +2186,8 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(GTOreDictUnificator.get(OrePrefixes.crushed, Materials.Lutetium, 1))
             .itemOutputs(Materials.SiliconDioxide.getDust(3))
-            .fluidInputs(Materials.Chlorine.getGas(36000))
-            .fluidOutputs(LutetiumChlorideConcentrate.getFluidOrGas(3000))
+            .fluidInputs(Materials.Chlorine.getGas(36_000))
+            .fluidOutputs(LutetiumChlorideConcentrate.getFluidOrGas(3_000))
             .metadata(COIL_HEAT, 800)
             .eut(TierEU.RECIPE_ZPM)
             .duration(2 * SECONDS)
@@ -2204,8 +2195,8 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(LutetiumOreConcentrate.get(OrePrefixes.dust, 1))
             .itemOutputs(Materials.SiliconDioxide.getDust(1))
-            .fluidInputs(Materials.Chlorine.getGas(12000))
-            .fluidOutputs(LutetiumChlorideConcentrate.getFluidOrGas(1000))
+            .fluidInputs(Materials.Chlorine.getGas(12_000))
+            .fluidOutputs(LutetiumChlorideConcentrate.getFluidOrGas(1_000))
             .metadata(COIL_HEAT, 800)
             .eut(TierEU.RECIPE_ZPM)
             .duration(2 * SECONDS)
@@ -2213,11 +2204,11 @@ public class RecipeLoader {
         // 1B oreChlorideConcentrate = 1 ore's rare earth metal + 3 any rare earth metal
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                LutetiumExtractingNanoResin.getFluidOrGas(1000),
-                LutetiumChlorideConcentrate.getFluidOrGas(1000))
+                LutetiumExtractingNanoResin.getFluidOrGas(1_000),
+                LutetiumChlorideConcentrate.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledLutetiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthConcentrate.getFluidOrGas(1000))
+                FilledLutetiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthConcentrate.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
@@ -2231,8 +2222,8 @@ public class RecipeLoader {
                 GTModHandler.getModItem(NewHorizonsCoreMod.ID, "item.MysteriousCrystalLens", 0),
                 Materials.Lanthanum.getDust(1),
                 Materials.Carbon.getNanite(1))
-            .fluidInputs(GGMaterial.P507.getFluidOrGas(4000))
-            .fluidOutputs(LanthanumExtractingNanoResin.getFluidOrGas(1000))
+            .fluidInputs(GGMaterial.P507.getFluidOrGas(4_000))
+            .fluidOutputs(LanthanumExtractingNanoResin.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(10 * SECONDS)
             .addTo(laserEngraverRecipes);
@@ -2243,8 +2234,8 @@ public class RecipeLoader {
                 GTModHandler.getModItem(NewHorizonsCoreMod.ID, "item.MysteriousCrystalLens", 0),
                 Materials.Praseodymium.getDust(1),
                 Materials.Carbon.getNanite(1))
-            .fluidInputs(GGMaterial.P507.getFluidOrGas(4000))
-            .fluidOutputs(PraseodymiumExtractingNanoResin.getFluidOrGas(1000))
+            .fluidInputs(GGMaterial.P507.getFluidOrGas(4_000))
+            .fluidOutputs(PraseodymiumExtractingNanoResin.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(10 * SECONDS)
             .addTo(laserEngraverRecipes);
@@ -2255,8 +2246,8 @@ public class RecipeLoader {
                 GTModHandler.getModItem(NewHorizonsCoreMod.ID, "item.MysteriousCrystalLens", 0),
                 Materials.Cerium.getDust(1),
                 Materials.Carbon.getNanite(1))
-            .fluidInputs(GGMaterial.P507.getFluidOrGas(4000))
-            .fluidOutputs(CeriumExtractingNanoResin.getFluidOrGas(1000))
+            .fluidInputs(GGMaterial.P507.getFluidOrGas(4_000))
+            .fluidOutputs(CeriumExtractingNanoResin.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(10 * SECONDS)
             .addTo(laserEngraverRecipes);
@@ -2267,20 +2258,8 @@ public class RecipeLoader {
                 GTModHandler.getModItem(NewHorizonsCoreMod.ID, "item.MysteriousCrystalLens", 0),
                 Materials.Neodymium.getDust(1),
                 Materials.Carbon.getNanite(1))
-            .fluidInputs(GGMaterial.P507.getFluidOrGas(4000))
-            .fluidOutputs(NeodymiumExtractingNanoResin.getFluidOrGas(1000))
-            .eut(TierEU.RECIPE_UV)
-            .duration(10 * SECONDS)
-            .addTo(laserEngraverRecipes);
-
-        // Promethium
-        GTValues.RA.stdBuilder()
-            .itemInputs(
-                GTModHandler.getModItem(NewHorizonsCoreMod.ID, "item.MysteriousCrystalLens", 0),
-                Materials.Promethium.getDust(1),
-                Materials.Carbon.getNanite(1))
-            .fluidInputs(GGMaterial.P507.getFluidOrGas(4000))
-            .fluidOutputs(PromethiumExtractingNanoResin.getFluidOrGas(1000))
+            .fluidInputs(GGMaterial.P507.getFluidOrGas(4_000))
+            .fluidOutputs(NeodymiumExtractingNanoResin.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(10 * SECONDS)
             .addTo(laserEngraverRecipes);
@@ -2291,8 +2270,8 @@ public class RecipeLoader {
                 GTModHandler.getModItem(NewHorizonsCoreMod.ID, "item.MysteriousCrystalLens", 0),
                 Materials.Samarium.getDust(1),
                 Materials.Carbon.getNanite(1))
-            .fluidInputs(GGMaterial.P507.getFluidOrGas(4000))
-            .fluidOutputs(SamariumExtractingNanoResin.getFluidOrGas(1000))
+            .fluidInputs(GGMaterial.P507.getFluidOrGas(4_000))
+            .fluidOutputs(SamariumExtractingNanoResin.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(10 * SECONDS)
             .addTo(laserEngraverRecipes);
@@ -2303,8 +2282,8 @@ public class RecipeLoader {
                 GTModHandler.getModItem(NewHorizonsCoreMod.ID, "item.MysteriousCrystalLens", 0),
                 Materials.Europium.getDust(1),
                 Materials.Carbon.getNanite(1))
-            .fluidInputs(GGMaterial.P507.getFluidOrGas(4000))
-            .fluidOutputs(EuropiumExtractingNanoResin.getFluidOrGas(1000))
+            .fluidInputs(GGMaterial.P507.getFluidOrGas(4_000))
+            .fluidOutputs(EuropiumExtractingNanoResin.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(10 * SECONDS)
             .addTo(laserEngraverRecipes);
@@ -2315,8 +2294,8 @@ public class RecipeLoader {
                 GTModHandler.getModItem(NewHorizonsCoreMod.ID, "item.MysteriousCrystalLens", 0),
                 Materials.Gadolinium.getDust(1),
                 Materials.Carbon.getNanite(1))
-            .fluidInputs(GGMaterial.P507.getFluidOrGas(4000))
-            .fluidOutputs(GadoliniumExtractingNanoResin.getFluidOrGas(1000))
+            .fluidInputs(GGMaterial.P507.getFluidOrGas(4_000))
+            .fluidOutputs(GadoliniumExtractingNanoResin.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(10 * SECONDS)
             .addTo(laserEngraverRecipes);
@@ -2327,8 +2306,8 @@ public class RecipeLoader {
                 GTModHandler.getModItem(NewHorizonsCoreMod.ID, "item.MysteriousCrystalLens", 0),
                 Materials.Terbium.getDust(1),
                 Materials.Carbon.getNanite(1))
-            .fluidInputs(GGMaterial.P507.getFluidOrGas(4000))
-            .fluidOutputs(TerbiumExtractingNanoResin.getFluidOrGas(1000))
+            .fluidInputs(GGMaterial.P507.getFluidOrGas(4_000))
+            .fluidOutputs(TerbiumExtractingNanoResin.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(10 * SECONDS)
             .addTo(laserEngraverRecipes);
@@ -2339,8 +2318,8 @@ public class RecipeLoader {
                 GTModHandler.getModItem(NewHorizonsCoreMod.ID, "item.MysteriousCrystalLens", 0),
                 Materials.Dysprosium.getDust(1),
                 Materials.Carbon.getNanite(1))
-            .fluidInputs(GGMaterial.P507.getFluidOrGas(4000))
-            .fluidOutputs(DysprosiumExtractingNanoResin.getFluidOrGas(1000))
+            .fluidInputs(GGMaterial.P507.getFluidOrGas(4_000))
+            .fluidOutputs(DysprosiumExtractingNanoResin.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(10 * SECONDS)
             .addTo(laserEngraverRecipes);
@@ -2351,8 +2330,8 @@ public class RecipeLoader {
                 GTModHandler.getModItem(NewHorizonsCoreMod.ID, "item.MysteriousCrystalLens", 0),
                 Materials.Holmium.getDust(1),
                 Materials.Carbon.getNanite(1))
-            .fluidInputs(GGMaterial.P507.getFluidOrGas(4000))
-            .fluidOutputs(HolmiumExtractingNanoResin.getFluidOrGas(1000))
+            .fluidInputs(GGMaterial.P507.getFluidOrGas(4_000))
+            .fluidOutputs(HolmiumExtractingNanoResin.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(10 * SECONDS)
             .addTo(laserEngraverRecipes);
@@ -2363,8 +2342,8 @@ public class RecipeLoader {
                 GTModHandler.getModItem(NewHorizonsCoreMod.ID, "item.MysteriousCrystalLens", 0),
                 Materials.Erbium.getDust(1),
                 Materials.Carbon.getNanite(1))
-            .fluidInputs(GGMaterial.P507.getFluidOrGas(4000))
-            .fluidOutputs(ErbiumExtractingNanoResin.getFluidOrGas(1000))
+            .fluidInputs(GGMaterial.P507.getFluidOrGas(4_000))
+            .fluidOutputs(ErbiumExtractingNanoResin.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(10 * SECONDS)
             .addTo(laserEngraverRecipes);
@@ -2375,8 +2354,8 @@ public class RecipeLoader {
                 GTModHandler.getModItem(NewHorizonsCoreMod.ID, "item.MysteriousCrystalLens", 0),
                 Materials.Thulium.getDust(1),
                 Materials.Carbon.getNanite(1))
-            .fluidInputs(GGMaterial.P507.getFluidOrGas(4000))
-            .fluidOutputs(ThuliumExtractingNanoResin.getFluidOrGas(1000))
+            .fluidInputs(GGMaterial.P507.getFluidOrGas(4_000))
+            .fluidOutputs(ThuliumExtractingNanoResin.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(10 * SECONDS)
             .addTo(laserEngraverRecipes);
@@ -2387,8 +2366,8 @@ public class RecipeLoader {
                 GTModHandler.getModItem(NewHorizonsCoreMod.ID, "item.MysteriousCrystalLens", 0),
                 Materials.Ytterbium.getDust(1),
                 Materials.Carbon.getNanite(1))
-            .fluidInputs(GGMaterial.P507.getFluidOrGas(4000))
-            .fluidOutputs(YtterbiumExtractingNanoResin.getFluidOrGas(1000))
+            .fluidInputs(GGMaterial.P507.getFluidOrGas(4_000))
+            .fluidOutputs(YtterbiumExtractingNanoResin.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(10 * SECONDS)
             .addTo(laserEngraverRecipes);
@@ -2399,8 +2378,8 @@ public class RecipeLoader {
                 GTModHandler.getModItem(NewHorizonsCoreMod.ID, "item.MysteriousCrystalLens", 0),
                 Materials.Lutetium.getDust(1),
                 Materials.Carbon.getNanite(1))
-            .fluidInputs(GGMaterial.P507.getFluidOrGas(4000))
-            .fluidOutputs(LutetiumExtractingNanoResin.getFluidOrGas(1000))
+            .fluidInputs(GGMaterial.P507.getFluidOrGas(4_000))
+            .fluidOutputs(LutetiumExtractingNanoResin.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(10 * SECONDS)
             .addTo(laserEngraverRecipes);
@@ -2410,196 +2389,169 @@ public class RecipeLoader {
         // La
         GTValues.RA.stdBuilder()
             .itemInputs(Materials.Empty.getCells(2))
-            .fluidInputs(FilledLanthanumExtractingNanoResin.getFluidOrGas(1000))
+            .fluidInputs(FilledLanthanumExtractingNanoResin.getFluidOrGas(1_000))
             .itemOutputs(
                 LanthanumExtractingNanoResin.get(OrePrefixes.cell, 1),
                 GTOreDictUnificator.get(OrePrefixes.cellMolten, Materials.Lanthanum, 1))
-            .fluidOutputs(Materials.Chlorine.getGas(3000))
+            .fluidOutputs(Materials.Chlorine.getGas(3_000))
             .eut(TierEU.RECIPE_ZPM)
             .duration(5 * SECONDS)
-            .noOptimize()
             .addTo(electrolyzerRecipes);
 
         // Pr
         GTValues.RA.stdBuilder()
             .itemInputs(Materials.Empty.getCells(2))
-            .fluidInputs(FilledPraseodymiumExtractingNanoResin.getFluidOrGas(1000))
+            .fluidInputs(FilledPraseodymiumExtractingNanoResin.getFluidOrGas(1_000))
             .itemOutputs(
                 PraseodymiumExtractingNanoResin.get(OrePrefixes.cell, 1),
                 GTOreDictUnificator.get(OrePrefixes.cellMolten, Materials.Praseodymium, 1))
-            .fluidOutputs(Materials.Chlorine.getGas(3000))
+            .fluidOutputs(Materials.Chlorine.getGas(3_000))
             .eut(TierEU.RECIPE_ZPM)
             .duration(5 * SECONDS)
-            .noOptimize()
             .addTo(electrolyzerRecipes);
 
         // Ce
         GTValues.RA.stdBuilder()
             .itemInputs(Materials.Empty.getCells(2))
-            .fluidInputs(FilledCeriumExtractingNanoResin.getFluidOrGas(1000))
+            .fluidInputs(FilledCeriumExtractingNanoResin.getFluidOrGas(1_000))
             .itemOutputs(
                 CeriumExtractingNanoResin.get(OrePrefixes.cell, 1),
                 GTOreDictUnificator.get(OrePrefixes.cellMolten, Materials.Cerium, 1))
-            .fluidOutputs(Materials.Chlorine.getGas(3000))
+            .fluidOutputs(Materials.Chlorine.getGas(3_000))
             .eut(TierEU.RECIPE_ZPM)
             .duration(5 * SECONDS)
-            .noOptimize()
             .addTo(electrolyzerRecipes);
 
         // Nd
         GTValues.RA.stdBuilder()
             .itemInputs(Materials.Empty.getCells(2))
-            .fluidInputs(FilledNeodymiumExtractingNanoResin.getFluidOrGas(1000))
+            .fluidInputs(FilledNeodymiumExtractingNanoResin.getFluidOrGas(1_000))
             .itemOutputs(
                 NeodymiumExtractingNanoResin.get(OrePrefixes.cell, 1),
                 GTOreDictUnificator.get(OrePrefixes.cellMolten, Materials.Neodymium, 1))
-            .fluidOutputs(Materials.Chlorine.getGas(3000))
+            .fluidOutputs(Materials.Chlorine.getGas(3_000))
             .eut(TierEU.RECIPE_ZPM)
             .duration(5 * SECONDS)
-            .noOptimize()
-            .addTo(electrolyzerRecipes);
-
-        // Po
-        GTValues.RA.stdBuilder()
-            .itemInputs(Materials.Empty.getCells(2))
-            .fluidInputs(FilledPromethiumExtractingNanoResin.getFluidOrGas(1000))
-            .itemOutputs(
-                PromethiumExtractingNanoResin.get(OrePrefixes.cell, 1),
-                GTOreDictUnificator.get(OrePrefixes.cellMolten, Materials.Promethium, 1))
-            .fluidOutputs(Materials.Chlorine.getGas(3000))
-            .eut(TierEU.RECIPE_ZPM)
-            .duration(5 * SECONDS)
-            .noOptimize()
             .addTo(electrolyzerRecipes);
 
         // Sm
         GTValues.RA.stdBuilder()
             .itemInputs(Materials.Empty.getCells(2))
-            .fluidInputs(FilledSamariumExtractingNanoResin.getFluidOrGas(1000))
+            .fluidInputs(FilledSamariumExtractingNanoResin.getFluidOrGas(1_000))
             .itemOutputs(
                 SamariumExtractingNanoResin.get(OrePrefixes.cell, 1),
                 GTOreDictUnificator.get(OrePrefixes.cellMolten, Materials.Samarium, 1))
-            .fluidOutputs(Materials.Chlorine.getGas(3000))
+            .fluidOutputs(Materials.Chlorine.getGas(3_000))
             .eut(TierEU.RECIPE_ZPM)
             .duration(5 * SECONDS)
-            .noOptimize()
             .addTo(electrolyzerRecipes);
 
         // Eu
         GTValues.RA.stdBuilder()
             .itemInputs(Materials.Empty.getCells(2))
-            .fluidInputs(FilledEuropiumExtractingNanoResin.getFluidOrGas(1000))
+            .fluidInputs(FilledEuropiumExtractingNanoResin.getFluidOrGas(1_000))
             .itemOutputs(
                 EuropiumExtractingNanoResin.get(OrePrefixes.cell, 1),
                 GTOreDictUnificator.get(OrePrefixes.cellMolten, Materials.Europium, 1))
-            .fluidOutputs(Materials.Chlorine.getGas(3000))
+            .fluidOutputs(Materials.Chlorine.getGas(3_000))
             .eut(TierEU.RECIPE_ZPM)
             .duration(5 * SECONDS)
-            .noOptimize()
             .addTo(electrolyzerRecipes);
 
         // Ga
         GTValues.RA.stdBuilder()
             .itemInputs(Materials.Empty.getCells(2))
-            .fluidInputs(FilledGadoliniumExtractingNanoResin.getFluidOrGas(1000))
+            .fluidInputs(FilledGadoliniumExtractingNanoResin.getFluidOrGas(1_000))
             .itemOutputs(
                 GadoliniumExtractingNanoResin.get(OrePrefixes.cell, 1),
                 GTOreDictUnificator.get(OrePrefixes.cellMolten, Materials.Gadolinium, 1))
-            .fluidOutputs(Materials.Chlorine.getGas(3000))
+            .fluidOutputs(Materials.Chlorine.getGas(3_000))
             .eut(TierEU.RECIPE_ZPM)
             .duration(5 * SECONDS)
-            .noOptimize()
             .addTo(electrolyzerRecipes);
 
         // Tb
         GTValues.RA.stdBuilder()
             .itemInputs(Materials.Empty.getCells(2))
-            .fluidInputs(FilledTerbiumExtractingNanoResin.getFluidOrGas(1000))
+            .fluidInputs(FilledTerbiumExtractingNanoResin.getFluidOrGas(1_000))
             .itemOutputs(
                 TerbiumExtractingNanoResin.get(OrePrefixes.cell, 1),
                 GTOreDictUnificator.get(OrePrefixes.cellMolten, Materials.Terbium, 1))
-            .fluidOutputs(Materials.Chlorine.getGas(3000))
+            .fluidOutputs(Materials.Chlorine.getGas(3_000))
             .eut(TierEU.RECIPE_ZPM)
             .duration(5 * SECONDS)
-            .noOptimize()
             .addTo(electrolyzerRecipes);
 
         // Dy
         GTValues.RA.stdBuilder()
             .itemInputs(Materials.Empty.getCells(2))
-            .fluidInputs(FilledDysprosiumExtractingNanoResin.getFluidOrGas(1000))
+            .fluidInputs(FilledDysprosiumExtractingNanoResin.getFluidOrGas(1_000))
             .itemOutputs(
                 DysprosiumExtractingNanoResin.get(OrePrefixes.cell, 1),
                 GTOreDictUnificator.get(OrePrefixes.cellMolten, Materials.Dysprosium, 1))
-            .fluidOutputs(Materials.Chlorine.getGas(3000))
+            .fluidOutputs(Materials.Chlorine.getGas(3_000))
             .eut(TierEU.RECIPE_ZPM)
             .duration(5 * SECONDS)
-            .noOptimize()
             .addTo(electrolyzerRecipes);
 
         // Ho
         GTValues.RA.stdBuilder()
             .itemInputs(Materials.Empty.getCells(2))
-            .fluidInputs(FilledHolmiumExtractingNanoResin.getFluidOrGas(1000))
+            .fluidInputs(FilledHolmiumExtractingNanoResin.getFluidOrGas(1_000))
             .itemOutputs(
                 HolmiumExtractingNanoResin.get(OrePrefixes.cell, 1),
                 GTOreDictUnificator.get(OrePrefixes.cellMolten, Materials.Holmium, 1))
-            .fluidOutputs(Materials.Chlorine.getGas(3000))
+            .fluidOutputs(Materials.Chlorine.getGas(3_000))
             .eut(TierEU.RECIPE_ZPM)
             .duration(5 * SECONDS)
-            .noOptimize()
             .addTo(electrolyzerRecipes);
 
         // Er
         GTValues.RA.stdBuilder()
             .itemInputs(Materials.Empty.getCells(2))
-            .fluidInputs(FilledErbiumExtractingNanoResin.getFluidOrGas(1000))
+            .fluidInputs(FilledErbiumExtractingNanoResin.getFluidOrGas(1_000))
             .itemOutputs(
                 ErbiumExtractingNanoResin.get(OrePrefixes.cell, 1),
                 GTOreDictUnificator.get(OrePrefixes.cellMolten, Materials.Erbium, 1))
-            .fluidOutputs(Materials.Chlorine.getGas(3000))
+            .fluidOutputs(Materials.Chlorine.getGas(3_000))
             .eut(TierEU.RECIPE_ZPM)
             .duration(5 * SECONDS)
-            .noOptimize()
             .addTo(electrolyzerRecipes);
 
         // Tm
         GTValues.RA.stdBuilder()
             .itemInputs(Materials.Empty.getCells(2))
-            .fluidInputs(FilledThuliumExtractingNanoResin.getFluidOrGas(1000))
+            .fluidInputs(FilledThuliumExtractingNanoResin.getFluidOrGas(1_000))
             .itemOutputs(
                 ThuliumExtractingNanoResin.get(OrePrefixes.cell, 1),
                 GTOreDictUnificator.get(OrePrefixes.cellMolten, Materials.Thulium, 1))
-            .fluidOutputs(Materials.Chlorine.getGas(3000))
+            .fluidOutputs(Materials.Chlorine.getGas(3_000))
             .eut(TierEU.RECIPE_ZPM)
             .duration(5 * SECONDS)
-            .noOptimize()
             .addTo(electrolyzerRecipes);
 
         // Yb
         GTValues.RA.stdBuilder()
             .itemInputs(Materials.Empty.getCells(2))
-            .fluidInputs(FilledYtterbiumExtractingNanoResin.getFluidOrGas(1000))
+            .fluidInputs(FilledYtterbiumExtractingNanoResin.getFluidOrGas(1_000))
             .itemOutputs(
                 YtterbiumExtractingNanoResin.get(OrePrefixes.cell, 1),
                 GTOreDictUnificator.get(OrePrefixes.cellMolten, Materials.Ytterbium, 1))
-            .fluidOutputs(Materials.Chlorine.getGas(3000))
+            .fluidOutputs(Materials.Chlorine.getGas(3_000))
             .eut(TierEU.RECIPE_ZPM)
             .duration(5 * SECONDS)
-            .noOptimize()
             .addTo(electrolyzerRecipes);
 
         // Lu
         GTValues.RA.stdBuilder()
             .itemInputs(Materials.Empty.getCells(2))
-            .fluidInputs(FilledLutetiumExtractingNanoResin.getFluidOrGas(1000))
+            .fluidInputs(FilledLutetiumExtractingNanoResin.getFluidOrGas(1_000))
             .itemOutputs(
                 LutetiumExtractingNanoResin.get(OrePrefixes.cell, 1),
                 GTOreDictUnificator.get(OrePrefixes.cellMolten, Materials.Lutetium, 1))
-            .fluidOutputs(Materials.Chlorine.getGas(3000))
+            .fluidOutputs(Materials.Chlorine.getGas(3_000))
             .eut(TierEU.RECIPE_ZPM)
             .duration(5 * SECONDS)
-            .noOptimize()
             .addTo(electrolyzerRecipes);
 
         // TODO ChlorinitedRareEarthConcentrate process with every 15 Rare Earth Extracting Nano Resin
@@ -2607,31 +2559,31 @@ public class RecipeLoader {
         // La
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                LanthanumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthConcentrate.getFluidOrGas(1000))
+                LanthanumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthConcentrate.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledLanthanumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1000))
+                FilledLanthanumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                LanthanumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1000))
+                LanthanumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledLanthanumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1000))
+                FilledLanthanumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                LanthanumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1000))
+                LanthanumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledLanthanumExtractingNanoResin.getFluidOrGas(1000),
-                GGMaterial.wasteLiquid.getFluidOrGas(1000))
+                FilledLanthanumExtractingNanoResin.getFluidOrGas(1_000),
+                GGMaterial.wasteLiquid.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
@@ -2639,31 +2591,31 @@ public class RecipeLoader {
         // Pr
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                PraseodymiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthConcentrate.getFluidOrGas(1000))
+                PraseodymiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthConcentrate.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledPraseodymiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1000))
+                FilledPraseodymiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                PraseodymiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1000))
+                PraseodymiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledPraseodymiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1000))
+                FilledPraseodymiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                PraseodymiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1000))
+                PraseodymiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledPraseodymiumExtractingNanoResin.getFluidOrGas(1000),
-                GGMaterial.wasteLiquid.getFluidOrGas(1000))
+                FilledPraseodymiumExtractingNanoResin.getFluidOrGas(1_000),
+                GGMaterial.wasteLiquid.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
@@ -2671,31 +2623,31 @@ public class RecipeLoader {
         // Ce
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                CeriumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthConcentrate.getFluidOrGas(1000))
+                CeriumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthConcentrate.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledCeriumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1000))
+                FilledCeriumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                CeriumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1000))
+                CeriumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledCeriumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1000))
+                FilledCeriumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                CeriumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1000))
+                CeriumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledCeriumExtractingNanoResin.getFluidOrGas(1000),
-                GGMaterial.wasteLiquid.getFluidOrGas(1000))
+                FilledCeriumExtractingNanoResin.getFluidOrGas(1_000),
+                GGMaterial.wasteLiquid.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
@@ -2703,63 +2655,31 @@ public class RecipeLoader {
         // Nd
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                NeodymiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthConcentrate.getFluidOrGas(1000))
+                NeodymiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthConcentrate.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledNeodymiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1000))
+                FilledNeodymiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                NeodymiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1000))
+                NeodymiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledNeodymiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1000))
+                FilledNeodymiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                NeodymiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1000))
+                NeodymiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledNeodymiumExtractingNanoResin.getFluidOrGas(1000),
-                GGMaterial.wasteLiquid.getFluidOrGas(1000))
-            .eut(TierEU.RECIPE_UV)
-            .duration(1 * SECONDS)
-            .addTo(multiblockChemicalReactorRecipes);
-
-        // Pm
-        GTValues.RA.stdBuilder()
-            .fluidInputs(
-                PromethiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthConcentrate.getFluidOrGas(1000))
-            .fluidOutputs(
-                FilledPromethiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1000))
-            .eut(TierEU.RECIPE_UV)
-            .duration(1 * SECONDS)
-            .addTo(multiblockChemicalReactorRecipes);
-        GTValues.RA.stdBuilder()
-            .fluidInputs(
-                PromethiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1000))
-            .fluidOutputs(
-                FilledPromethiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1000))
-            .eut(TierEU.RECIPE_UV)
-            .duration(1 * SECONDS)
-            .addTo(multiblockChemicalReactorRecipes);
-        GTValues.RA.stdBuilder()
-            .fluidInputs(
-                PromethiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1000))
-            .fluidOutputs(
-                FilledPromethiumExtractingNanoResin.getFluidOrGas(1000),
-                GGMaterial.wasteLiquid.getFluidOrGas(1000))
+                FilledNeodymiumExtractingNanoResin.getFluidOrGas(1_000),
+                GGMaterial.wasteLiquid.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
@@ -2767,31 +2687,31 @@ public class RecipeLoader {
         // Sm
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                SamariumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthConcentrate.getFluidOrGas(1000))
+                SamariumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthConcentrate.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledSamariumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1000))
+                FilledSamariumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                SamariumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1000))
+                SamariumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledSamariumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1000))
+                FilledSamariumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                SamariumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1000))
+                SamariumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledSamariumExtractingNanoResin.getFluidOrGas(1000),
-                GGMaterial.wasteLiquid.getFluidOrGas(1000))
+                FilledSamariumExtractingNanoResin.getFluidOrGas(1_000),
+                GGMaterial.wasteLiquid.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
@@ -2799,31 +2719,31 @@ public class RecipeLoader {
         // Eu
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                EuropiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthConcentrate.getFluidOrGas(1000))
+                EuropiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthConcentrate.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledEuropiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1000))
+                FilledEuropiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                EuropiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1000))
+                EuropiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledEuropiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1000))
+                FilledEuropiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                EuropiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1000))
+                EuropiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledEuropiumExtractingNanoResin.getFluidOrGas(1000),
-                GGMaterial.wasteLiquid.getFluidOrGas(1000))
+                FilledEuropiumExtractingNanoResin.getFluidOrGas(1_000),
+                GGMaterial.wasteLiquid.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
@@ -2831,31 +2751,31 @@ public class RecipeLoader {
         // Ga
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                GadoliniumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthConcentrate.getFluidOrGas(1000))
+                GadoliniumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthConcentrate.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledGadoliniumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1000))
+                FilledGadoliniumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                GadoliniumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1000))
+                GadoliniumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledGadoliniumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1000))
+                FilledGadoliniumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                GadoliniumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1000))
+                GadoliniumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledGadoliniumExtractingNanoResin.getFluidOrGas(1000),
-                GGMaterial.wasteLiquid.getFluidOrGas(1000))
+                FilledGadoliniumExtractingNanoResin.getFluidOrGas(1_000),
+                GGMaterial.wasteLiquid.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
@@ -2863,31 +2783,31 @@ public class RecipeLoader {
         // Tb
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                TerbiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthConcentrate.getFluidOrGas(1000))
+                TerbiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthConcentrate.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledTerbiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1000))
+                FilledTerbiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                TerbiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1000))
+                TerbiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledTerbiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1000))
+                FilledTerbiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                TerbiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1000))
+                TerbiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledTerbiumExtractingNanoResin.getFluidOrGas(1000),
-                GGMaterial.wasteLiquid.getFluidOrGas(1000))
+                FilledTerbiumExtractingNanoResin.getFluidOrGas(1_000),
+                GGMaterial.wasteLiquid.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
@@ -2895,31 +2815,31 @@ public class RecipeLoader {
         // Dy
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                DysprosiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthConcentrate.getFluidOrGas(1000))
+                DysprosiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthConcentrate.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledDysprosiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1000))
+                FilledDysprosiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                DysprosiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1000))
+                DysprosiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledDysprosiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1000))
+                FilledDysprosiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                DysprosiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1000))
+                DysprosiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledDysprosiumExtractingNanoResin.getFluidOrGas(1000),
-                GGMaterial.wasteLiquid.getFluidOrGas(1000))
+                FilledDysprosiumExtractingNanoResin.getFluidOrGas(1_000),
+                GGMaterial.wasteLiquid.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
@@ -2927,31 +2847,31 @@ public class RecipeLoader {
         // Ho
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                HolmiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthConcentrate.getFluidOrGas(1000))
+                HolmiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthConcentrate.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledHolmiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1000))
+                FilledHolmiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                HolmiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1000))
+                HolmiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledHolmiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1000))
+                FilledHolmiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                HolmiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1000))
+                HolmiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledHolmiumExtractingNanoResin.getFluidOrGas(1000),
-                GGMaterial.wasteLiquid.getFluidOrGas(1000))
+                FilledHolmiumExtractingNanoResin.getFluidOrGas(1_000),
+                GGMaterial.wasteLiquid.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
@@ -2959,31 +2879,31 @@ public class RecipeLoader {
         // Er
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                ErbiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthConcentrate.getFluidOrGas(1000))
+                ErbiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthConcentrate.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledErbiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1000))
+                FilledErbiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                ErbiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1000))
+                ErbiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledErbiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1000))
+                FilledErbiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                ErbiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1000))
+                ErbiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledErbiumExtractingNanoResin.getFluidOrGas(1000),
-                GGMaterial.wasteLiquid.getFluidOrGas(1000))
+                FilledErbiumExtractingNanoResin.getFluidOrGas(1_000),
+                GGMaterial.wasteLiquid.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
@@ -2991,31 +2911,31 @@ public class RecipeLoader {
         // Tm
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                ThuliumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthConcentrate.getFluidOrGas(1000))
+                ThuliumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthConcentrate.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledThuliumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1000))
+                FilledThuliumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                ThuliumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1000))
+                ThuliumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledThuliumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1000))
+                FilledThuliumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                ThuliumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1000))
+                ThuliumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledThuliumExtractingNanoResin.getFluidOrGas(1000),
-                GGMaterial.wasteLiquid.getFluidOrGas(1000))
+                FilledThuliumExtractingNanoResin.getFluidOrGas(1_000),
+                GGMaterial.wasteLiquid.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
@@ -3023,31 +2943,31 @@ public class RecipeLoader {
         // Yb
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                YtterbiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthConcentrate.getFluidOrGas(1000))
+                YtterbiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthConcentrate.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledYtterbiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1000))
+                FilledYtterbiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                YtterbiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1000))
+                YtterbiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledYtterbiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1000))
+                FilledYtterbiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                YtterbiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1000))
+                YtterbiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledYtterbiumExtractingNanoResin.getFluidOrGas(1000),
-                GGMaterial.wasteLiquid.getFluidOrGas(1000))
+                FilledYtterbiumExtractingNanoResin.getFluidOrGas(1_000),
+                GGMaterial.wasteLiquid.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
@@ -3055,31 +2975,31 @@ public class RecipeLoader {
         // Lu
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                LutetiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthConcentrate.getFluidOrGas(1000))
+                LutetiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthConcentrate.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledLutetiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1000))
+                FilledLutetiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                LutetiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1000))
+                LutetiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthEnrichedSolution.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledLutetiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1000))
+                FilledLutetiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
         GTValues.RA.stdBuilder()
             .fluidInputs(
-                LutetiumExtractingNanoResin.getFluidOrGas(1000),
-                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1000))
+                LutetiumExtractingNanoResin.getFluidOrGas(1_000),
+                ChlorinatedRareEarthDilutedSolution.getFluidOrGas(1_000))
             .fluidOutputs(
-                FilledLutetiumExtractingNanoResin.getFluidOrGas(1000),
-                GGMaterial.wasteLiquid.getFluidOrGas(1000))
+                FilledLutetiumExtractingNanoResin.getFluidOrGas(1_000),
+                GGMaterial.wasteLiquid.getFluidOrGas(1_000))
             .eut(TierEU.RECIPE_UV)
             .duration(1 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
@@ -3102,7 +3022,7 @@ public class RecipeLoader {
             .itemInputs(GTOreDictUnificator.get(OrePrefixes.crushed, Materials.Samarium, 8))
             .fluidInputs(Materials.NitricAcid.getFluid(300))
             .itemOutputs(ThoriumPhosphateConcentrate.get(OrePrefixes.dust, 3))
-            .fluidOutputs(MuddySamariumRareEarthSolution.getFluidOrGas(1200))
+            .fluidOutputs(MuddySamariumRareEarthSolution.getFluidOrGas(1_200))
             .metadata(COIL_HEAT, 800)
             .eut(TierEU.RECIPE_EV)
             .duration(10 * SECONDS)
@@ -3112,32 +3032,30 @@ public class RecipeLoader {
         // CeriumRichMixture(CeriumOreConcentrate)
         GTValues.RA.stdBuilder()
             .itemInputs(GTUtility.getIntegratedCircuit(1))
-            .fluidInputs(Materials.NitricAcid.getFluid(1000), MuddySamariumRareEarthSolution.getFluidOrGas(1000))
+            .fluidInputs(Materials.NitricAcid.getFluid(1_000), MuddySamariumRareEarthSolution.getFluidOrGas(1_000))
             .itemOutputs(CeriumDioxide.get(OrePrefixes.dust, 1), CeriumOreConcentrate.get(OrePrefixes.dust, 1))
-            .fluidOutputs(SamariumRareEarthMud.getFluidOrGas(2000))
+            .fluidOutputs(SamariumRareEarthMud.getFluidOrGas(2_000))
             .metadata(DISSOLUTION_TANK_RATIO, 1)
             .outputChances(8000, 6000)
-            .noOptimize()
             .eut(TierEU.RECIPE_EV)
             .duration(10 * SECONDS)
             .addTo(dissolutionTankRecipes);
         GTValues.RA.stdBuilder()
             .itemInputs(GTUtility.getIntegratedCircuit(9))
-            .fluidInputs(Materials.NitricAcid.getFluid(9000), MuddySamariumRareEarthSolution.getFluidOrGas(9000))
+            .fluidInputs(Materials.NitricAcid.getFluid(9_000), MuddySamariumRareEarthSolution.getFluidOrGas(9_000))
             .itemOutputs(CeriumDioxide.get(OrePrefixes.dust, 9), CeriumOreConcentrate.get(OrePrefixes.dust, 9))
-            .fluidOutputs(SamariumRareEarthMud.getFluidOrGas(18000))
+            .fluidOutputs(SamariumRareEarthMud.getFluidOrGas(18_000))
             .metadata(DISSOLUTION_TANK_RATIO, 1)
             .outputChances(8000, 6000)
-            .noOptimize()
             .eut(TierEU.RECIPE_IV)
             .duration(300)
             .addTo(dissolutionTankRecipes);
         // Low Efficiency method in LCR
         GTValues.RA.stdBuilder()
             .itemInputs(GTUtility.getIntegratedCircuit(1))
-            .fluidInputs(Materials.NitricAcid.getFluid(1000), MuddySamariumRareEarthSolution.getFluidOrGas(1000))
+            .fluidInputs(Materials.NitricAcid.getFluid(1_000), MuddySamariumRareEarthSolution.getFluidOrGas(1_000))
             .itemOutputs(CeriumDioxide.get(OrePrefixes.dust, 1))
-            .fluidOutputs(SamariumRareEarthMud.getFluidOrGas(1000))
+            .fluidOutputs(SamariumRareEarthMud.getFluidOrGas(1_000))
             .outputChances(5000)
             .eut(TierEU.RECIPE_EV)
             .duration(300)
@@ -3147,35 +3065,33 @@ public class RecipeLoader {
         // + (90% + 60%) NeodymiumREConcentrate
         GTValues.RA.stdBuilder()
             .itemInputs(GTUtility.getIntegratedCircuit(1))
-            .fluidInputs(Materials.Water.getFluid(9000), SamariumRareEarthMud.getFluidOrGas(1000))
+            .fluidInputs(Materials.Water.getFluid(9_000), SamariumRareEarthMud.getFluidOrGas(1_000))
             .itemOutputs(
                 NeodymicRareEarthConcentrate.get(OrePrefixes.dust, 1),
                 NeodymicRareEarthConcentrate.get(OrePrefixes.dust, 1))
-            .fluidOutputs(DilutedSamariumRareEarthSolution.getFluidOrGas(10000))
+            .fluidOutputs(DilutedSamariumRareEarthSolution.getFluidOrGas(10_000))
             .metadata(DISSOLUTION_TANK_RATIO, 9)
             .outputChances(9000, 6000)
-            .noOptimize()
             .eut(TierEU.RECIPE_EV)
             .duration(600)
             .addTo(dissolutionTankRecipes);
         GTValues.RA.stdBuilder()
             .itemInputs(GTUtility.getIntegratedCircuit(9))
-            .fluidInputs(Materials.Water.getFluid(81000), SamariumRareEarthMud.getFluidOrGas(9000))
+            .fluidInputs(Materials.Water.getFluid(81_000), SamariumRareEarthMud.getFluidOrGas(9_000))
             .itemOutputs(
                 NeodymicRareEarthConcentrate.get(OrePrefixes.dust, 9),
                 NeodymicRareEarthConcentrate.get(OrePrefixes.dust, 9))
-            .fluidOutputs(DilutedSamariumRareEarthSolution.getFluidOrGas(90000))
+            .fluidOutputs(DilutedSamariumRareEarthSolution.getFluidOrGas(90_000))
             .metadata(DISSOLUTION_TANK_RATIO, 9)
             .outputChances(9000, 6000)
-            .noOptimize()
             .eut(TierEU.RECIPE_IV)
             .duration(900)
             .addTo(dissolutionTankRecipes);
         // Low Efficiency method in LCR
         GTValues.RA.stdBuilder()
             .itemInputs(GTUtility.getIntegratedCircuit(1))
-            .fluidInputs(SamariumRareEarthMud.getFluidOrGas(1000), Materials.Water.getFluid(16000))
-            .fluidOutputs(DilutedSamariumRareEarthSolution.getFluidOrGas(8000))
+            .fluidInputs(SamariumRareEarthMud.getFluidOrGas(1_000), Materials.Water.getFluid(16_000))
+            .fluidOutputs(DilutedSamariumRareEarthSolution.getFluidOrGas(8_000))
             .eut(TierEU.RECIPE_EV)
             .duration(1200)
             .addTo(multiblockChemicalReactorRecipes);
@@ -3186,7 +3102,7 @@ public class RecipeLoader {
         // LepersonniteDust -> DephosphatedSamariumConcentrate
         GTValues.RA.stdBuilder()
             .itemInputs(GTUtility.getIntegratedCircuit(13))
-            .fluidInputs(DilutedSamariumRareEarthSolution.getFluidOrGas(2000), GGMaterial.oxalate.getFluidOrGas(3000))
+            .fluidInputs(DilutedSamariumRareEarthSolution.getFluidOrGas(2_000), GGMaterial.oxalate.getFluidOrGas(3_000))
             .itemOutputs(
                 SamariumOxalate.get(OrePrefixes.dust, 5),
                 DephosphatedSamariumConcentrate.get(OrePrefixes.dust, 3))
@@ -3199,9 +3115,9 @@ public class RecipeLoader {
         // 5 ImpureSamariumOxalate + 6B HCL = 8 ImpureSamariumChloride + 6B CO
         GTValues.RA.stdBuilder()
             .itemInputs(SamariumOxalate.get(OrePrefixes.dust, 5))
-            .fluidInputs(Materials.HydrochloricAcid.getFluid(6000))
+            .fluidInputs(Materials.HydrochloricAcid.getFluid(6_000))
             .itemOutputs(SamariumChloride.get(OrePrefixes.dust, 8))
-            .fluidOutputs(Materials.CarbonMonoxide.getGas(6000))
+            .fluidOutputs(Materials.CarbonMonoxide.getGas(6_000))
             .eut(960)
             .duration(10 * SECONDS)
             .addTo(multiblockChemicalReactorRecipes);
@@ -3228,7 +3144,7 @@ public class RecipeLoader {
                 Materials.Samarium.getDust(1),
                 Materials.Sodium.getDust(1),
                 RarestEarthResidue.get(OrePrefixes.dustTiny, 2))
-            .fluidOutputs(Materials.Chlorine.getGas(4000))
+            .fluidOutputs(Materials.Chlorine.getGas(4_000))
             .eut(TierEU.RECIPE_IV)
             .duration(1 * SECONDS)
             .addTo(electrolyzerRecipes);
@@ -3240,7 +3156,7 @@ public class RecipeLoader {
                 Materials.Samarium.getDust(9),
                 Materials.Sodium.getDust(9),
                 RarestEarthResidue.get(OrePrefixes.dust, 2))
-            .fluidOutputs(Materials.Chlorine.getGas(36000))
+            .fluidOutputs(Materials.Chlorine.getGas(36_000))
             .eut(TierEU.RECIPE_LuV)
             .duration(2 * SECONDS)
             .addTo(electrolyzerRecipes);
@@ -3249,11 +3165,10 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(Materials.Lanthanum.getDust(9))
             .itemOutputs(ImpureLanthanumChloride.get(OrePrefixes.dust, 36))
-            .fluidInputs(SamariumChloride.getMolten(5184))
-            .fluidOutputs(Materials.Samarium.getMolten(2304))
+            .fluidInputs(SamariumChloride.getMolten(5_184))
+            .fluidOutputs(Materials.Samarium.getMolten(16 * INGOTS))
             .eut(TierEU.RECIPE_ZPM)
             .duration(5 * SECONDS)
-            .noOptimize()
             .addTo(distillationTowerRecipes);
 
         // Centrifuge ImpureLanthanumChlorideDust
@@ -3271,8 +3186,8 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(WerkstoffMaterialPool.Butanediol.get(OrePrefixes.cell, 1))
             .itemOutputs(Materials.Empty.getCells(1))
-            .fluidInputs(WerkstoffMaterialPool.TolueneTetramethylDiisocyanate.getFluidOrGas(4000))
-            .fluidOutputs(WerkstoffMaterialPool.PTMEGElastomer.getMolten(4000))
+            .fluidInputs(WerkstoffMaterialPool.TolueneTetramethylDiisocyanate.getFluidOrGas(4_000))
+            .fluidOutputs(WerkstoffMaterialPool.PTMEGElastomer.getMolten(4_000))
             .duration(1 * MINUTES + 15 * SECONDS)
             .eut(TierEU.RECIPE_HV)
             .addTo(UniversalChemical);
@@ -3283,8 +3198,8 @@ public class RecipeLoader {
                 WerkstoffMaterialPool.TolueneDiisocyanate.get(OrePrefixes.cell, 3),
                 Materials.Hydrogen.getCells(2))
             .itemOutputs(Materials.Empty.getCells(5))
-            .fluidInputs(WerkstoffMaterialPool.Polytetrahydrofuran.getFluidOrGas(1000))
-            .fluidOutputs(WerkstoffMaterialPool.TolueneTetramethylDiisocyanate.getFluidOrGas(2000))
+            .fluidInputs(WerkstoffMaterialPool.Polytetrahydrofuran.getFluidOrGas(1_000))
+            .fluidOutputs(WerkstoffMaterialPool.TolueneTetramethylDiisocyanate.getFluidOrGas(2_000))
             .duration(1 * MINUTES)
             .eut(TierEU.RECIPE_HV)
             .addTo(UniversalChemical);
@@ -3295,8 +3210,8 @@ public class RecipeLoader {
                 WerkstoffMaterialPool.TungstophosphoricAcid.get(OrePrefixes.cell, 1),
                 Materials.Oxygen.getCells(1))
             .itemOutputs(Materials.Empty.getCells(2))
-            .fluidInputs(WerkstoffMaterialPool.Tetrahydrofuran.getFluidOrGas(144))
-            .fluidOutputs(WerkstoffMaterialPool.Polytetrahydrofuran.getFluidOrGas(432))
+            .fluidInputs(WerkstoffMaterialPool.Tetrahydrofuran.getFluidOrGas(1 * INGOTS))
+            .fluidOutputs(WerkstoffMaterialPool.Polytetrahydrofuran.getFluidOrGas(3 * INGOTS))
             .duration(50 * SECONDS)
             .eut(TierEU.RECIPE_MV)
             .addTo(UniversalChemical);
@@ -3305,8 +3220,8 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(WerkstoffMaterialPool.AcidicButanediol.get(OrePrefixes.cell, 1))
             .itemOutputs(Materials.Empty.getCells(1))
-            .fluidInputs(Materials.Ethanol.getFluid(1000))
-            .fluidOutputs(WerkstoffMaterialPool.Tetrahydrofuran.getFluidOrGas(1000))
+            .fluidInputs(Materials.Ethanol.getFluid(1_000))
+            .fluidOutputs(WerkstoffMaterialPool.Tetrahydrofuran.getFluidOrGas(1_000))
             .duration(40 * SECONDS)
             .eut(TierEU.RECIPE_HV)
             .addTo(UniversalChemical);
@@ -3315,8 +3230,8 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(Materials.SulfuricAcid.getCells(1))
             .itemOutputs(Materials.Water.getCells(1))
-            .fluidInputs(WerkstoffMaterialPool.Butanediol.getFluidOrGas(1000))
-            .fluidOutputs(WerkstoffMaterialPool.AcidicButanediol.getFluidOrGas(1000))
+            .fluidInputs(WerkstoffMaterialPool.Butanediol.getFluidOrGas(1_000))
+            .fluidOutputs(WerkstoffMaterialPool.AcidicButanediol.getFluidOrGas(1_000))
             .duration(30 * SECONDS)
             .eut(TierEU.RECIPE_EV)
             .addTo(mixerRecipes);
@@ -3324,16 +3239,16 @@ public class RecipeLoader {
         // Butanediol
         GTValues.RA.stdBuilder()
             .itemInputs(WerkstoffMaterialPool.MoTeOCatalyst.get(OrePrefixes.dustTiny, 1))
-            .fluidInputs(Materials.Butane.getGas(1000))
-            .fluidOutputs(WerkstoffMaterialPool.Butanediol.getFluidOrGas(1000))
+            .fluidInputs(Materials.Butane.getGas(1_000))
+            .fluidOutputs(WerkstoffMaterialPool.Butanediol.getFluidOrGas(1_000))
             .duration(45 * SECONDS)
             .eut(TierEU.RECIPE_EV)
             .addTo(UniversalChemical);
 
         GTValues.RA.stdBuilder()
             .itemInputs(GTUtility.getIntegratedCircuit(9), WerkstoffMaterialPool.MoTeOCatalyst.get(OrePrefixes.dust, 1))
-            .fluidInputs(Materials.Butane.getGas(9000))
-            .fluidOutputs(WerkstoffMaterialPool.Butanediol.getFluidOrGas(9000))
+            .fluidInputs(Materials.Butane.getGas(9_000))
+            .fluidOutputs(WerkstoffMaterialPool.Butanediol.getFluidOrGas(9_000))
             .duration(6 * MINUTES + 45 * SECONDS)
             .eut(TierEU.RECIPE_EV)
             .addTo(multiblockChemicalReactorRecipes);
@@ -3352,8 +3267,8 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(Materials.PhosphoricAcid.getCells(1), Materials.HydrochloricAcid.getCells(24))
             .itemOutputs(Materials.Salt.getDust(24), Materials.Empty.getCells(25))
-            .fluidInputs(BotWerkstoffMaterialPool.SodiumTungstate.getFluidOrGas(12000))
-            .fluidOutputs(WerkstoffMaterialPool.TungstophosphoricAcid.getFluidOrGas(1000))
+            .fluidInputs(BotWerkstoffMaterialPool.SodiumTungstate.getFluidOrGas(12_000))
+            .fluidOutputs(WerkstoffMaterialPool.TungstophosphoricAcid.getFluidOrGas(1_000))
             .duration(25 * SECONDS)
             .eut(1024)
             .addTo(UniversalChemical);
@@ -3362,8 +3277,8 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(WerkstoffMaterialPool.Diaminotoluene.get(OrePrefixes.cell, 1), Materials.Empty.getCells(3))
             .itemOutputs()
-            .fluidInputs(BotWerkstoffMaterialPool.Phosgene.getFluidOrGas(2000))
-            .fluidOutputs(WerkstoffMaterialPool.TolueneDiisocyanate.getFluidOrGas(1000))
+            .fluidInputs(BotWerkstoffMaterialPool.Phosgene.getFluidOrGas(2_000))
+            .fluidOutputs(WerkstoffMaterialPool.TolueneDiisocyanate.getFluidOrGas(1_000))
             .duration(45 * SECONDS)
             .eut(TierEU.RECIPE_HV)
             .addTo(UniversalChemical);
@@ -3372,8 +3287,8 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(Materials.Hydrogen.getCells(4))
             .itemOutputs()
-            .fluidInputs(WerkstoffMaterialPool.Dinitrotoluene.getFluidOrGas(1000))
-            .fluidOutputs(WerkstoffMaterialPool.Diaminotoluene.getFluidOrGas(1000))
+            .fluidInputs(WerkstoffMaterialPool.Dinitrotoluene.getFluidOrGas(1_000))
+            .fluidOutputs(WerkstoffMaterialPool.Diaminotoluene.getFluidOrGas(1_000))
             .duration(15 * SECONDS)
             .eut(TierEU.RECIPE_HV)
             .addTo(UniversalChemical);
@@ -3382,8 +3297,8 @@ public class RecipeLoader {
         GTValues.RA.stdBuilder()
             .itemInputs(Materials.NitricAcid.getCells(2))
             .itemOutputs(Materials.Empty.getCells(2))
-            .fluidInputs(Materials.Toluene.getFluid(1000))
-            .fluidOutputs(WerkstoffMaterialPool.Dinitrotoluene.getFluidOrGas(1000))
+            .fluidInputs(Materials.Toluene.getFluid(1_000))
+            .fluidOutputs(WerkstoffMaterialPool.Dinitrotoluene.getFluidOrGas(1_000))
             .duration(45 * SECONDS)
             .eut(TierEU.RECIPE_HV)
             .addTo(UniversalChemical);
@@ -3399,7 +3314,7 @@ public class RecipeLoader {
                 GTOreDictUnificator.get(OrePrefixes.circuit, Materials.LuV, 4L),
                 GTUtility.getIntegratedCircuit(1))
             .itemOutputs(LanthItemList.DIGESTER)
-            .fluidInputs(Materials.Polytetrafluoroethylene.getMolten(1440))
+            .fluidInputs(Materials.Polytetrafluoroethylene.getMolten(10 * INGOTS))
             .duration(30 * SECONDS)
             .eut(4096)
             .addTo(assemblerRecipes);
@@ -3414,21 +3329,21 @@ public class RecipeLoader {
                 GTOreDictUnificator.get(OrePrefixes.circuit, Materials.EV, 4L),
                 GTUtility.getIntegratedCircuit(2))
             .itemOutputs(LanthItemList.DISSOLUTION_TANK)
-            .fluidInputs(Materials.Polytetrafluoroethylene.getMolten(720))
+            .fluidInputs(Materials.Polytetrafluoroethylene.getMolten(5 * INGOTS))
             .duration(20 * SECONDS)
             .eut(960)
             .addTo(assemblerRecipes);
 
         GTValues.RA.stdBuilder()
-            .fluidInputs(WerkstoffMaterialPool.DilutedAcetone.getFluidOrGas(250))
-            .fluidOutputs(Materials.Acetone.getFluid(150))
-            .duration(6 * SECONDS)
+            .fluidInputs(WerkstoffMaterialPool.DilutedAcetone.getFluidOrGas(50))
+            .fluidOutputs(Materials.Acetone.getFluid(30))
+            .duration(1 * SECONDS + 4 * TICKS)
             .eut(TierEU.RECIPE_MV)
             .addTo(fluidHeaterRecipes);
 
         GTValues.RA.stdBuilder()
-            .fluidInputs(WerkstoffMaterialPool.HotSuperCoolant.getFluidOrGas(1000))
-            .fluidOutputs(Materials.SuperCoolant.getFluid(1000))
+            .fluidInputs(WerkstoffMaterialPool.HotSuperCoolant.getFluidOrGas(1_000))
+            .fluidOutputs(Materials.SuperCoolant.getFluid(1_000))
             .duration(10 * SECONDS)
             .eut(TierEU.RECIPE_EV)
             .addTo(vacuumFreezerRecipes);
@@ -3482,7 +3397,6 @@ public class RecipeLoader {
                 CeriumDopedLutetiumAluminiumOxygenBlend.get(OrePrefixes.dust, 17))
             .eut(TierEU.RECIPE_UV)
             .duration(45 * SECONDS)
-            .noOptimize()
             .addTo(mixerRecipes);
         GTValues.RA.stdBuilder()
             .itemInputs(
@@ -3495,7 +3409,6 @@ public class RecipeLoader {
                 CeriumDopedLutetiumAluminiumOxygenBlend.get(OrePrefixes.dust, 17))
             .eut(TierEU.RECIPE_UV)
             .duration(45 * SECONDS)
-            .noOptimize()
             .addTo(mixerRecipes);
         GTValues.RA.stdBuilder()
             .itemInputs(
@@ -3508,14 +3421,13 @@ public class RecipeLoader {
                 CeriumDopedLutetiumAluminiumOxygenBlend.get(OrePrefixes.dust, 17))
             .eut(TierEU.RECIPE_UV)
             .duration(45 * SECONDS)
-            .noOptimize()
             .addTo(mixerRecipes);
 
         // Get LuAG Crystal seed
         GTValues.RA.stdBuilder()
             .itemInputs(CeriumDopedLutetiumAluminiumOxygenBlend.get(OrePrefixes.dust, 1))
             .itemOutputs(CeriumDopedLutetiumAluminiumGarnet.get(OrePrefixes.gem, 1))
-            .fluidInputs(Materials.Lutetium.getMolten(144 * 8))
+            .fluidInputs(Materials.Lutetium.getMolten(8 * INGOTS))
             .outputChances(514)
             .eut(TierEU.RECIPE_UV)
             .duration(500)

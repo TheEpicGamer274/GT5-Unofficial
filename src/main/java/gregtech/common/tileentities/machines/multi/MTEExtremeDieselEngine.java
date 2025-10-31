@@ -95,11 +95,6 @@ public class MTEExtremeDieselEngine extends MTEDieselEngine {
     }
 
     @Override
-    public Block getCasingBlock() {
-        return GregTechAPI.sBlockCasings4;
-    }
-
-    @Override
     public byte getCasingMeta() {
         return 0;
     }
@@ -111,16 +106,6 @@ public class MTEExtremeDieselEngine extends MTEDieselEngine {
 
     @Override
     public byte getIntakeMeta() {
-        return 4;
-    }
-
-    @Override
-    public Block getGearboxBlock() {
-        return GregTechAPI.sBlockCasings2;
-    }
-
-    @Override
-    public byte getGearboxMeta() {
         return 4;
     }
 
@@ -140,18 +125,8 @@ public class MTEExtremeDieselEngine extends MTEDieselEngine {
     }
 
     @Override
-    protected int getBoostFactor() {
-        return 2;
-    }
-
-    @Override
     protected Materials getBooster() {
         return Materials.LiquidOxygen;
-    }
-
-    @Override
-    protected int getAdditiveFactor() {
-        return 1;
     }
 
     @Override
@@ -160,13 +135,8 @@ public class MTEExtremeDieselEngine extends MTEDieselEngine {
     }
 
     @Override
-    public int getMaxEfficiency(ItemStack aStack) {
-        return boostEu ? 30000 : 10000;
-    }
-
-    @Override
     public int getPollutionPerSecond(ItemStack aStack) {
-        return GTMod.gregtechproxy.mPollutionExtremeCombustionEnginePerSecond;
+        return GTMod.proxy.mPollutionExtremeCombustionEnginePerSecond;
     }
 
     @Override
@@ -180,7 +150,9 @@ public class MTEExtremeDieselEngine extends MTEDieselEngine {
                 .getEUCapacity();
         }
 
-        return new String[] { EnumChatFormatting.BLUE + "Extreme Diesel Engine" + EnumChatFormatting.RESET,
+        return new String[] {
+            EnumChatFormatting.BLUE + StatCollector.translateToLocal("GT5U.infodata.extreme_diesel_engine")
+                + EnumChatFormatting.RESET,
             StatCollector.translateToLocal("GT5U.multiblock.energy") + ": "
                 + EnumChatFormatting.GREEN
                 + GTUtility.formatNumbers(storedEnergy)

@@ -34,9 +34,12 @@ import com.gtnewhorizon.structurelib.structure.IStructureDefinition;
 import com.gtnewhorizon.structurelib.structure.ISurvivalBuildEnvironment;
 import com.gtnewhorizon.structurelib.structure.StructureDefinition;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import gregtech.GTMod;
 import gregtech.api.enums.Materials;
 import gregtech.api.enums.OrePrefixes;
+import gregtech.api.enums.SoundResource;
 import gregtech.api.enums.Textures;
 import gregtech.api.enums.Textures.BlockIcons;
 import gregtech.api.interfaces.ITexture;
@@ -109,6 +112,11 @@ public abstract class MTELargeBoiler extends MTEEnhancedMultiBlockBase<MTELargeB
 
     public MTELargeBoiler(String aName) {
         super(aName);
+    }
+
+    @Override
+    public boolean supportsPowerPanel() {
+        return false;
     }
 
     @Override
@@ -191,8 +199,7 @@ public abstract class MTELargeBoiler extends MTEEnhancedMultiBlockBase<MTELargeB
         // allows for 0 pollution if circuit throttle is too high
         return Math.max(
             0,
-            (int) (pollutionPerSecond
-                * (1 - GTMod.gregtechproxy.mPollutionReleasedByThrottle * getIntegratedCircuitConfig())));
+            (int) (pollutionPerSecond * (1 - GTMod.proxy.mPollutionReleasedByThrottle * getIntegratedCircuitConfig())));
     }
 
     @Override
@@ -220,11 +227,6 @@ public abstract class MTELargeBoiler extends MTEEnhancedMultiBlockBase<MTELargeB
                     .build() };
         }
         return new ITexture[] { Textures.BlockIcons.getCasingTextureForId(getCasingTextureIndex()) };
-    }
-
-    @Override
-    public boolean isCorrectMachinePart(ItemStack aStack) {
-        return true;
     }
 
     boolean isFuelValid() {
@@ -276,9 +278,13 @@ public abstract class MTELargeBoiler extends MTEEnhancedMultiBlockBase<MTELargeB
                 if (tFluid != null && tRecipe.mSpecialValue > 1) {
                     tFluid.amount = 1000;
                     if (depleteInput(tFluid)) {
-                        this.mEfficiencyIncrease = this.mMaxProgresstime * getEfficiencyIncrease() * 4;
                         this.mMaxProgresstime = adjustBurnTimeForConfig(runtimeBoost(tRecipe.mSpecialValue / 2));
+                        this.mEfficiencyIncrease = this.mMaxProgresstime * getEfficiencyIncrease() * 4;
                         this.mEUt = adjustEUtForConfig(getEUt());
+                        if (this.mEfficiencyIncrease > 5000) {
+                            this.mEfficiencyIncrease = 0;
+                            this.mSuperEfficencyIncrease = 20;
+                        }
                         return CheckRecipeResultRegistry.SUCCESSFUL;
                     }
                 }
@@ -288,10 +294,14 @@ public abstract class MTELargeBoiler extends MTEEnhancedMultiBlockBase<MTELargeB
                 if (tFluid != null) {
                     tFluid.amount = 1000;
                     if (depleteInput(tFluid)) {
-                        this.mEfficiencyIncrease = this.mMaxProgresstime * getEfficiencyIncrease();
                         this.mMaxProgresstime = adjustBurnTimeForConfig(
                             Math.max(1, runtimeBoost(tRecipe.mSpecialValue * 2)));
+                        this.mEfficiencyIncrease = this.mMaxProgresstime * getEfficiencyIncrease();
                         this.mEUt = adjustEUtForConfig(getEUt());
+                        if (this.mEfficiencyIncrease > 5000) {
+                            this.mEfficiencyIncrease = 0;
+                            this.mSuperEfficencyIncrease = 20;
+                        }
                         return CheckRecipeResultRegistry.SUCCESSFUL;
                     }
                 }
@@ -396,7 +406,7 @@ public abstract class MTELargeBoiler extends MTEEnhancedMultiBlockBase<MTELargeB
                 } else {
                     if (depleteInput(Materials.Water.getFluid(amount))
                         || depleteInput(GTModHandler.getDistilledWater(amount))) {
-                        addOutput(GTModHandler.getSteam(tGeneratedEU));
+                        addOutput(Materials.Steam.getGas(tGeneratedEU));
                     } else {
                         GTLog.exp.println("Boiler " + this.mName + " had no Water!");
                         explodeMultiblock();
@@ -460,21 +470,6 @@ public abstract class MTELargeBoiler extends MTEEnhancedMultiBlockBase<MTELargeB
             && !mMufflerHatches.isEmpty();
     }
 
-    @Override
-    public int getMaxEfficiency(ItemStack aStack) {
-        return 10000;
-    }
-
-    @Override
-    public int getDamageToComponent(ItemStack aStack) {
-        return 0;
-    }
-
-    @Override
-    public boolean explodesOnComponentBreak(ItemStack aStack) {
-        return false;
-    }
-
     private int adjustEUtForConfig(int rawEUt) {
         int adjustedSteamOutput = rawEUt - (isSuperheated() ? 75 : 25) * integratedCircuitConfig;
         return Math.max(adjustedSteamOutput, 25);
@@ -507,6 +502,13 @@ public abstract class MTELargeBoiler extends MTEEnhancedMultiBlockBase<MTELargeB
     @Override
     public int survivalConstruct(ItemStack stackSize, int elementBudget, ISurvivalBuildEnvironment env) {
         if (mMachine) return -1;
-        return survivialBuildPiece(STRUCTURE_PIECE_MAIN, stackSize, 1, 4, 0, elementBudget, env, false, true);
+        return survivalBuildPiece(STRUCTURE_PIECE_MAIN, stackSize, 1, 4, 0, elementBudget, env, false, true);
     }
+
+    @SideOnly(Side.CLIENT)
+    @Override
+    protected SoundResource getActivitySoundLoop() {
+        return SoundResource.GTCEU_LOOP_BOILER;
+    }
+
 }

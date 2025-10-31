@@ -36,6 +36,7 @@ import static gregtech.common.items.IDMetaTool01.SOFTMALLET;
 import static gregtech.common.items.IDMetaTool01.SOLDERING_IRON_HV;
 import static gregtech.common.items.IDMetaTool01.SOLDERING_IRON_LV;
 import static gregtech.common.items.IDMetaTool01.SOLDERING_IRON_MV;
+import static gregtech.common.items.IDMetaTool01.TROWEL;
 import static gregtech.common.items.IDMetaTool01.TURBINE;
 import static gregtech.common.items.IDMetaTool01.TURBINE_HUGE;
 import static gregtech.common.items.IDMetaTool01.TURBINE_LARGE;
@@ -51,6 +52,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 
 import gregtech.api.GregTechAPI;
+import gregtech.api.enums.ItemList;
 import gregtech.api.enums.Materials;
 import gregtech.api.enums.OrePrefixes;
 import gregtech.api.enums.TCAspects;
@@ -79,12 +81,14 @@ import gregtech.common.tools.ToolSaw;
 import gregtech.common.tools.ToolScoop;
 import gregtech.common.tools.ToolScrewdriver;
 import gregtech.common.tools.ToolScrewdriverLV;
-import gregtech.common.tools.ToolSoftHammer;
+import gregtech.common.tools.ToolSoftMallet;
 import gregtech.common.tools.ToolSolderingIron;
+import gregtech.common.tools.ToolTrowel;
 import gregtech.common.tools.ToolTurbineHuge;
 import gregtech.common.tools.ToolTurbineLarge;
 import gregtech.common.tools.ToolTurbineNormal;
 import gregtech.common.tools.ToolTurbineSmall;
+import gregtech.common.tools.ToolVajra;
 import gregtech.common.tools.ToolWireCutter;
 import gregtech.common.tools.ToolWrench;
 import gregtech.common.tools.ToolWrenchHV;
@@ -130,11 +134,11 @@ public class MetaGeneratedTool01 extends MetaGeneratedTool {
                 SOFTMALLET.ID,
                 "Soft Mallet",
                 "",
-                new ToolSoftHammer(),
-                ToolDictNames.craftingToolSoftHammer,
+                new ToolSoftMallet(),
+                ToolDictNames.craftingToolSoftMallet,
                 new TCAspects.TC_AspectStack(TCAspects.INSTRUMENTUM, 2L),
                 new TCAspects.TC_AspectStack(TCAspects.LIMUS, 4L)),
-            GregTechAPI.sSoftHammerList);
+            GregTechAPI.sSoftMalletList);
         GregTechAPI.registerTool(
             addTool(
                 WRENCH.ID,
@@ -512,6 +516,16 @@ public class MetaGeneratedTool01 extends MetaGeneratedTool {
             new TCAspects.TC_AspectStack(TCAspects.INSTRUMENTUM, 6),
             new TCAspects.TC_AspectStack(TCAspects.FABRICO, 3),
             new TCAspects.TC_AspectStack(TCAspects.ORDO, 3));
+        addTool(
+            TROWEL.ID,
+            "Decorator's Trowel",
+            "",
+            new ToolTrowel(),
+            new TCAspects.TC_AspectStack(TCAspects.INSTRUMENTUM, 8),
+            new TCAspects.TC_AspectStack(TCAspects.SENSUS, 4),
+            new TCAspects.TC_AspectStack(TCAspects.PERDITIO, 2));
+        ItemList.Tool_Vajra.set(new ToolVajra("Tool_Vajra", "Vajra", "", 0, 20, true));
+
         initCraftingShapedRecipes();
         initCraftingShapelessRecipes();
     }
@@ -593,10 +607,10 @@ public class MetaGeneratedTool01 extends MetaGeneratedTool {
             new Object[] { "  S", " I ", "S f", 'I', OrePrefixes.plank.get(Materials.Wood), 'S',
                 OrePrefixes.stick.get(Materials.Wood) });
         GTModHandler.addCraftingRecipe(
-            INSTANCE.getToolWithStats(ROLLING_PIN.ID, 1, Materials.Plastic, Materials.Plastic, null),
+            INSTANCE.getToolWithStats(ROLLING_PIN.ID, 1, Materials.Polyethylene, Materials.Polyethylene, null),
             GTModHandler.RecipeBits.NOT_REMOVABLE,
-            new Object[] { "  S", " I ", "S f", 'I', OrePrefixes.ingot.get(Materials.Plastic), 'S',
-                OrePrefixes.stick.get(Materials.Plastic) });
+            new Object[] { "  S", " I ", "S f", 'I', OrePrefixes.ingot.get(Materials.Polyethylene), 'S',
+                OrePrefixes.stick.get(Materials.Polyethylene) });
         GTModHandler.addCraftingRecipe(
             INSTANCE.getToolWithStats(ROLLING_PIN.ID, 1, Materials.Aluminium, Materials.Aluminium, null),
             GTModHandler.RecipeBits.NOT_REMOVABLE,

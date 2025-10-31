@@ -14,6 +14,7 @@ import static gregtech.api.enums.Textures.BlockIcons.OVERLAY_FRONT_OIL_CRACKER_A
 import static gregtech.api.enums.Textures.BlockIcons.OVERLAY_FRONT_OIL_CRACKER_ACTIVE_GLOW;
 import static gregtech.api.enums.Textures.BlockIcons.OVERLAY_FRONT_OIL_CRACKER_GLOW;
 import static gregtech.api.enums.Textures.BlockIcons.casingTexturePages;
+import static gregtech.api.util.GTStructureUtility.activeCoils;
 import static gregtech.api.util.GTStructureUtility.buildHatchAdder;
 import static gregtech.api.util.GTStructureUtility.ofCoil;
 
@@ -69,7 +70,7 @@ public class MTEDigester extends MTEEnhancedMultiBlockBase<MTEDigester> implemen
                 .buildAndChain(GregTechAPI.sBlockCasings4, 0))
         .addElement('h', ofBlock(GregTechAPI.sBlockCasings1, 11))
         .addElement('s', ofBlock(GregTechAPI.sBlockCasings4, 1))
-        .addElement('c', ofCoil(MTEDigester::setCoilLevel, MTEDigester::getCoilLevel))
+        .addElement('c', activeCoils(ofCoil(MTEDigester::setCoilLevel, MTEDigester::getCoilLevel)))
         .build();
 
     public MTEDigester(String name) {
@@ -83,11 +84,6 @@ public class MTEDigester extends MTEEnhancedMultiBlockBase<MTEDigester> implemen
     @Override
     public boolean checkMachine(IGregTechTileEntity aBaseMetaTileEntity, ItemStack aStack) {
         return checkPiece(mName, 3, 3, 0) && !mMufflerHatches.isEmpty() && mMaintenanceHatches.size() == 1;
-    }
-
-    @Override
-    public boolean isCorrectMachinePart(ItemStack aStack) {
-        return true;
     }
 
     public HeatingCoilLevel getCoilLevel() {
@@ -144,11 +140,6 @@ public class MTEDigester extends MTEEnhancedMultiBlockBase<MTEDigester> implemen
     }
 
     @Override
-    public int getMaxEfficiency(ItemStack itemStack) {
-        return 10000;
-    }
-
-    @Override
     public int getPollutionPerSecond(ItemStack aStack) {
         return 400;
     }
@@ -166,7 +157,7 @@ public class MTEDigester extends MTEEnhancedMultiBlockBase<MTEDigester> implemen
     @Override
     public int survivalConstruct(ItemStack stackSize, int elementBudget, ISurvivalBuildEnvironment env) {
         if (mMachine) return -1;
-        return survivialBuildPiece(mName, stackSize, 3, 3, 0, elementBudget, env, false, true);
+        return survivalBuildPiece(mName, stackSize, 3, 3, 0, elementBudget, env, false, true);
     }
 
     @Override
@@ -206,10 +197,15 @@ public class MTEDigester extends MTEEnhancedMultiBlockBase<MTEDigester> implemen
     protected MultiblockTooltipBuilder createTooltip() {
         final MultiblockTooltipBuilder tt = new MultiblockTooltipBuilder();
         tt.addMachineType("Digester")
-            .addInfo("Input ores and fluid, output water.")
-            .addInfo("Performs perfect overclocks")
+            .addInfo("Input ores and fluid, output water")
+            .addPerfectOCInfo()
             .addPollutionAmount(getPollutionPerSecond(null))
+            .beginStructureBlock(7, 7, 4, true)
             .addController("Front bottom")
+            .addCasingInfoExactly("Robust Tungstensteel Machine Casing", 52, false)
+            .addCasingInfoExactly("Heat Proof Machine Casing", 16, false)
+            .addCasingInfoExactly("Clean Stainless Steel Machine Casing", 9, false)
+            .addCasingInfoExactly("Coil", 16, true)
             .addInputHatch("Hint block with dot 1")
             .addInputBus("Hint block with dot 1")
             .addOutputHatch("Hint block with dot 1")
@@ -225,15 +221,4 @@ public class MTEDigester extends MTEEnhancedMultiBlockBase<MTEDigester> implemen
         return multiDefinition;
     }
 
-    @Override
-    public boolean explodesOnComponentBreak(ItemStack arg0) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public int getDamageToComponent(ItemStack arg0) {
-        // TODO Auto-generated method stub
-        return 0;
-    }
 }

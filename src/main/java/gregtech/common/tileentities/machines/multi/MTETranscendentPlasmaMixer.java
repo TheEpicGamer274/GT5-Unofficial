@@ -20,8 +20,6 @@ import static gregtech.common.tileentities.machines.multi.MTEPlasmaForge.DIM_BRI
 import static gregtech.common.tileentities.machines.multi.MTEPlasmaForge.DIM_INJECTION_CASING;
 import static gregtech.common.tileentities.machines.multi.MTEPlasmaForge.DIM_TRANS_CASING;
 import static kekztech.util.Util.toStandardForm;
-import static net.minecraft.util.EnumChatFormatting.GOLD;
-import static net.minecraft.util.EnumChatFormatting.GRAY;
 import static net.minecraft.util.StatCollector.translateToLocal;
 
 import java.math.BigInteger;
@@ -110,6 +108,11 @@ public class MTETranscendentPlasmaMixer extends MTEEnhancedMultiBlockBase<MTETra
     }
 
     @Override
+    public boolean supportsPowerPanel() {
+        return false;
+    }
+
+    @Override
     public IStructureDefinition<MTETranscendentPlasmaMixer> getStructureDefinition() {
         return STRUCTURE_DEFINITION;
     }
@@ -118,14 +121,24 @@ public class MTETranscendentPlasmaMixer extends MTEEnhancedMultiBlockBase<MTETra
     protected MultiblockTooltipBuilder createTooltip() {
         final MultiblockTooltipBuilder tt = new MultiblockTooltipBuilder();
         tt.addMachineType("Transcendent Mixer, TPM")
-            .addInfo("Assisting in all your DTPF needs.")
-            .addInfo("This multiblock will run in parallel according to the amount set")
-            .addInfo("in the parallel menu. All inputs will scale, except time.")
-            .addInfo("All EU is deducted from wireless EU networks only.")
+            .addInfo("Assisting in all your DTPF needs!")
+            .addInfo("This multiblock will run in parallel according to the amount set in the parallel menu")
+            .addInfo("All inputs will scale, except time...")
+            .addInfo("All EU is deducted from wireless EU networks only")
             .beginStructureBlock(5, 7, 5, false)
-            .addStructureInfo(GOLD + "1+ " + GRAY + "Input Hatch")
-            .addStructureInfo(GOLD + "1+ " + GRAY + "Output Hatch")
-            .addStructureInfo(GOLD + "1+ " + GRAY + "Input Bus")
+            .addController("Front Center")
+            .addCasingInfoExactly("Dimensionally Transcendent Casing", 48, false)
+            .addCasingInfoExactly("Dimensional Bridge", 16, false)
+            .addCasingInfoRangeColored(
+                "Dimensional Injection Casing",
+                EnumChatFormatting.GRAY,
+                0,
+                33,
+                EnumChatFormatting.GOLD,
+                false)
+            .addInputBus("Any Dimensional Injection Casing", 1)
+            .addInputHatch("Any Dimensional Injection Casing", 1)
+            .addOutputHatch("Any Dimensional Injection Casing", 1)
             .toolTipFinisher(AuthorColen);
         return tt;
     }
@@ -155,11 +168,6 @@ public class MTETranscendentPlasmaMixer extends MTEEnhancedMultiBlockBase<MTETra
         }
 
         return new ITexture[] { casingTexturePages[0][DIM_TRANS_CASING] };
-    }
-
-    @Override
-    public boolean isCorrectMachinePart(ItemStack aStack) {
-        return true;
     }
 
     int multiplier = 1;
@@ -202,7 +210,7 @@ public class MTETranscendentPlasmaMixer extends MTEEnhancedMultiBlockBase<MTETra
                     return CheckRecipeResultRegistry.insufficientStartupPower(finalConsumption);
                 }
                 // Energy consumed all at once from wireless net.
-                setCalculatedEut(0);
+                overwriteCalculatedEut(0);
                 return CheckRecipeResultRegistry.SUCCESSFUL;
             }
 
@@ -211,7 +219,12 @@ public class MTETranscendentPlasmaMixer extends MTEEnhancedMultiBlockBase<MTETra
             protected OverclockCalculator createOverclockCalculator(@Nonnull GTRecipe recipe) {
                 return OverclockCalculator.ofNoOverclock(recipe);
             }
-        }.setMaxParallelSupplier(() -> multiplier);
+        }.setMaxParallelSupplier(this::getTrueParallel);
+    }
+
+    @Override
+    public int getMaxParallelRecipes() {
+        return multiplier;
     }
 
     @Override
@@ -220,6 +233,7 @@ public class MTETranscendentPlasmaMixer extends MTEEnhancedMultiBlockBase<MTETra
         logic.setAvailableVoltage(Long.MAX_VALUE);
         logic.setAvailableAmperage(1);
         logic.setAmperageOC(false);
+        logic.setUnlimitedTierSkips();
     }
 
     private static final int HORIZONTAL_OFFSET = 2;
@@ -233,7 +247,7 @@ public class MTETranscendentPlasmaMixer extends MTEEnhancedMultiBlockBase<MTETra
 
     @Override
     public int survivalConstruct(ItemStack stackSize, int elementBudget, ISurvivalBuildEnvironment env) {
-        return survivialBuildPiece(
+        return survivalBuildPiece(
             STRUCTURE_PIECE_MAIN,
             stackSize,
             HORIZONTAL_OFFSET,
@@ -264,16 +278,6 @@ public class MTETranscendentPlasmaMixer extends MTEEnhancedMultiBlockBase<MTETra
     }
 
     @Override
-    public int getDamageToComponent(ItemStack aStack) {
-        return 0;
-    }
-
-    @Override
-    public boolean explodesOnComponentBreak(ItemStack aStack) {
-        return false;
-    }
-
-    @Override
     public void onPreTick(IGregTechTileEntity aBaseMetaTileEntity, long aTick) {
 
         super.onPreTick(aBaseMetaTileEntity, aTick);
@@ -285,6 +289,11 @@ public class MTETranscendentPlasmaMixer extends MTEEnhancedMultiBlockBase<MTETra
     }
 
     private static final int PARALLEL_WINDOW_ID = 10;
+
+    @Override
+    protected boolean useMui2() {
+        return false;
+    }
 
     @Override
     public void addUIWidgets(ModularWindow.Builder builder, UIBuildContext buildContext) {
